@@ -670,4 +670,4 @@
 
     </script>
     
-  @endsection
+@endsection

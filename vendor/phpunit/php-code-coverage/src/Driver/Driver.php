@@ -75,8 +75,8 @@ abstract class Driver
             throw new BranchAndPathCoverageNotSupportedException(
                 sprintf(
                     '%s does not support branch and path coverage',
-                    $this->nameAndVersion()
-                )
+                    $this->nameAndVersion(),
+                ),
             );
         }
 
@@ -107,8 +107,8 @@ abstract class Driver
             throw new DeadCodeDetectionNotSupportedException(
                 sprintf(
                     '%s does not support dead code detection',
-                    $this->nameAndVersion()
-                )
+                    $this->nameAndVersion(),
+                ),
             );
         }
 
@@ -118,6 +118,16 @@ abstract class Driver
     public function disableDeadCodeDetection(): void
     {
         $this->detectDeadCode = false;
+    }
+
+    public function isPcov(): bool
+    {
+        return false;
+    }
+
+    public function isXdebug(): bool
+    {
+        return false;
     }
 
     abstract public function nameAndVersion(): string;

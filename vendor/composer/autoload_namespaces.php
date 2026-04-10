@@ -6,6 +6,4 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'tmhOAuth' => array($vendorDir . '/themattharris/tmhoauth'),
-    'Thujohn\\Twitter' => array($vendorDir . '/atymic/twitter/src', $vendorDir . '/thujohn/twitter/src'),
 );

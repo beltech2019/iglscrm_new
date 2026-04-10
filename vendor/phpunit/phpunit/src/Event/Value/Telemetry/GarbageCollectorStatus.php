@@ -12,31 +12,39 @@ namespace PHPUnit\Event\Telemetry;
 use PHPUnit\Event\RuntimeException;
 
 /**
- * @psalm-immutable
+ * @immutable
  *
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class GarbageCollectorStatus
+final readonly class GarbageCollectorStatus
 {
-    private readonly int $runs;
-    private readonly int $collected;
-    private readonly int $threshold;
-    private readonly int $roots;
-    private readonly ?bool $running;
-    private readonly ?bool $protected;
-    private readonly ?bool $full;
-    private readonly ?int $bufferSize;
+    private int $runs;
+    private int $collected;
+    private int $threshold;
+    private int $roots;
+    private ?float $applicationTime;
+    private ?float $collectorTime;
+    private ?float $destructorTime;
+    private ?float $freeTime;
+    private ?bool $running;
+    private ?bool $protected;
+    private ?bool $full;
+    private ?int $bufferSize;
 
-    public function __construct(int $runs, int $collected, int $threshold, int $roots, ?bool $running, ?bool $protected, ?bool $full, ?int $bufferSize)
+    public function __construct(int $runs, int $collected, int $threshold, int $roots, ?float $applicationTime, ?float $collectorTime, ?float $destructorTime, ?float $freeTime, ?bool $running, ?bool $protected, ?bool $full, ?int $bufferSize)
     {
-        $this->runs       = $runs;
-        $this->collected  = $collected;
-        $this->threshold  = $threshold;
-        $this->roots      = $roots;
-        $this->running    = $running;
-        $this->protected  = $protected;
-        $this->full       = $full;
-        $this->bufferSize = $bufferSize;
+        $this->runs            = $runs;
+        $this->collected       = $collected;
+        $this->threshold       = $threshold;
+        $this->roots           = $roots;
+        $this->applicationTime = $applicationTime;
+        $this->collectorTime   = $collectorTime;
+        $this->destructorTime  = $destructorTime;
+        $this->freeTime        = $freeTime;
+        $this->running         = $running;
+        $this->protected       = $protected;
+        $this->full            = $full;
+        $this->bufferSize      = $bufferSize;
     }
 
     public function runs(): int
@@ -60,14 +68,66 @@ final class GarbageCollectorStatus
     }
 
     /**
-     * @psalm-assert-if-true !null $this->running
-     * @psalm-assert-if-true !null $this->protected
-     * @psalm-assert-if-true !null $this->full
-     * @psalm-assert-if-true !null $this->bufferSize
+     * @phpstan-assert-if-true !null $this->applicationTime
+     * @phpstan-assert-if-true !null $this->collectorTime
+     * @phpstan-assert-if-true !null $this->destructorTime
+     * @phpstan-assert-if-true !null $this->freeTime
+     * @phpstan-assert-if-true !null $this->running
+     * @phpstan-assert-if-true !null $this->protected
+     * @phpstan-assert-if-true !null $this->full
+     * @phpstan-assert-if-true !null $this->bufferSize
      */
     public function hasExtendedInformation(): bool
     {
         return $this->running !== null;
+    }
+
+    /**
+     * @throws RuntimeException on PHP < 8.3
+     */
+    public function applicationTime(): float
+    {
+        if ($this->applicationTime === null) {
+            throw new RuntimeException('Information not available');
+        }
+
+        return $this->applicationTime;
+    }
+
+    /**
+     * @throws RuntimeException on PHP < 8.3
+     */
+    public function collectorTime(): float
+    {
+        if ($this->collectorTime === null) {
+            throw new RuntimeException('Information not available');
+        }
+
+        return $this->collectorTime;
+    }
+
+    /**
+     * @throws RuntimeException on PHP < 8.3
+     */
+    public function destructorTime(): float
+    {
+        if ($this->destructorTime === null) {
+            throw new RuntimeException('Information not available');
+        }
+
+        return $this->destructorTime;
+    }
+
+    /**
+     * @throws RuntimeException on PHP < 8.3
+     */
+    public function freeTime(): float
+    {
+        if ($this->freeTime === null) {
+            throw new RuntimeException('Information not available');
+        }
+
+        return $this->freeTime;
     }
 
     /**

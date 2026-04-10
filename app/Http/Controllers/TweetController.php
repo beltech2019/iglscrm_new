@@ -1192,7 +1192,15 @@ class TweetController extends Controller
 		$settings['account_id'] =$accountId;  
 		$client = new Client($settings);
 		$i=0;
-		$tweets	 = $client->timeline()->getRecentMentions($accountId,$start_time,$end_time)->performRequest();
+		$tweets	 = $client->timeline()->getRecentMentions($accountId)->performRequest([
+        'start_time' => $start_time,
+        'end_time' => $end_time,
+
+        'tweet.fields' => 'author_id,created_at,attachments,text',
+        'expansions' => 'attachments.media_keys',
+        'media.fields' => 'preview_image_url,url,type',
+        'poll.fields' => 'duration_minutes,end_datetime,id,options'
+    ]);
 		log::info("API Hit");
 		if($tweets->meta->result_count!=0)
 		{

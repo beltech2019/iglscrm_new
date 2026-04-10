@@ -16,6 +16,8 @@ use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use Throwable;
 
+use function Laravel\Prompts\suggest;
+
 #[AsCommand(name: 'docs')]
 class DocsCommand extends Command
 {
@@ -38,7 +40,7 @@ class DocsCommand extends Command
      *
      * @var string
      */
-    protected $help = 'If you would like to perform a content search against the documention, you may call: <fg=green>php artisan docs -- </><fg=green;options=bold;>search query here</>';
+    protected $help = 'If you would like to perform a content search against the documentation, you may call: <fg=green>php artisan docs -- </><fg=green;options=bold;>search query here</>';
 
     /**
      * The HTTP client instance.
@@ -123,11 +125,11 @@ class DocsCommand extends Command
      */
     protected function openUrl()
     {
-        with($this->url(), function ($url) {
-            $this->components->info("Opening the docs to: <fg=yellow>{$url}</>");
+        $url = $this->url();
 
-            $this->open($url);
-        });
+        $this->components->info("Opening the docs to: <fg=yellow>{$url}</>");
+
+        $this->open($url);
     }
 
     /**
@@ -143,9 +145,9 @@ class DocsCommand extends Command
             ]);
         }
 
-        return with($this->page(), function ($page) {
-            return trim("https://laravel.com/docs/{$this->version()}/{$page}#{$this->section($page)}", '#/');
-        });
+        $page = $this->page();
+
+        return trim("https://laravel.com/docs/{$this->version()}/{$page}#{$this->section($page)}", '#/');
     }
 
     /**
@@ -155,15 +157,15 @@ class DocsCommand extends Command
      */
     protected function page()
     {
-        return with($this->resolvePage(), function ($page) {
-            if ($page === null) {
-                $this->components->warn('Unable to determine the page you are trying to visit.');
+        $page = $this->resolvePage();
 
-                return '/';
-            }
+        if ($page === null) {
+            $this->components->warn('Unable to determine the page you are trying to visit.');
 
-            return $page;
-        });
+            return '/';
+        }
+
+        return $page;
     }
 
     /**
@@ -179,7 +181,7 @@ class DocsCommand extends Command
 
         return $this->didNotRequestPage()
             ? $this->askForPage()
-            : $this->guessPage();
+            : $this->guessPage($this->argument('page'));
     }
 
     /**
@@ -229,18 +231,20 @@ class DocsCommand extends Command
      */
     protected function askForPageViaAutocomplete()
     {
-        $choice = $this->components->choice(
-            'Which page would you like to open?',
-            $this->pages()->mapWithKeys(fn ($option) => [
-                Str::lower($option['title']) => $option['title'],
-            ])->all(),
-            'installation',
-            3
+        $choice = suggest(
+            label: 'Which page would you like to open?',
+            options: fn ($value) => $this->pages()
+                ->mapWithKeys(fn ($option) => [
+                    Str::lower($option['title']) => $option['title'],
+                ])
+                ->filter(fn ($title) => str_contains(Str::lower($title), Str::lower($value)))
+                ->all(),
+            placeholder: 'E.g. Collections'
         );
 
         return $this->pages()->filter(
             fn ($page) => $page['title'] === $choice || Str::lower($page['title']) === $choice
-        )->keys()->first() ?: null;
+        )->keys()->first() ?: $this->guessPage($choice);
     }
 
     /**
@@ -248,22 +252,22 @@ class DocsCommand extends Command
      *
      * @return string|null
      */
-    protected function guessPage()
+    protected function guessPage($search)
     {
         return $this->pages()
             ->filter(fn ($page) => str_starts_with(
                 Str::slug($page['title'], ' '),
-                Str::slug($this->argument('page'), ' ')
+                Str::slug($search, ' ')
             ))->keys()->first() ?? $this->pages()->map(fn ($page) => similar_text(
                 Str::slug($page['title'], ' '),
-                Str::slug($this->argument('page'), ' '),
+                Str::slug($search, ' '),
             ))
-            ->filter(fn ($score) => $score >= min(3, Str::length($this->argument('page'))))
+            ->filter(fn ($score) => $score >= min(3, Str::length($search)))
             ->sortDesc()
             ->keys()
             ->sortByDesc(fn ($slug) => Str::contains(
                 Str::slug($this->pages()[$slug]['title'], ' '),
-                Str::slug($this->argument('page'), ' ')
+                Str::slug($search, ' ')
             ) ? 1 : 0)
             ->first();
     }
@@ -377,10 +381,10 @@ class DocsCommand extends Command
             return;
         }
 
-        $binary = Collection::make(match ($this->systemOsFamily) {
+        $binary = (new Collection(match ($this->systemOsFamily) {
             'Darwin' => ['open'],
             'Linux' => ['xdg-open', 'wslview'],
-        })->first(fn ($binary) => (new ExecutableFinder)->find($binary) !== null);
+        }))->first(fn ($binary) => (new ExecutableFinder)->find($binary) !== null);
 
         if ($binary === null) {
             $this->components->warn('Unable to open the URL on your system. You will need to open it yourself or create a custom opener for your system.');
@@ -437,11 +441,11 @@ class DocsCommand extends Command
      */
     protected function refreshDocs()
     {
-        with($this->fetchDocs(), function ($response) {
-            if ($response->successful()) {
-                $this->cache->put("artisan.docs.{{$this->version()}}.index", $response->collect(), CarbonInterval::months(2));
-            }
-        });
+        $response = $this->fetchDocs();
+
+        if ($response->successful()) {
+            $this->cache->put("artisan.docs.{{$this->version()}}.index", $response->collect(), CarbonInterval::months(2));
+        }
     }
 
     /**
@@ -471,7 +475,7 @@ class DocsCommand extends Command
      */
     protected function searchQuery()
     {
-        return Collection::make($_SERVER['argv'])->skip(3)->implode(' ');
+        return (new Collection($_SERVER['argv']))->skip(3)->implode(' ');
     }
 
     /**
