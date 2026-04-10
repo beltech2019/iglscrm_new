@@ -1,0 +1,1 @@
+ALTER TABLE `tb_tweet_reply` ADD `user_id` VARCHAR(255) NULL DEFAULT NULL AFTER `media_type`;

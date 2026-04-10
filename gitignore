@@ -1,0 +1,27 @@
+# Minimal .gitignore (allows vendor and most project files)
+
+# Log files
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files (optional)
+.idea/
+.vscode/
+
+# Environment files (keep ignored for security)
+.env
+.env.*
+
+# Composer lock can be kept (recommended), so NOT ignoring it
+
+# Optional: comment/remove below if you also want these pushed
+# node_modules/
+# dist/
+# target/
+
+# Cache / temp files
+*.cache
+*.tmp

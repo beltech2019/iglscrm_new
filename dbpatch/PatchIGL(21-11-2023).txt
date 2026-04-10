@@ -1,0 +1,4 @@
+ALTER TABLE `tb_gettweet` ADD `bp_number` VARCHAR(255) NULL DEFAULT NULL AFTER `conversation_id`;
+ALTER TABLE `tb_change_log` ADD `assignto_by_id` VARCHAR(255) NULL DEFAULT NULL AFTER `field`;
+
+

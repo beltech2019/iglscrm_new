@@ -1,0 +1,15 @@
+CREATE TABLE tb_projectattachment (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    attachment_id VARCHAR(255),
+    fileName LONGTEXT,
+    filePath LONGTEXT,
+    fileUrl LONGTEXT,
+    upload_time VARCHAR(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP NULL
+);
+
+INSERT INTO `tb_defaults` (`default_id`, `key`, `value`, `type`, `label`, `created_at`, `updated_at`, `deleted_at`) VALUES (NULL, 'AWS_FILENAME', '2', 'system', 'Aws File Name Prefix', NULL, NULL, NULL);
+INSERT INTO `tb_component` (`id`, `component_key`, `component_label`, `component_type`, `component_level`, `created_at`, `updated_at`, `deleted_at`) VALUES (NULL, 'SOCIALPOST_REPLY_TEMPLATE', 'Social Post Reply Template', 'SOCIALPOST', '4', NULL, NULL, NULL), (NULL, 'LEAD_CONVERT_SOCIALTICKET', 'Lead Convert Social Media Ticket', 'LEAD', '4', NULL, NULL, NULL);
+INSERT INTO `tb_component` (`id`, `component_key`, `component_label`, `component_type`, `component_level`, `created_at`, `updated_at`, `deleted_at`) VALUES (NULL, 'GLOBALSEARCH', 'Global Search', 'MENU', '1', NULL, NULL, NULL);

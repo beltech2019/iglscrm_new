@@ -1,0 +1,151 @@
+@media only screen and (max-width: 600px) and (min-width: 320px){
+  .sidenav {
+    width: 0;
+  }
+  #main {
+    transition: .5s;
+    margin-left: 0;
+}
+.formsearch {
+  width: 97%;
+}
+.iconsmenu ul li i {
+  /* background: #efefef; */
+  padding: 4px 6px;
+  border-radius: 9px;
+  border: 1px solid #e5e5e5;
+  /* padding: 6px 9px; */
+  font-size: 14px;
+}
+.iconsbg {
+  font-size: 13px;
+}
+.heading_two h2 {
+  font-size: 14px;
+  font-weight: 600;
+}
+.bgwhite2 {
+  background-color: #fff;
+  margin-top: 2px;
+  padding: 16px;
+  border-radius: 6px;
+  box-shadow: 0px 2px 0px #f1f1f1;
+  margin-bottom: 24px;
+}
+.states_inner{
+  margin-bottom: 22px;
+  padding: 25px 13px 6px;
+}
+.postioninner{
+  display: none !important;
+}
+.states_inner p {
+  font-size: 13px;
+  margin: 0;
+  color: #000;
+  margin-top: 17px;
+  font-weight: 500;
+}
+.hidemobile{
+  display:none;
+}
+.bi-list-task {
+  margin-right: 0;
+}
+.hidedesktop{
+  display:inline !important;
+}
+.buttonset {
+  background: none;
+  border: none;
+  padding: 7px 13px;
+  border-radius: 7px;
+  font-size: 19px;
+}
+.navbar-nav{
+  flex-direction: inherit;
+}
+.navbar-nav .dropdown-menu {
+  position: absolute;
+  left: -111px;
+}
+.bgwhite2.mt-3{
+  margin-top:0 !important;
+}
+.heightscroll {
+  height: auto;
+  overflow: auto;
+}
+.login_image {
+  background: none;
+}
+.mobile_480_bg{
+  background: url(../images/mobile_480_bg.png);
+    background-size: cover;
+    background-position: bottom;
+}
+.position_for_mobile{
+  position: absolute;
+}
+.login{
+  background: #fff0;
+
+}
+.images_manage .img6{
+  width: 109px;
+}
+.images_manage .img10 {
+  width: 180px;
+  bottom: -4px;
+}
+.images_manage .img15 {
+  width: 80px;
+  position: absolute;
+  left: 0;
+  top: 495px;
+  z-index: 99;
+}
+.images_manage .img18 {
+  width: 137px;
+  position: absolute;
+  left: 0;
+  bottom: -34px;
+  z-index: 9;
+  z-index: 9999;
+}
+.images_manage .img11 {
+  width: 133px;
+  position: absolute;
+  left: 0px;
+  bottom: -24px;
+  z-index: 9;
+}
+.images_manage .img12 {
+  width: 70px;
+}
+.images_manage .img14{
+  top: 546px;
+  width: 30px;
+}
+.images_manage .img13 {
+  width: 56px;
+  position: absolute;
+  left: 0;
+  top: 599px;
+  z-index: 99;
+}
+.images_manage {
+  position: relative;
+  height: 93vh;
+  overflow: hidden;
+}
+.widthdialoge {
+  width: 57%;
+  margin: auto;
+  margin-top: 103px;
+}
+table {
+  width: 100%;
+  table-layout: auto;
+}
+}

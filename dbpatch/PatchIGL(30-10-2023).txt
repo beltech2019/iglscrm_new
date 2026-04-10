@@ -1,0 +1,3 @@
+ALTER TABLE `tb_socialticket` CHANGE `source` `source` ENUM('Facebook','Twitter','Instagram','Linkedin','Whatsapp','Other','Portal','Call','Inbounced Email') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `tb_leads` ADD `convertedtoticket` VARCHAR(255) NOT NULL DEFAULT '0' AFTER `leadId`;
+ALTER TABLE `tb_leads` CHANGE `convertedtoticket` `convertedtoticket` VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0';

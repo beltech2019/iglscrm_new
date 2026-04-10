@@ -1,0 +1,4 @@
+ALTER TABLE `tb_leads` ADD `bp_number` VARCHAR(255) NULL DEFAULT NULL AFTER `convertedtoticket`, ADD `resolution` TEXT NULL DEFAULT NULL AFTER `bp_number`;
+ALTER TABLE `tb_socialticket` CHANGE `final_state` `final_state` ENUM('Open','In Process','Close') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'Open';
+ALTER TABLE `tb_socialticket` CHANGE `final_state` `final_state` ENUM('Open','In Process','Close') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'Open';
+UPDATE `tb_socialticket` SET `final_state`='Open' WHERE `final_state`='';

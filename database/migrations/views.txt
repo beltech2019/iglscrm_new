@@ -1,0 +1,37 @@
+CREATE VIEW vw_all_type_and_contractors AS
+SELECT getTweet_id, postMessage, socialUser,socialUser_userName,source,id,name,type,postUrl,istPostDate,mobile_no,email_id,status,converted,convertLead',post_category,post_reply,responed,responseDate
+FROM (
+    SELECT tb_gettweet.postMessage, tb_gettweet.socialUser_name as socialUser, tb_gettweet.id,users.name as name,tb_gettweet.getTweet_id,tb_gettweet.source,'post' AS type,tb_gettweet.postUrl,tb_gettweet.istPostDate,tb_gettweet.mobile_no,tb_gettweet.email_id,tb_gettweet.status,tb_gettweet.converted,tb_gettweet.convertLead,tb_gettweet.post_category,tb_gettweet.post_reply,tb_gettweet.responed,tb_gettweet.responseDate
+    FROM tb_gettweet 
+	LEFT JOIN users  ON tb_gettweet.assignedto = users.id
+    UNION
+    SELECT id, getTweet_id as ticket_getTweet_id, 'ticket' AS employee_type,postMessage,socialUser,source,status as ticket_status,priority,bpNumber,type as ticket_type,subject,converted as ticket_converted,suggestion,description,additional_Text,resolution,final_state,date_Created,postUrl,postDate,mobile_no,email_id,internalUpdate
+    FROM tb_socialticket
+	LEFT JOIN users  ON tb_socialticket.assigned_to = users.id
+) AS combined_data;
+
+
+CREATE VIEW vw_all_post AS
+SELECT tb_gettweet.postMessage, tb_gettweet.socialUser_name as socialUser, tb_gettweet.id,tb_gettweet.getTweet_id,tb_gettweet.source,'post' AS type,tb_gettweet.postUrl,tb_gettweet.istPostDate,tb_gettweet.mobile_no,tb_gettweet.email_id,tb_gettweet.status,tb_gettweet.converted,tb_gettweet.convertLead,tb_gettweet.post_category,tb_gettweet.post_reply,tb_gettweet.responed,tb_gettweet.responseDate,tc.postMessage as ticket_postMessage,tc.socialUser as ticket_social_user,tc.subSource,tc.source as ticket_source,tc.status as ticket_status,tc.priority,tc.bpNumber,tc.type as ticket_type,tc.subject,tc.converted as ticket_converted,tc.suggestion,tc.description as ticket_description,tc.additional_Text,tc.resolution,tc.final_state,tc.date_Created as date_created,tc.postUrl as ticket_posturl,tc.postDate as ticket_postDate,tc.mobile_no as ticket_mobile_no,tc.email_id as ticket_email,tc.internalUpdate,tcuser.name as ticket_assigned_user,ld.getTweet_id as lead_getTweet_id,ld.greeting_first_name,ld.first_name,ld.last_name,ld.type as lead_type,ld.title,ld.department,ld.customer_name,ld.status as lead_status,ld.office_phone,ld.mobile,ld.website,ld.approval_status,ld.primary_address,ld.primary_city,ld.primary_state,ld.primary_postal_code,ld.primary_country,ld.other_address,ld.other_city,ld.other_state,ld.other_postal_code,ld.other_country,ld.email_address,ld.converted as lead_converted,ld.description,ld.fax,ld.partner_contacts,ld.lead_source,ld.created_date,ld.leadId,ldcuser.name as lead_assign_to
+    FROM tb_gettweet 
+	LEFT JOIN users  ON tb_gettweet.assignedto = users.id
+	LEFT JOIN tb_socialticket tc ON tb_gettweet.getTweet_id  = tc.getTweet_id
+	LEFT JOIN users  tcuser ON tc.assigned_to = tcuser.id
+	LEFT JOIN tb_leads ld ON tb_gettweet.getTweet_id  = ld.getTweet_id
+	LEFT JOIN users  ldcuser ON ld.assigned_to = ldcuser.id;
+	
+	
+CREATE VIEW vw_post AS
+SELECT tb_gettweet.postMessage, tb_gettweet.socialUser_name as socialUser, tb_gettweet.id,users.name as name,tb_gettweet.getTweet_id,tb_gettweet.source,'post' AS type,tb_gettweet.postUrl,tb_gettweet.istPostDate,tb_gettweet.mobile_no,tb_gettweet.email_id,tb_gettweet.status,tb_gettweet.converted,tb_gettweet.convertLead,tb_gettweet.post_category,tb_gettweet.post_reply,tb_gettweet.responed,tb_gettweet.responseDate
+    FROM tb_gettweet 
+	LEFT JOIN users  ON tb_gettweet.assignedto = users.id
+	
+CREATE VIEW vw_ticket AS
+SELECT tc.postMessage as ticket_postMessage,tc.socialUser as ticket_social_user,tc.subSource,tc.source as ticket_source,tc.status as ticket_status,tc.priority,tc.bpNumber,tc.type as ticket_type,tc.subject,tc.converted as ticket_converted,tc.suggestion,tc.description as ticket_description,tc.additional_Text,tc.resolution,tc.final_state,tc.date_Created as date_created,tc.postUrl as ticket_posturl,tc.postDate as ticket_postDate,tc.mobile_no as ticket_mobile_no,tc.email_id as ticket_email,tc.internalUpdate,tcuser.name as ticket_assigned_user
+    FROM tb_socialticket  tc
+	LEFT JOIN users  tcuser ON tc.assigned_to = tcuser.id;
+	
+CREATE VIEW vw_lead AS
+SELECT ld.getTweet_id as lead_getTweet_id,ld.greeting_first_name,ld.first_name,ld.last_name,ld.type as lead_type,ld.title,ld.department,ld.customer_name,ld.status as lead_status,ld.office_phone,ld.mobile,ld.website,ld.approval_status,ld.primary_address,ld.primary_city,ld.primary_state,ld.primary_postal_code,ld.primary_country,ld.other_address,ld.other_city,ld.other_state,ld.other_postal_code,ld.other_country,ld.email_address,ld.converted as lead_converted,ld.description,ld.fax,ld.partner_contacts,ld.lead_source,ld.created_date,ld.leadId,lduser.name as lead_assign_to
+    FROM tb_leads  ld
+	LEFT JOIN users  lduser ON ld.assigned_to = lduser.id;
