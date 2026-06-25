@@ -107,7 +107,7 @@ class PreDefinedReportController extends Controller{
             {	
               $col = [];
               $col= ['Post ID','Ticket ID',"Post Message","Social User","Source","Final Status","Status",
-              "AssignTo","Creation Date","BP Number","Mobile Number","Description","Resolution","Additional Text","SAP Ticket","PostUrl",
+              "AssignTo","Creation Date","Modified At","BP Number","Mobile Number","Description","Resolution","Additional Text","SAP Ticket","PostUrl",
               "Activity"];
               $getInfo = $getInfo->select('tb_socialticket.*','users.name')->get();
               if(!empty($getInfo)){

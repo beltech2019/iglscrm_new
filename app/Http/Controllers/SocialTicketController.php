@@ -171,7 +171,7 @@ class SocialTicketController extends Controller
 			if(isset($request->download))
 			{	$col = [];
 				$col= ['Post ID','Ticket ID',"Post Message","Social User","Source","Final Status","Status",
-                "AssignTo","Creation Date","BP Number","Mobile Number","Description","Resolution","Additional Text","PostUrl",
+                "AssignTo","Creation Date","Modified At","BP Number","Mobile Number","Description","Resolution","Additional Text","PostUrl",
                 "Activity"];
 				$data = [];
 				$getInfo = $getInfo->get();

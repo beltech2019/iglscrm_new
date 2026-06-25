@@ -117,6 +117,7 @@
                                                         <th scope="col">Status</th>
                                                         <th scope="col">Assigned To</th>
                                                         <th scope="col">Creation Date</th>
+                                                        <th scope="col">Modified At</th>
                                                         <th scope="col">Activity</th>
                                                     </tr>
                                                 </thead>
@@ -132,6 +133,7 @@
                                                         <td>{{ $info->status }}</td>
                                                         <td>{{ $info->name }}</td>
                                                         <td>{{ $info->date_Created }}</td>
+                                                        <td>{{ $info->updated_at }}</td>
                                                         @if (!empty($info->activies))
                                                         <td>
                                                             @foreach($info->activies as $activity)
