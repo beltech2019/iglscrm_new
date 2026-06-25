@@ -115,6 +115,7 @@
                                                         <th scope="col">Post Url</th>
                                                         <th scope="col">Status</th>
                                                         <th scope="col">Post Date</th>
+                                                        <th scope="col">Department</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -128,6 +129,12 @@
                                                         <td>{{ $post->postUrl }}</td>
                                                         <td>{{ $post->status }}</td>
                                                         <td>{{ $post->istPostDate }}</td>
+                                                         <td>
+                                                            {{ $post->department 
+                                                                ? ($departments->where('department_id', $post->department)->first()->department_name ?? '-') 
+                                                                : '-' 
+                                                            }}
+                                                        </td>
                                                     </tr>
                                                     @endforeach
                                                 </tbody>

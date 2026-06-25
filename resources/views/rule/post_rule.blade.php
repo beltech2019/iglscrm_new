@@ -17,7 +17,7 @@
                     <div class="row mb-4">
                         <div class="col-md-8">
                             <div class="heading_two">
-                                <h2><i class="bi bi-ticket iconsbg2"></i>Post Rule</h2>
+                                <h2><i class="bi bi-ticket iconsbg2"></i>Sentiments</h2>
                             </div>
                         </div>
                        

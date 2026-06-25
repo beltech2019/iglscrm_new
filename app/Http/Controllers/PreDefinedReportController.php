@@ -18,6 +18,7 @@ use App\Models\LeadTicket;
 use App\Models\SocialTicket;
 use App\Models\TicketSapGroups;
 use App\Models\Activity;
+use App\Models\Department;
 use Exception;
 use DB;
 use View;
@@ -50,11 +51,14 @@ class PreDefinedReportController extends Controller{
 		  
 		  if(isset($request->download))
 		  {	$col = [];
-            $col= ['id',"Post Message","Social User","Source","Post Url","Post Date","Category","Status","Converted","Ticket Id","Lead Number","Aging","BP Number","Reason"];
+             $departments = Department::pluck('department_name', 'department_id');
+            $col= ['id',"Post Message","Social User","Source","Post Url","Post Date","Category","Status","Converted","Ticket Id","Lead Number","Aging","BP Number","Reason","Department"];
 			$data = [];
 			$posts = $post->get();
             if(!empty($posts)){
                 foreach($posts as $info){
+                    $info->Department = $departments[$info->department] ?? '-';
+
                     $info->leads = implode(',', LeadTicket::where('getTweet_id', $info->getTweet_id)->pluck('leadId')->toArray());
 					$info->socialTickets = implode(',', SocialTicket::where('getTweet_id', $info->getTweet_id)->pluck('ticket_id')->toArray());
                     $info->activies = Activity::leftjoin('users','users.id','=','tb_activity.created_by')
@@ -75,8 +79,9 @@ class PreDefinedReportController extends Controller{
 			//echo $e->getMessage();die;
 			return redirect()->back()->with('message',$e->getMessage());
         }
-        
-		return \View::make('predefineReport.report', compact(['posts','start','end']));
+        $departments = Department::all();
+
+		return \View::make('predefineReport.report', compact(['posts','start','end', 'departments']));
     }
 
     public function getSocialTicketReport(Request $request)

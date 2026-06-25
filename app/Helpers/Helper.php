@@ -746,7 +746,8 @@ function adminChange($postInfo,$data,$type,$operation)
 				$posts->leads,
 				$aging,
 				$posts->bp_number?"'" . strval($posts->bp_number):'',
-				$formattedStatus
+				$formattedStatus,
+				$posts->Department ?? '-'
 				]);
 			}
 		fclose($handle);
