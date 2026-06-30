@@ -360,11 +360,19 @@ class TweetController extends Controller
 			  if(isset($request->replyondm)){
 				  $responsedm=$this->replyDMByTwitter($request->postMessage,$id2);
 
-			  }else{	
-				$accountId = getValueByKey('REPLY_USERACCOUNNTNO');;
-				$settings = getReplyClientInfo();
+			  }else{
+				$accountId = '';
+				$settings = '';
+				if (stripos($postData->postMessage, '@IGLConnect') !== false){
+                    $accountId = getValueByKey('REPLY_USERACCOUNNTNO__IGLCONNECT');
+					$settings = getReplyClientInfo2(); 
+				}else{
+					$accountId = getValueByKey('REPLY_USERACCOUNNTNO');
+					$settings = getReplyClientInfo();
+				}	
 				$settings['account_id'] =$accountId;  
 				$client = new Client($settings);
+				
 				$return ="";
 				$media_type="Text";
 				if($request->hasFile('media')){

@@ -233,6 +233,23 @@ function getReplyClientInfo()
 	return $settings;
 }
 
+
+function getReplyClientInfo2()
+{
+	$consumer_Key=getValueByKey('REPLY_CONSUMER_KEY_IGLCONNECT');
+	$consumer_Secret=getValueByKey('REPLY_CONSUMER_SECRET_IGLCONNECT');
+	$access_Token=getValueByKey('REPLY_ACCESS_TOKEN_IGLCONNECT');
+	$token_Secret=getValueByKey('REPLY_TOKEN_SECRET_IGLCONNECT');
+	$bearer_token=getValueByKey('REPLY_BEARER_TOKEN_IGLCONNECT');
+   
+	$settings['access_token'] = $access_Token;
+	$settings['access_token_secret'] = $token_Secret;
+	$settings['consumer_key'] =$consumer_Key;
+	$settings['consumer_secret'] =$consumer_Secret;
+	$settings['bearer_token'] = $bearer_token;
+	return $settings;
+}
+
 function changeByKey($key)
 {
     $name = str_replace('_', ' ', $key);
