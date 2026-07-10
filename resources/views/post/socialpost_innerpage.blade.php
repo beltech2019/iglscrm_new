@@ -136,6 +136,12 @@ $leadIdsStr = implode(', ', $leadIds);
                                                     <p class="peragraph_content">{{$getSocial->post_category}}</p>
                                                 </div>
                                             </div>
+                                            <div class="col-md-6">
+                                                <div class="coulams_form">
+                                                    <label class="form-label">Sentiment</label>
+                                                    <p class="peragraph_content">{{ $getSocial->sentiment ?? '-' }}</p>
+                                                </div>
+                                            </div>
 											<div class="col-md-6">
                                                 <div class="coulams_form">
                                                     <label class="form-label">Reply Days</label>

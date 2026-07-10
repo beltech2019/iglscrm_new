@@ -143,6 +143,10 @@
                         <td>{{$posts->status}}</td>
 						@endif
 						
+                        @if(in_array('sentiment',$fields))
+                            <td>{{ $posts->sentiment ?? '-' }}</td>
+                        @endif
+
 						@if(in_array('action',$fields))
                         <td>
                             <div class="editer_file">

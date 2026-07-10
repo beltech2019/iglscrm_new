@@ -59,7 +59,7 @@ body{
                                 <a href="/postAssignRuleList" class="{{ addUIComponent('ADMINMANAGEMENT_POST_RULE') }}">  
                                     <div class="states_inner admin_states">
                                         
-                                    <p >Sentiments</p>
+                                    <p >Post Rule</p>
                                  <img src="/images/img4.svg" class="img-fluid">
 
                                     </div>

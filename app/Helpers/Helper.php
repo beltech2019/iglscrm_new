@@ -757,6 +757,7 @@ function adminChange($postInfo,$data,$type,$operation)
 				$posts->postUrl,
 				$posts->istPostDate,
 				$posts->post_category,
+    			$posts->sentiment,    
 				$posts->status,
 				$converted,
 				$posts->socialTickets,
