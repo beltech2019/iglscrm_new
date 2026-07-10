@@ -18,7 +18,6 @@ use App\Models\Defaults;
 use App\Models\Favourite;
 use App\Models\Department;
 use App\Models\User;
-use App\Helpers\SentimentHelper;
 use Carbon\Carbon;
 use Log;
 use Illuminate\Support\Facades\Http;
@@ -81,7 +80,7 @@ class TweetController extends Controller
                     }
 					$assigntoid=getUserAssignRule('gettweet','Whatsapp',$body);
 					$category=setPostAssignRule('post',$body);
-					$sentiment = SentimentHelper::getSentiment($body);
+					$sentiment = getSentiment($body);
 					$assignto=User::find($assigntoid);
 					$assigntoname="";
 					if($assignto){
@@ -797,7 +796,7 @@ class TweetController extends Controller
 					$cleanedText = preg_replace('/\s+/', ' ', $data->text);
 					$assigntoid=getUserAssignRule('gettweet','twitter',$cleanedText);
 					$category=setPostAssignRule('post',$cleanedText);
-					$sentiment = SentimentHelper::getSentiment($body);
+					$sentiment = getSentiment($cleanedText);
 					$assignto=User::find($assigntoid);
 					$assigntoname="";
 					if($assignto){
@@ -1015,7 +1014,7 @@ class TweetController extends Controller
 					$cleanedText = preg_replace('/\s+/', ' ', $data->text);
 					$assigntoid=getUserAssignRule('gettweet','twitter',$cleanedText);
 					$category=setPostAssignRule('post',$cleanedText);
-					$sentiment = SentimentHelper::getSentiment($body);
+					$sentiment = getSentiment($cleanedText);
 					$assignto=User::find($assigntoid);
 					$assigntoname="";
 					if($assignto){
@@ -1099,7 +1098,7 @@ class TweetController extends Controller
 					$cleanedText = preg_replace('/\s+/', ' ', $data->text);
 					$assigntoid=getUserAssignRule('gettweet','twitter',$cleanedText);
 					$category=setPostAssignRule('post',$cleanedText);
-					$sentiment = SentimentHelper::getSentiment($body);
+					$sentiment = getSentiment($cleanedText);
 					$assignto=User::find($assigntoid);
 					$assigntoname="";
 					if($assignto){
@@ -1261,7 +1260,7 @@ class TweetController extends Controller
 					$cleanedText = preg_replace('/\s+/', ' ', $data->text);
 					$assigntoid=getUserAssignRule('gettweet','twitter',$cleanedText);
 					$category=setPostAssignRule('post',$cleanedText);
-					$sentiment = SentimentHelper::getSentiment($body);
+					$sentiment = getSentiment($cleanedText);
 					$assignto=User::find($assigntoid);
 					$assigntoname="";
 					if($assignto){
@@ -1474,7 +1473,7 @@ class TweetController extends Controller
 					
 	// 				$assigntoid=getUserAssignRule('gettweet','Facebook',$body);
 	// 				$category=setPostAssignRule('post',$body);
-	//				$sentiment = SentimentHelper::getSentiment($body);
+	//				$sentiment = getSentiment($body);
 	// 				$assignto=User::find($assigntoid);
 					
 	// 				$assigntoname="";
@@ -1688,7 +1687,7 @@ class TweetController extends Controller
 					
 	// 				$assigntoid=getUserAssignRule('gettweet','Linkedin',$body);
 	// 				$category=setPostAssignRule('post',$body);
-	//				$sentiment = SentimentHelper::getSentiment($body);
+	//				$sentiment = getSentiment($body);
 	// 				$assignto=User::find($assigntoid);
 					
 	// 				$assigntoname="";
@@ -1863,7 +1862,7 @@ class TweetController extends Controller
 					}
 					$assigntoid=getUserAssignRule('gettweet','Linkedin',$body);
 					$category=setPostAssignRule('post',$body);
-					$sentiment = SentimentHelper::getSentiment($body);
+					$sentiment = getSentiment($body);
 					$assignto=User::find($assigntoid);
 					$posturl="https://www.linkedin.com/feed/update/".$element->sourcePost."/?actorCompanyId=".$company;
 					$assigntoname="";
@@ -2014,7 +2013,7 @@ class TweetController extends Controller
 					
 					$assigntoid=getUserAssignRule('gettweet','Facebook',$body);
 					$category=setPostAssignRule('post',$body);
-					$sentiment = SentimentHelper::getSentiment($body);
+					$sentiment = getSentiment($body);
 					$assignto=User::find($assigntoid);
 					
 					$assigntoname="";
@@ -2367,7 +2366,7 @@ class TweetController extends Controller
 							
 							$assigntoid=getUserAssignRule('gettweet','Instagram',$body);
 							$category=setPostAssignRule('post',$body);
-							$sentiment = SentimentHelper::getSentiment($body);
+							$sentiment = getSentiment($body);
 							$assignto=User::find($assigntoid);
 							
 							$assigntoname="";
@@ -2480,7 +2479,7 @@ public function store2(Request $request)
     $category = setPostAssignRule('post', $cleanMessage);
 
     // Get sentiment from Hugging Face
-    $sentiment = SentimentHelper::getSentiment($cleanMessage);
+    $sentiment = getSentiment($cleanMessage);
 
     // Save record
     $tweet = GetTweet::create([
