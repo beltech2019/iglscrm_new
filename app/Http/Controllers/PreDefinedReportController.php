@@ -52,7 +52,7 @@ class PreDefinedReportController extends Controller{
 		  if(isset($request->download))
 		  {	$col = [];
              $departments = Department::pluck('department_name', 'department_id');
-            $col= ['id',"Post Message","Social User","Source","Post Url","Post Date","Category","Status","Converted","Ticket Id","Lead Number","Aging","BP Number","Reason","Department"];
+            $col= ['id',"Post Message","Social User","Source","Post Url","Post Date","Category","Sentiment","Status","Converted","Ticket Id","Lead Number","Aging","BP Number","Reason","Department"];
 			$data = [];
 			$posts = $post->get();
             if(!empty($posts)){

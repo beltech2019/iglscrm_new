@@ -32,6 +32,7 @@ class GetTweet extends Model
 		'converted',
         'convertLead',
         'post_category',
+        'sentiment',
         'post_reply',
         'other_info',
         'responed',
