@@ -31,6 +31,12 @@ use App\Http\Controllers\PreDefinedReportController;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/data-deletion', function () {
+    return view('data-deletion');
+});
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+});
 
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
