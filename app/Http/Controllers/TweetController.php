@@ -1968,7 +1968,7 @@ class TweetController extends Controller
 		    $response = Http::withHeaders([
 				'Content-Type' => 'application/json',
 			])
-			->get('https://graph.facebook.com/v17.0/809771529057153/tagged?access_token='.$accessToken.'&fields=from,id,message,tagged_time&limit=100');
+			->get('https://graph.facebook.com/v20.0/809771529057153/tagged?access_token='.$accessToken.'&fields=id,message,created_time,permalink_url,full_picture,tagged_time&limit=100');
 	
 			$statusCode = $response->getStatusCode();
 			$responseBody = $response->getBody()->getContents();
