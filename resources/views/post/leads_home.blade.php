@@ -45,7 +45,8 @@
                 </div>
             </div>
         <div class="formscoulam">
-        <table class="table">
+        <div class="table-responsive">
+        <table class="table ig-table">
   <thead>
     <tr>
       <th scope="col">Date Created</th>
@@ -174,6 +175,7 @@
 </table>
         </div>
         </div>
+        </div>
     </div>
 </div>
 </div>
@@ -191,10 +193,10 @@
                     <!-- Nav pills -->
                     <ul class="nav nav-pills" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="pill" href="#home">Quick Filter </a>
+                            <a class="nav-link active" data-bs-toggle="pill" href="#home"><i class="bi bi-lightning-charge"></i> Quick Filter</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="pill" href="#menu1">Advanced Filter</a>
+                            <a class="nav-link" data-bs-toggle="pill" href="#menu1"><i class="bi bi-sliders"></i> Advanced Filter</a>
                         </li>
 
                     </ul>
@@ -319,10 +321,11 @@
             <div class="headingmain">
                 <h5>Social User</h5>
             </div>
-            <table class="table">
+            <div class="table-responsive">
+            <table class="table ig-table">
   <thead>
     <tr>
-   
+
       <th scope="col">Name</th>
       <th scope="col">Assigned to</th>
       <th scope="col">Date Created</th>
@@ -368,6 +371,7 @@
  
   </tbody>
 </table>
+            </div>
         </div>
       </div>
      

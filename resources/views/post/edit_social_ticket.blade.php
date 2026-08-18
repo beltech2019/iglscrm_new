@@ -267,10 +267,11 @@
             <div class="headingmain">
                 <h5>Social User</h5>
             </div>
-            <table class="table">
+            <div class="table-responsive">
+            <table class="table ig-table">
   <thead>
     <tr>
-   
+
       <th scope="col">Name</th>
       <th scope="col">Assigned to</th>
       <th scope="col">Date Created</th>
@@ -289,6 +290,7 @@
    @endif  
   </tbody>
 </table>
+            </div>
 <div class="my-2">
 
                 

@@ -7,25 +7,17 @@
 
 <div class="container-fluid">
     <div class="div_container">
-        <div class="bgwhite2">
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="heading_two ">
-                        <h2><i class="bi bi-mailbox iconsbg"></i>User List </h2>
-                    </div>
-                </div>
-                <div class="col-md-6">
-				<div class="iconsmenu">
-                        <ul class="ms-auto">
-                            
-                            <li><a href="\register" class="{{ addUIComponent('ADMINMANAGEMENT_CREATE_REGISTER') }}"><i class="bi bi-plus-lg"></i></a></li>
-                            <div style="clear:both;"></div>
-                        </ul>
-                    </div>
-                     <a href="/user-list"></a>
-                </div>
+        <div class="ig-page-header">
+            <div>
+                <span class="ig-eyebrow-light">Administration</span>
+                <h1><i class="bi bi-people"></i> User List</h1>
+                <p>Everyone with access to this workspace.</p>
             </div>
-            <table class="table {{ addUIComponent('ADMINMANAGEMENT_USER_LIST_TABLE') }}">
+            <a href="\register" class="btn btn-danger ig-btn-add {{ addUIComponent('ADMINMANAGEMENT_CREATE_REGISTER') }}"><i class="bi bi-plus-lg"></i> New User</a>
+        </div>
+        <div class="bgwhite2 ig-panel">
+            <div class="table-responsive">
+            <table class="table ig-table {{ addUIComponent('ADMINMANAGEMENT_USER_LIST_TABLE') }}" data-ig-tabletools>
                 <thead>
                     <tr>
                         <th scope="col">S.No.</th>
@@ -48,7 +40,7 @@
                         <td>{{$user->name}}</td>
                         <td>{{$user->email}}</td>
                         <td>{{$user->role_name}}</td>
-                        <td>{{$user->status}}</td>
+                        <td><span class="ig-badge ig-badge-{{ \Illuminate\Support\Str::slug($user->status ?? '') }}">{{$user->status}}</span></td>
                         <td>{{$user->created_at}}</td>
                         <td>
                            <div class="editer_file">
@@ -71,11 +63,20 @@
                     </tr>
                   <?php $i++;?>
                     @endforeach
+					@else
+					<tr class="ig-empty-row">
+						<td colspan="7">
+							<div class="ig-empty-state">
+								<i class="bi bi-people"></i>
+								<h6>No users found</h6>
+							</div>
+						</td>
+					</tr>
 					@endif
                 </tbody>
             </table>
-				<div class="my-2 d-flex ">
-				
+            </div>
+				<div class="my-2 d-flex ig-table-toolbar">
 				 {!! $users->links() !!}
 				</div>
         </div>

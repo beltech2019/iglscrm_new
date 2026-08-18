@@ -5,26 +5,18 @@
 
     <div class="container-fluid">
         <div class="div_container">
-            <div class="bgwhite2">
-                <div class="borderalignheading">
-                    <div class="row mb-4">
-                        <div class="col-md-8">
-                            <div class="heading_two">
-                                <h2><i class="bi bi-ticket iconsbg2"></i>Manual Reports</h2>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="btnplus">
-                                <a class="{{ addUIComponent('REPORTS_CREATE_REPORTS') }}" href="/createReport"> <i class="bi bi-plus-lg btnchange"></i></a>
-
-                            </div>
-
-                        </div>
-                    </div>
+            <div class="ig-page-header">
+                <div>
+                    <span class="ig-eyebrow-light">Reporting</span>
+                    <h1><i class="bi bi-file-earmark-bar-graph"></i> Manual Reports</h1>
+                    <p>Custom reports built and shared by your team.</p>
                 </div>
+                <a class="btn btn-danger ig-btn-add {{ addUIComponent('REPORTS_CREATE_REPORTS') }}" href="/createReport"><i class="bi bi-plus-lg"></i> New Report</a>
+            </div>
+            <div class="bgwhite2 ig-panel">
                 <div class="busines_details">
-                    <div class="moreinfo">
-                    <table class="table {{ addUIComponent('REPORTS_TABLE') }}">
+                    <div class="moreinfo table-responsive">
+                    <table class="table ig-table {{ addUIComponent('REPORTS_TABLE') }}" data-ig-tabletools>
                         <thead>
                             <tr>   
                             <th scope="col">Report Id</th>
@@ -69,15 +61,25 @@
                             <td>{{$reportLists->updated_at}}</td>
                             </tr>
                           @endforeach
-                        @endif   
+                        @else
+                          <tr class="ig-empty-row">
+                            <td colspan="5">
+                                <div class="ig-empty-state">
+                                    <i class="bi bi-file-earmark-bar-graph"></i>
+                                    <h6>No reports yet</h6>
+                                    <p>Reports you create will show up here.</p>
+                                </div>
+                            </td>
+                          </tr>
+                        @endif
                         </tbody>
                         </table>
                     </div>
-                    <div class="my-2 d-flex  {{ addUIComponent('REPORTS_TABLE') }}">
+                    <div class="my-2 d-flex  {{ addUIComponent('REPORTS_TABLE') }} ig-table-toolbar">
                         {!! $reportList->withQueryString()->links() !!}
                   </div>
                 </div>
-               
+
             </div>
         </div>
     </div>

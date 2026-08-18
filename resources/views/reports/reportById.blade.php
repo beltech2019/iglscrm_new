@@ -94,7 +94,8 @@
             </p>
         </div>
     </div>
-		<table class="table {{ addUIComponent('REPORTS_INNER_TABLE') }}">
+		<div class="table-responsive">
+		<table class="table ig-table {{ addUIComponent('REPORTS_INNER_TABLE') }}" data-ig-tabletools>
   <thead>
     <tr>
       @if(!empty($field) && $field->count())
@@ -120,6 +121,7 @@
 
   </tbody>
 </table>
+		</div>
 		
 		
     </div>

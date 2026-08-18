@@ -31,7 +31,8 @@
 @endif
 </div>
             <div class="">
-            <table class="table">
+            <div class="table-responsive">
+            <table class="table ig-table">
                 <thead>
                     <tr class="table_width_align">
                     <th scope="col">ID</th>
@@ -63,6 +64,7 @@
                     @endif
                 </tbody>
             </table>
+            </div>
 			</div>
             <div class="my-2 row">
 

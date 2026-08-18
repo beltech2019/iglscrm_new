@@ -90,7 +90,8 @@ if(isset($reportData['report']))
                         <div class="tab-content" id="pills-tabContent">
                             <div class="tab-pane fade show active" id="pills-field" role="tabpanel"
                                 aria-labelledby="pills-field-tab">
-                                <table class="table {{ addUIComponent('DASHBOARD_TICKETS') }}">
+                                <div class="table-responsive">
+                                <table class="table ig-table {{ addUIComponent('DASHBOARD_TICKETS') }}">
                                     <thead>
                                         <tr>
                                             <th scope="col" style="width:2%;"></th>
@@ -118,11 +119,13 @@ if(isset($reportData['report']))
 
                                     </tbody>
                                 </table>
+                                </div>
 
                             </div>
                             <div class="tab-pane fade" id="pills-Conditions" role="tabpanel"
                                 aria-labelledby="pills-Conditions-tab">
-                                <table class="table">
+                                <div class="table-responsive">
+                                <table class="table ig-table">
 								  <thead>
 									<tr>
 									  <th scope="col"></th>
@@ -214,6 +217,7 @@ if(isset($reportData['report']))
 									@endif 
 								  </tbody>
 								</table>
+                                </div>
                             
                             </div>
                        

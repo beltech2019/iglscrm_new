@@ -24,38 +24,30 @@
 
 <div class="mt-3">
     <div class="div_container">
-        <div class="bgwhite2">
-            <div class="row mb-4">
-                <div class="col-md-6 col-6">
-                    <div class="heading_two ">
-                        <h2><i class="bi bi-ticket iconsbg2"></i>Social Tickets </h2>
-                    </div>
-                </div>
-                <div class="col-md-6 col-6">
-                    <div class="iconsmenu">
-                        <ul class="ms-auto">
-                            <li><i class="bi bi-funnel  {{ addUIComponent('SOCIALTICKET_FILTER') }}" data-bs-toggle="modal" data-bs-target="#exampleModal"></i></li>
-                            <li><i id="refresh-icon" style="cursor: pointer;" class="bi bi-bootstrap-reboot"></i></li>
-                            <li id="deleteBtn" class=" {{ addUIComponent('SOCIALTICKET_DELETE') }}"><i class="bi bi-trash3"></i></li>
-                            <li ><i class="bi bi-list-task"></i></li>
-                            <li><i class="bi bi-plus-lg "></i></li>
-                            <div style="clear:both;"></div>
-                        </ul>
-                    </div>
+        <div class="ig-page-header">
+            <div>
+                <span class="ig-eyebrow-light">Support</span>
+                <h1><i class="bi bi-ticket"></i> Social Tickets</h1>
+                <p>Track every ticket from first contact to resolution.</p>
+            </div>
+        </div>
+        <div class="bgwhite2 ig-panel">
+            <div class="ig-panel-toolbar mb-3">
+                <h6 class="ig-panel-title"><i class="bi bi-list-ul"></i> All tickets</h6>
+                <div class="ig-toolbar-actions">
+                    <button type="button" class="ig-icon-btn {{ addUIComponent('SOCIALTICKET_FILTER') }}" data-bs-toggle="modal" data-bs-target="#exampleModal" title="Filter"><i class="bi bi-funnel"></i></button>
+                    <button type="button" id="refresh-icon" class="ig-icon-btn" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
+                    <button type="button" id="deleteBtn" class="ig-icon-btn ig-icon-btn-danger {{ addUIComponent('SOCIALTICKET_DELETE') }}" title="Delete selected"><i class="bi bi-trash3"></i></button>
                 </div>
             </div>
-            <div class="my-2 {{ addUIComponent('SOCIALTICKET_TABLE') }} row">
-                <div class="col-md-9">
+            <div class="my-2 {{ addUIComponent('SOCIALTICKET_TABLE') }} ig-table-toolbar">
                   {!! $getInfo->withQueryString()->links() !!}
-                </div>
-                <div class="col-md-3">
-                    <p style="margin-top: 8px;text-align: right;" class="pagination-info">
+                    <p class="pagination-info">
                         Showing {{ $getInfo->firstItem() }} - {{ $getInfo->lastItem() }} of {{ $getInfo->total() }} tickets
                     </p>
                 </div>
-            </div>
-            <div class="">
-            <table class="table {{ addUIComponent('SOCIALTICKET_TABLE') }}">
+            <div class="table-responsive">
+            <table class="table ig-table {{ addUIComponent('SOCIALTICKET_TABLE') }}" data-ig-tabletools>
                 <thead>
                     <tr>
                         <th scope="col">Num.</th>
@@ -97,8 +89,8 @@
                         
                             <td>{{ $getInfos->assigned_department ?? 'N/A' }}</td>
                         <td><a herf="#" onclick="location.href='/getSocialTicketById/{{$getInfos->id}}';">{{$getInfos->source}}</a></td>
-                        <td><a herf="#" onclick="location.href='/getSocialTicketById/{{$getInfos->id}}';">{{$getInfos->priority}}</a></td>
-                        <td><a herf="#" onclick="location.href='/getSocialTicketById/{{$getInfos->id}}';">{{$getInfos->status}}</a></td>
+                        <td><a herf="#" onclick="location.href='/getSocialTicketById/{{$getInfos->id}}';"><span class="ig-badge ig-badge-{{ \Illuminate\Support\Str::slug($getInfos->priority ?? '') }}">{{$getInfos->priority}}</span></a></td>
+                        <td><a herf="#" onclick="location.href='/getSocialTicketById/{{$getInfos->id}}';"><span class="ig-badge ig-badge-{{ \Illuminate\Support\Str::slug($getInfos->status ?? '') }}">{{$getInfos->status}}</span></a></td>
                         <td><a herf="#" onclick="location.href='/getSocialTicketById/{{$getInfos->id}}';">{{$getInfos->final_state}}</a></td>
                         <td><a herf="#" onclick="location.href='/getSocialTicketById/{{$getInfos->id}}';">{{$getInfos->name}}</a></td>
                         <td><a herf="#" onclick="location.href='/getSocialTicketById/{{$getInfos->id}}';">{{$getInfos->date_Created}}</a></td>
@@ -106,20 +98,25 @@
                         <td><a herf="#" >{{$getInfos->sapstatus}}</a></td>
                     </tr>
 					@endforeach
+					@else
+					<tr class="ig-empty-row">
+						<td colspan="12">
+							<div class="ig-empty-state">
+								<i class="bi bi-ticket"></i>
+								<h6>No tickets found</h6>
+								<p>Try adjusting your filters, or check back once new tickets arrive.</p>
+							</div>
+						</td>
+					</tr>
 					@endif
                 </tbody>
             </table>
             </div>
-			<div class="my-2 {{ addUIComponent('SOCIALTICKET_TABLE') }} row">
-
-                <div class="col-md-9">
+			<div class="my-2 {{ addUIComponent('SOCIALTICKET_TABLE') }} ig-table-toolbar">
                  {!! $getInfo->withQueryString()->links() !!}
-                 </div>
-                 <div class="col-md-3">
-                 <p style="margin-top: 8px;text-align: right;" class="pagination-info">
+                 <p class="pagination-info">
                     Showing {{ $getInfo->firstItem() }} - {{ $getInfo->lastItem() }} of {{ $getInfo->total() }} tickets
                  </p>
-                </div>
             </div>
         </div>
     </div>
@@ -141,13 +138,13 @@
                     <!-- Nav pills -->
                     <ul class="nav nav-pills" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="pill" href="#home">Quick Filter </a>
+                            <a class="nav-link active" data-bs-toggle="pill" href="#home"><i class="bi bi-lightning-charge"></i> Quick Filter</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="pill" href="#menu1">Advanced Filter</a>
+                            <a class="nav-link" data-bs-toggle="pill" href="#menu1"><i class="bi bi-sliders"></i> Advanced Filter</a>
                         </li>
                          <li class="nav-item">
-                            <a class="nav-link active2" data-bs-toggle="pill" href="#sap">Sap Ticket Filter</a>
+                            <a class="nav-link active2" data-bs-toggle="pill" href="#sap"><i class="bi bi-upc-scan"></i> Sap Ticket Filter</a>
                         </li>
 
                     </ul>

@@ -461,7 +461,8 @@
                     <div class="headingmain">
                         <h5>Social User</h5>
                     </div>
-                    <table class="table">
+                    <div class="table-responsive">
+                    <table class="table ig-table">
                         <thead>
                             <tr>
 
@@ -484,6 +485,7 @@
    @endif  
   </tbody> -->
                     </table>
+                    </div>
                 </div>
             </div>
 

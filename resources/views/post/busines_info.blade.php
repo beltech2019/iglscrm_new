@@ -26,7 +26,8 @@
                 </div>
                 <div class="busines_details">
                     <div class="moreinfo">
-                    <table class="table {{ addUIComponent('ADMINMANAGEMENT_BUSINESS_INFO_TABLE') }}">
+                    <div class="table-responsive">
+                    <table class="table ig-table {{ addUIComponent('ADMINMANAGEMENT_BUSINESS_INFO_TABLE') }}" data-ig-tabletools>
                         <thead>
                             <tr>   
                             <th scope="col">User</th>
@@ -80,6 +81,7 @@
                         @endif   
                         </tbody>
                         </table>
+                    </div>
                     </div>
                 </div>
                

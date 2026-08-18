@@ -127,7 +127,8 @@
         <div class="bgwhite2">
 
         @if($reply)
-		<table class="table">
+		<div class="table-responsive">
+		<table class="table ig-table">
   <thead>
     <tr>
       <th scope="col">ID</th>
@@ -160,7 +161,8 @@
                 <tr id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
                     data-bs-parent="#accordionExample">
                     <td colspan="6">
-                        <table class="table accordion-body">
+                        <div class="table-responsive">
+                        <table class="table ig-table accordion-body">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -176,10 +178,11 @@
                                     <td>{{$dmDatas-> message}}</td>
                                     <td>{{$dmDatas-> sender_name}}</td>
                                     <td>{{$dmDatas-> message_time}}</td>
-                                </tr>         
-                            @endforeach    
+                                </tr>
+                            @endforeach
                             </tbody>
                         </table>
+                        </div>
                     </td>
                 </tr>
             </td>
@@ -194,6 +197,7 @@
     </tr>
   </tbody>
 </table>
+</div>
 		@endif
 
     </div>

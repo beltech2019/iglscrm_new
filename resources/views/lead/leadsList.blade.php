@@ -4,40 +4,31 @@
 
 <div class="mt-3">
     <div class="div_container">
-        <div class="bgwhite2">
-            <div class="row mb-4">
-                <div class="col-md-6 col-6">
-                    <div class="heading_two ">
-                        <h2><i class="bi bi-mailbox iconsbg"></i>LEADS </h2>
-                    </div>
-                </div>
-                <div class="col-md-6 col-6">
-
-                    <div class="iconsmenu">
-                        <ul class="ms-auto">
-                            <li><i class="bi bi-funnel {{ addUIComponent('LEAD_FILTER') }}" data-bs-toggle="modal" data-bs-target="#exampleModal"></i></li>
-                            <li><i id="refresh-icon" style="cursor: pointer;" class="bi bi-bootstrap-reboot"></i></li>
-                            <li id="deleteBtn" class="{{ addUIComponent('LEAD_DELETE') }}"><i class="bi bi-trash3"></i></li>
-                            <li><i class="bi bi-list-task"></i></li>
-                            <li><a href="/createLead" class="{{ addUIComponent('LEAD_CREATE_LEAD') }}"><i class="bi bi-plus-lg"></i></a></li>
-
-                            <div style="clear:both;"></div>
-                        </ul>
-                    </div>
+        <div class="ig-page-header">
+            <div>
+                <span class="ig-eyebrow-light">Pipeline</span>
+                <h1><i class="bi bi-funnel"></i> Leads</h1>
+                <p>Every inbound lead captured from social &amp; direct channels.</p>
+            </div>
+        </div>
+        <div class="bgwhite2 ig-panel">
+            <div class="ig-panel-toolbar mb-3">
+                <h6 class="ig-panel-title"><i class="bi bi-list-ul"></i> All leads</h6>
+                <div class="ig-toolbar-actions">
+                    <button type="button" class="ig-icon-btn {{ addUIComponent('LEAD_FILTER') }}" data-bs-toggle="modal" data-bs-target="#exampleModal" title="Filter" data-bs-toggle-tt="tooltip"><i class="bi bi-funnel"></i></button>
+                    <button type="button" id="refresh-icon" class="ig-icon-btn" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
+                    <button type="button" id="deleteBtn" class="ig-icon-btn ig-icon-btn-danger {{ addUIComponent('LEAD_DELETE') }}" title="Delete selected"><i class="bi bi-trash3"></i></button>
+                    <a href="/createLead" class="btn btn-danger ig-btn-add {{ addUIComponent('LEAD_CREATE_LEAD') }}"><i class="bi bi-plus-lg"></i> New Lead</a>
                 </div>
             </div>
-            <div class="my-2 d-flex  {{ addUIComponent('LEAD_TABLE') }} row">
-            <div class="col-md-9">
+            <div class="my-2 d-flex  {{ addUIComponent('LEAD_TABLE') }} ig-table-toolbar">
                  {!! $lead->withQueryString()->links() !!}
-                 </div>
-                 <div class="col-md-3">
-                 <p style="margin-top: 8px;text-align: right;" class="pagination-info">
+                 <p class="pagination-info">
                     Showing {{ $lead->firstItem() }} - {{ $lead->lastItem() }} of {{ $lead->total() }} lead
                  </p>
             </div>
-            </div>
             <div class="table-responsive">
-            <table class="table {{ addUIComponent('LEAD_TABLE') }}">
+            <table class="table ig-table {{ addUIComponent('LEAD_TABLE') }}" data-ig-tabletools>
                 <thead>
                     <tr>
                         <th scope="col"> Date Created</th>
@@ -54,14 +45,14 @@
                     @foreach($lead as $key => $leads)
                     <tr>
 
-                        <td scope="row"> 
+                        <td scope="row">
                         <span class="d-flex">
                         <input class="form-check-input deleteCheck" type="checkbox"
                                 value="{{$leads->id}}" id="{{$leads->id}}">
                             <div class="dropdown">
-                                <button class="settingicons" type="button" id="dropdownMenuButton1"
+                                <button class="settingicons ig-row-menu-btn" type="button" id="dropdownMenuButton1"
                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                    <a href=""><i class="bi bi-gear mainstyle"></i></a> </button>
+                                    <i class="bi bi-three-dots-vertical"></i></button>
                                 <ul class="dropdown-menu dropdownmenu_innner " aria-labelledby="dropdownMenuButton1">
                                     <li><a class="dropdown-item {{ addUIComponent('LEAD_EDIT_LEAD') }}" href='/createLead/{{$leads->id}}'><i
                                                 class="bi bi-pencil"></i> Edit</a></li>
@@ -69,14 +60,14 @@
                                                 class="bi bi-trash3"></i> Delete</a></li>
                                 </ul>
                             </div>{{$leads->created_date}}
-                            </span>   
+                            </span>
                         </td>
                         <td class="socialusertd" ><i class="bi bi-clipboard copy-button"></i> <a class="" href="{{ addUIComponent('LEAD_INNER') == 'HIDDEN' ? '#':'/getLeadById/'.$leads->id}}" >{{$leads->leadId}}</a></td>
                         <td>{!! getUrlinString($leads->description)!!}</td>
                         <td class="socialusertd" ><i class="bi bi-clipboard copy-button"></i> <a   href="{{ addUIComponent('SOCIALUSER') == 'HIDDEN' ? '#':'/userProfile/'.$leads->socialUser_id}}" >{{$leads->first_name}} {{$leads->last_name}}</a></td>
                         <td>{{$leads->lead_source}}</td>
                         <td>{{$leads->leadBy}}</td>
-                        <td>{{$leads->status}}</td>
+                        <td><span class="ig-badge ig-badge-{{ \Illuminate\Support\Str::slug($leads->status ?? '') }}">{{$leads->status}}</span></td>
                         <td>
                             <div class="editer_file">
 
@@ -93,6 +84,7 @@
                                                     aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
+                                                <div class="table-responsive">
                                                 <table class="table table-striped table-hover">
                                                     <tr>
                                                         <td>Name :
@@ -110,6 +102,7 @@
                                                         <td>{{$leads->created_date}}</td>
                                                     </tr>
                                                 </table>
+                                                </div>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary"
@@ -125,20 +118,26 @@
 
 
                     @endforeach
+                    @else
+                    <tr class="ig-empty-row">
+                        <td colspan="8">
+                            <div class="ig-empty-state">
+                                <i class="bi bi-funnel"></i>
+                                <h6>No leads found</h6>
+                                <p>Try adjusting your filters, or check back once new leads come in.</p>
+                            </div>
+                        </td>
+                    </tr>
                     @endif
                 </tbody>
             </table>
             </div>
 
-            <div class="my-2 d-flex  {{ addUIComponent('LEAD_TABLE') }} row">
-            <div class="col-md-9">
+            <div class="my-2 d-flex  {{ addUIComponent('LEAD_TABLE') }} ig-table-toolbar">
                  {!! $lead->withQueryString()->links() !!}
-                 </div>
-                 <div class="col-md-3">
-                 <p style="margin-top: 8px;text-align: right;" class="pagination-info">
+                 <p class="pagination-info">
                     Showing {{ $lead->firstItem() }} - {{ $lead->lastItem() }} of {{ $lead->total() }} lead
                  </p>
-            </div>
             </div>
         </div>
     </div>
@@ -161,10 +160,10 @@
                     <!-- Nav pills -->
                     <ul class="nav nav-pills" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="pill" href="#home">Quick Filter </a>
+                            <a class="nav-link active" data-bs-toggle="pill" href="#home"><i class="bi bi-lightning-charge"></i> Quick Filter</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="pill" href="#menu1">Advanced Filter</a>
+                            <a class="nav-link" data-bs-toggle="pill" href="#menu1"><i class="bi bi-sliders"></i> Advanced Filter</a>
                         </li>
                     </ul>
                     <!-- Tab panes -->

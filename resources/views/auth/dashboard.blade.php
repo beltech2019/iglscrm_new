@@ -44,7 +44,8 @@
                     </div>
                 </div>
             </div>
-            <table class="table">
+            <div class="table-responsive">
+            <table class="table ig-table">
                 <thead>
                     <tr>
                         <th scope="col">Post ID</th>
@@ -82,6 +83,7 @@
 					@endif
                 </tbody>
             </table>
+            </div>
 				<div class="my-2 d-flex ">
 				
 				 {!! $post->links() !!}
@@ -104,10 +106,10 @@
                     <!-- Nav pills -->
                     <ul class="nav nav-pills" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="pill" href="#home">Quick Filter </a>
+                            <a class="nav-link active" data-bs-toggle="pill" href="#home"><i class="bi bi-lightning-charge"></i> Quick Filter</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="pill" href="#menu1">Advanced Filter</a>
+                            <a class="nav-link" data-bs-toggle="pill" href="#menu1"><i class="bi bi-sliders"></i> Advanced Filter</a>
                         </li>
 
                     </ul>

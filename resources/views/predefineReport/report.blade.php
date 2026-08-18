@@ -105,7 +105,8 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="">
-                                            <table class="table tickettable">
+                                            <div class="table-responsive">
+                                            <table class="table ig-table tickettable" data-ig-tabletools>
                                                 <thead>
                                                     <tr>
                                                         <th scope="col">Post ID</th>
@@ -139,6 +140,7 @@
                                                     @endforeach
                                                 </tbody>
                                             </table>
+                                            </div>
                                         </div>
                                         <div class="my-2 row">
                                             <div class="col-md-9">

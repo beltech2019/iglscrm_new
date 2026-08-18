@@ -28,40 +28,35 @@
 
 <div class="mt-3">
     <div class="div_container">
-        <div class="bgwhite2">
-            <div class="row mb-4">
-                <div class="col-md-6 col-6">
-                    <div class="heading_two ">
-                        <h2><i class="bi bi-mailbox iconsbg"></i>Social Post </h2>
-                    </div>
-                </div>
-                <div class="col-md-6 col-6">
-                    <div class="iconsmenu">
-                        <ul class="ms-auto">
-                            <li><i class="bi bi-funnel  {{ addUIComponent('SOCIALPOST_FILTER') }}" data-bs-toggle="modal" data-bs-target="#exampleModal"></i></li>
-                            <li><i id="refresh-icon" style="cursor: pointer;" class="bi bi-bootstrap-reboot"></i></li>
-                            <li id="deleteBtn" class=" {{ addUIComponent('SOCIALPOST_DELETE') }}"><i class="bi bi-trash3"></i> </li>
-                            <li><i class="bi bi-list-task  {{ addUIComponent('SOCIALPOST_CHOOSE COLUMNS') }}" data-bs-toggle="modal" data-bs-target="#myModal"></i></li>
-                            <li><a href="\createpost" class=" {{ addUIComponent('SOCIALPOST_CREATE_POST') }}"><i class="bi bi-plus-lg"></i></a></li>
-                            <div style="clear:both;"></div>
-                        </ul>
-                    </div>
+        <div class="ig-page-header">
+            <div>
+                <span class="ig-eyebrow-light">Engagement</span>
+                <h1><i class="bi bi-mailbox"></i> Social Post</h1>
+                <p>Every inbound social post, in one queue.</p>
+            </div>
+        </div>
+        <div class="bgwhite2 ig-panel">
+            <div class="ig-panel-toolbar mb-3">
+                <h6 class="ig-panel-title"><i class="bi bi-list-ul"></i> All posts</h6>
+                <div class="ig-toolbar-actions">
+                    <button type="button" class="ig-icon-btn {{ addUIComponent('SOCIALPOST_FILTER') }}" data-bs-toggle="modal" data-bs-target="#exampleModal" title="Filter"><i class="bi bi-funnel"></i></button>
+                    <button type="button" id="refresh-icon" class="ig-icon-btn" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
+                    <button type="button" id="deleteBtn" class="ig-icon-btn ig-icon-btn-danger {{ addUIComponent('SOCIALPOST_DELETE') }}" title="Delete selected"><i class="bi bi-trash3"></i></button>
+                    <button type="button" class="ig-icon-btn {{ addUIComponent('SOCIALPOST_CHOOSE COLUMNS') }}" data-bs-toggle="modal" data-bs-target="#myModal" title="Choose columns"><i class="bi bi-list-task"></i></button>
+                    <a href="\createpost" class="btn btn-danger ig-btn-add {{ addUIComponent('SOCIALPOST_CREATE_POST') }}"><i class="bi bi-plus-lg"></i> New Post</a>
                 </div>
             </div>
             <div class="">
-            
-            
-            <div class="my-2 {{ addUIComponent('SOCIALPOST_TABLE') }} row">
-                 <div class="col-md-9">
+
+
+            <div class="my-2 {{ addUIComponent('SOCIALPOST_TABLE') }} ig-table-toolbar">
                  {!! $post->withQueryString()->links() !!}
-                 </div>
-                 <div class="col-md-3">
-                 <p style="margin-top: 8px;text-align: right;" class="pagination-info">
+                 <p class="pagination-info">
                     Showing {{ $post->firstItem() }} - {{ $post->lastItem() }} of {{ $post->total() }} posts
                  </p>
-                </div>
-            </div>   
-            <table class="table  {{ addUIComponent('SOCIALPOST_TABLE') }}">
+            </div>
+            <div class="table-responsive">
+            <table class="table ig-table  {{ addUIComponent('SOCIALPOST_TABLE') }}" data-ig-tabletools>
                 <thead>
                     <tr class="table_width_align">
 					@if(!empty($postColumn) && $postColumn->count())
@@ -184,16 +179,13 @@
                     @endif
                 </tbody>
             </table>
+            </div>
 			</div>
-            <div class="my-2 {{ addUIComponent('SOCIALPOST_TABLE') }} row">
-                 <div class="col-md-9">
+            <div class="my-2 {{ addUIComponent('SOCIALPOST_TABLE') }} ig-table-toolbar">
                  {!! $post->withQueryString()->links() !!}
-                 </div>
-                 <div class="col-md-3">
-                 <p style="margin-top: 8px;text-align: right;" class="pagination-info">
+                 <p class="pagination-info">
                     Showing {{ $post->firstItem() }} - {{ $post->lastItem() }} of {{ $post->total() }} posts
                  </p>
-                </div>
             </div>
         </div>
     </div>
@@ -212,10 +204,10 @@
                <!-- Nav pills -->
                <ul class="nav nav-pills" role="tablist">
                   <li class="nav-item">
-                     <a class="nav-link active" data-bs-toggle="pill" href="#home">Quick Filter </a>
+                     <a class="nav-link active" data-bs-toggle="pill" href="#home"><i class="bi bi-lightning-charge"></i> Quick Filter</a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link" data-bs-toggle="pill" href="#menu1">Advanced Filter</a>
+                     <a class="nav-link" data-bs-toggle="pill" href="#menu1"><i class="bi bi-sliders"></i> Advanced Filter</a>
                   </li>
                </ul>
                <!-- Tab panes -->

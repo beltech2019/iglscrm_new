@@ -1,455 +1,625 @@
+/* ==========================================================================
+   IGL Social CRM — Design System
+   A premium, CNG / energy-themed visual language for the whole application.
+   NOTE: every selector that existed before this redesign is preserved so
+   blade views and inline JS (openNav/closeNav, DataTables, CanvasJS, the
+   login flip, permission classes .HIDDEN/.READ_ONLY, etc.) keep working
+   exactly as before. Only the visual treatment changed.
+   ========================================================================== */
+
+/* ---------- Design tokens ---------- */
+:root{
+  /* brand */
+  --ig-green-900:#052e1e;
+  --ig-green-800:#07452c;
+  --ig-green-700:#0a5c39;
+  --ig-green-600:#0d7a49;
+  --ig-green-500:#0f9457;
+  --ig-green-100:#e3f7ec;
+  --ig-green-50:#f2fbf6;
+
+  --ig-amber-600:#e7b400;
+  --ig-amber-500:#ffd525;
+  --ig-amber-400:#ffe073;
+  --ig-amber-100:#fff6d6;
+
+  --ig-flame-600:#e8590c;
+  --ig-flame-500:#ff7a1a;
+  --ig-flame-100:#ffe8d6;
+
+  --ig-danger:#e5484d;
+  --ig-danger-100:#fdecec;
+  --ig-info:#3b6cff;
+  --ig-info-100:#eaf0ff;
+
+  /* neutrals */
+  --ig-ink-900:#101820;
+  --ig-ink-700:#33404b;
+  --ig-ink-500:#5c6a76;
+  --ig-ink-400:#8994a1;
+  --ig-ink-200:#dbe1e8;
+  --ig-ink-100:#eef1f5;
+  --ig-surface:#ffffff;
+  --ig-bg:#f4f7fa;
+  --ig-border:#e6eaf0;
+
+  /* elevation */
+  --ig-shadow-xs:0 1px 2px rgba(16,24,32,.05);
+  --ig-shadow-sm:0 2px 8px rgba(16,24,32,.06);
+  --ig-shadow-md:0 10px 24px -8px rgba(16,24,32,.14);
+  --ig-shadow-lg:0 22px 48px -14px rgba(16,24,32,.22);
+
+  /* shape */
+  --ig-radius-xs:6px;
+  --ig-radius-sm:10px;
+  --ig-radius-md:14px;
+  --ig-radius-lg:20px;
+  --ig-radius-pill:999px;
+
+  /* motion */
+  --ig-ease:cubic-bezier(.4,0,.2,1);
+  --ig-fast:150ms;
+  --ig-med:260ms;
+  --ig-slow:420ms;
+}
+
+*{ box-sizing:border-box; }
+
 body{
     margin:0;
     padding:0;
     font-family: 'Montserrat', sans-serif !important;
-    background-color: #f8f9fd;
+    background-color: var(--ig-bg);
+    color: var(--ig-ink-900);
+    -webkit-font-smoothing:antialiased;
     cursor:url('/images/tool.png'), auto;
 }
+
+::selection{ background: var(--ig-amber-400); color:var(--ig-ink-900); }
+
+/* focus-visible ring for accessibility everywhere */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+textarea:focus-visible, .btn:focus-visible, [tabindex]:focus-visible{
+  outline: 2px solid var(--ig-green-500) !important;
+  outline-offset: 2px;
+  box-shadow: none !important;
+}
+
+/* thin, elegant scrollbars app-wide (progressive enhancement only) */
+::-webkit-scrollbar{ width:8px; height:8px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:#ccd3da; border-radius:10px; }
+::-webkit-scrollbar-thumb:hover{ background:#b7c0c9; }
+
+/* ==========================================================================
+   Login page
+   ========================================================================== */
 .logo_company{
-    width:35%;
+    width:120px;
+    max-width:60%;
 }
 .login{
-    width: 343px;
-    background: #fff;
-    padding: 32px;
+    width: 100%;
     margin: auto;
-    border-radius: 16px;
-
 }
 .btn-primary{
     width: 100%;
-    background: #ffd525 !important;
+    background: linear-gradient(135deg, var(--ig-amber-500) 0%, var(--ig-amber-600) 100%) !important;
     border: none !important;
-    color: #000 !important;
-    font-weight: 600 !important ;
+    color: #14210f !important;
+    font-weight: 700 !important;
     font-size:14px;
+    padding: 11px 16px;
+    border-radius: var(--ig-radius-sm) !important;
+    box-shadow: 0 10px 20px -8px rgba(231,180,0,.55);
+    transition: transform var(--ig-fast) var(--ig-ease), box-shadow var(--ig-fast) var(--ig-ease), filter var(--ig-fast) var(--ig-ease);
+    letter-spacing:.2px;
+}
+.btn-primary:hover{
+    filter: brightness(1.03);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 26px -8px rgba(231,180,0,.6);
+}
+.btn-primary:active{
+    transform: translateY(0);
+    box-shadow: 0 6px 14px -6px rgba(231,180,0,.5);
+}
+/* native submit-button "loading" affordance without touching JS/behaviour */
+.btn-primary:disabled,
+.btn-primary[aria-busy="true"]{
+    opacity:.75;
+    cursor: progress;
 }
 .peralogin{
     font-size: 0px;
     color: #999;
 }
 .loginh2{
-    font-size: 24px;
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing:-.2px;
+    color: var(--ig-ink-900);
 }
 .logo{
     text-align: center;
-    margin: 32px 0;
+    margin: 0 0 18px;
 }
 .form-label {
-  
     font-size: 13px;
-    font-weight: 400;
-    margin-bottom: 3px;
+    font-weight: 600;
+    color: var(--ig-ink-500);
+    margin-bottom: 6px;
 }
 .form-control {
-  /* background: #f4f4f4 !important; */
-  border: 1px solid #e6e6e6!important;
-  border-radius: 4px !important;    font-size: 14px;
+  border: 1.5px solid var(--ig-border) !important;
+  border-radius: var(--ig-radius-sm) !important;
+  font-size: 14px;
+  padding: 10px 14px;
+  background: #fbfcfe !important;
+  color: var(--ig-ink-900);
+  transition: border-color var(--ig-fast) var(--ig-ease), box-shadow var(--ig-fast) var(--ig-ease), background var(--ig-fast) var(--ig-ease);
 }
+.form-control:focus{
+  border-color: var(--ig-green-500) !important;
+  background: var(--ig-surface) !important;
+  box-shadow: 0 0 0 4px var(--ig-green-100) !important;
+}
+.form-control.is-invalid{
+  border-color: var(--ig-danger) !important;
+  background: var(--ig-danger-100) !important;
+}
+
+/* -- disabled / readonly: visually distinct so users don't mistake a
+      locked field for an editable one, without touching any markup -- */
+.form-control:disabled,
+.form-control[readonly],
+.form-select:disabled{
+  background: var(--ig-ink-100) !important;
+  border-color: var(--ig-border) !important;
+  color: var(--ig-ink-400) !important;
+  cursor: not-allowed;
+  box-shadow: none !important;
+}
+.form-check-input:disabled{ cursor: not-allowed; opacity:.55; }
+.form-check-input:disabled ~ label{ color: var(--ig-ink-400); cursor: not-allowed; }
+
+/* -- validation feedback: a quick, calm fade/slide-in instead of just
+      snapping into view (motion-safe) -- */
+.invalid-feedback,
+.ig-error{ animation: ig-feedback-in .22s var(--ig-ease); }
+@keyframes ig-feedback-in{ from{ opacity:0; transform: translateY(-3px);} to{ opacity:1; transform:none;} }
+@media (prefers-reduced-motion: reduce){
+  .invalid-feedback, .ig-error{ animation: none; }
+}
+
+/* -- checkbox / radio: focus ring + smooth check transition, matching
+      the text-input focus treatment above -- */
+.form-check-input{
+  transition: background-color var(--ig-fast) var(--ig-ease), border-color var(--ig-fast) var(--ig-ease), box-shadow var(--ig-fast) var(--ig-ease);
+}
+.form-check-input:focus{
+  border-color: var(--ig-green-500);
+  box-shadow: 0 0 0 4px var(--ig-green-100);
+}
+
+/* -- file inputs: theme the native picker button to match .btn-secondary
+      instead of leaving the browser-default grey button -- */
+input[type="file"].form-control{
+  padding: 8px 14px;
+}
+input[type="file"].form-control::file-selector-button,
+input[type="file"].form-control::-webkit-file-upload-button{
+  margin-right: 12px;
+  padding: 6px 14px;
+  border: 1px solid var(--ig-border);
+  border-radius: var(--ig-radius-sm);
+  background: #fff;
+  color: var(--ig-ink-700);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background var(--ig-fast) var(--ig-ease), color var(--ig-fast) var(--ig-ease);
+}
+input[type="file"].form-control:hover::file-selector-button,
+input[type="file"].form-control:hover::-webkit-file-upload-button{
+  background: var(--ig-ink-100);
+  color: var(--ig-ink-900);
+}
+
+/* -- date / time / datetime-local: recolor the native picker icon so it
+      doesn't look like an unstyled browser default next to themed fields -- */
+input[type="date"].form-control::-webkit-calendar-picker-indicator,
+input[type="time"].form-control::-webkit-calendar-picker-indicator,
+input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator{
+  opacity:.6;
+  cursor:pointer;
+  transition: opacity var(--ig-fast) var(--ig-ease);
+}
+input[type="date"].form-control:hover::-webkit-calendar-picker-indicator,
+input[type="time"].form-control:hover::-webkit-calendar-picker-indicator,
+input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicator{
+  opacity:1;
+}
+
 .forgetpera{
     font-size: 12px;
     color: #999;
 }
-.login_image{
-    
-    background: linear-gradient(to bottom, #d4eff8 0%, #ffffff 100%);
-  
-
+.login-sub{
+    font-size: 13px;
+    color: var(--ig-ink-400);
+    margin-top: -10px;
+    margin-bottom: 14px;
 }
-.images_manage{
-    position: relative;
-    height: 100vh;    overflow: hidden;
-}
-.images_manage .img1{
-    width: 80px;
+.ig-field{ text-align: left; }
+.ig-input-group{ position: relative; }
+.ig-input-icon{
     position: absolute;
-    right: 30px;
-    top: 20px;
-}
-.images_manage .img2{
-    width: 110px;
-    position: absolute;
-    right: 270px;
-    top: 90px;
-}
-.images_manage .img3{
-    width: 110px;
-    position: absolute;
-    left: 30px;
-    top: 190px;
-}
-.images_manage .img4{
-    width: 110px;
-    position: absolute;
-    left: 630px;
-    top: 260px;
-}
-
-.images_manage .img5{
-    width: 560px;
-    position: absolute;
-    right: 0;
-    bottom: 47px;
-    z-index: 9;
-}
-.images_manage .img6{
-    width: 150px;
-    position: absolute;
-    left: 0;
-    bottom: 10px;
-    z-index: 9;
-    -webkit-transform: scaleX(-1);
-    transform: scaleX(-1);
-    
-}
-.images_manage .img18{
-  width: 154px;
-  position: absolute;
-  left: 0;
-  bottom: -34px;
-  z-index: 9;
-  z-index: 9999;
-}
-.images_manage .img10{
-  width: 291px;
-  position: absolute;
-  right: -100px;
-  bottom: -17px;
-  z-index: 99;
-  /* -webkit-transform: scaleX(-1); */
-  /* transform: scaleX(-1);*/
-}
-.images_manage .img13{
-  width: 70px;
-  position: absolute;
-  left: 0;
-  top: 300px;
-  z-index: 99;
-}
-.images_manage .img15{
-  width: 130px;
-  position: absolute;
-  left: 0;
-  top: 99px;
-  z-index: 99;
-}
-.images_manage .img14{
-  width: 50px;
-  position: absolute;
-  right: -100px;
-  top: 250px;
-  z-index: 99;
-  -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
-}
-.images_manage .img11{
-    width: 170px;
-    position: absolute;
-    left: 0px;
-    bottom: -34px;
-    z-index: 9;
-
-}
-.images_manage .img12{
-    width: 100px;
-    position: absolute;
-    right: -100px;
-    bottom: 10px;
-    z-index: 9;
-    -webkit-transform: scaleX(-1);
-    transform: scaleX(-1);
-}
-.images_manage .img7{
-    width: 100%;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    z-index: 2;
-    
-}
-.images_manage .img9{
-    width: 210px;
-    position: absolute;
-    left: 0;
-    bottom: 36px;
-    z-index: 1;
-    
-}
-.images_manage .img8{
-    width: 100%;
-    position: absolute;
-    left: 0;
-    bottom: 47px;
-    opacity:0.5 !important;
-}
-.car {
-
-    animation: car-animation 50s linear  infinite;
-  }
-  
-  @keyframes car-animation {
-    0% {
-      left: -40%;
-    } 
-    10% {
-      /* The car will stop at 75% of the animation duration */
-      left: 72%;
-     
-    }
-    10.01% {
-      animation-delay: 0s;
-    }
-    20% {
-      /* The car will stop at 75% of the animation duration */
-      left: 72%;
-     
-    }
-    20.01% {
-      animation-delay: 0s;
-    }
-    30% {
-      /* The car will stop at 75% of the animation duration */
-      left: 72%;
-     
-    }
-    30.01% {
-      animation-delay: 0s;
-    }
-    40% {
-      /* The car will stop at 75% of the animation duration */
-      left: 72%;
-     
-    }
-    40.01% {
-      animation-delay: 0s;
-    }
-    50% {
-      /* The car will stop at 75% of the animation duration */
-      left: 72%;
-     
-    }
-    50.01% {
-      animation-delay: 0s;
-    }
-    60% {
-      /* The car will stop at 75% of the animation duration */
-      left: 72%;
-     
-    }
-    60.01% {
-      animation-delay: 0s;
-    }
-    70% {
-      /* The car will stop at 75% of the animation duration */
-      left: 72%;
-     
-    }
-    70.01% {
-      animation-delay: 15s;
-    }
-    80% {
-      /* The car will stop at 75% of the animation duration */
-      left: 72%;
-     
-    }
-    80.01% {
-      animation-delay: 15s;
-    }
-    90% {
-      /* The car will stop at 75% of the animation duration */
-      left: 72%;
-     
-    }
-    90.01% {
-      animation-delay: 15s;
-    }
-    100% {
-      left: 100%;
-    }
-  }
-  .car9 {
-
-    animation: car-animation18 15s linear  infinite;
-  }
-  
-  @keyframes car-animation18 {
-    0% {
-      left: -40%;
-    }
-    75% {
-      /* The car will stop at 75% of the animation duration */
-      left: 55%;
-      animation-play-state: paused; /* Pause the animation at this point */
-    }
-    100% {
-      left: 100%;
-    }
-  }
-  .car2 {
-
-    animation: car-animation2 15s linear  infinite;
-  }
-  
-  @keyframes car-animation2 {
-    0% {
-      right: -40%;
-    }
-    75% {
-      /* The car will stop at 75% of the animation duration */
-      right: 55%;
-      animation-play-state: paused; /* Pause the animation at this point */
-    }
-    100% {
-      right: 100%;
-    }
-  }
-  .car3 {
-
-    animation: car-animation3 10s linear  infinite;
-  }
-  
-  @keyframes car-animation3 {
-    0% {
-      left: -40%;
-    }
-    75% {
-      /* The car will stop at 75% of the animation duration */
-      left: 55%;
-   
-    }
-    100% {
-      left: 100%;
-    }
-  }
-  .car4 {
-
-    animation: car-animation4 25s linear  infinite;
-  }
-  
-  @keyframes car-animation4 {
-    0% {
-      right: -120%;
-    }
-    75% {
-      /* The car will stop at 75% of the animation duration */
-      right: 55%;
-      
-    }
-    100% {
-      right: 100%;
-    }
-  }
-  .car5 {
-
-    animation: car-animation5 10s linear  infinite;
-  }
-  
-  @keyframes car-animation5 {
-    0% {
-      left: -550px;
-    }
-    50% {
-      left: calc(100% - 100);
-      }
-    100% {
-      left: calc(100% - 50px);
-    }
-  }
-  .car7 {
-
-    animation: car-animation8 20s linear  infinite;
-  }
-  
-  @keyframes car-animation8 {
-    0% {
-      left: -550px;
-    }
-    50% {
-      left: calc(100% );
-      }
-    100% {
-      left: calc(110%);
-    }
-  }
-  .car6 {
-
-    animation: car-animation6 15s linear  infinite;
-  }
-  
-  @keyframes car-animation6 {
-    0% {
-      right: -900px;
-    }
-    50% {
-      right: calc(100% - 100);
-      }
-    100% {
-      right: calc(100% - 50px);
-    }
-  }
-  .heaidng{
-    position: absolute;
-    top: 180px;
-    z-index: 99;
-    text-align: center;
-    width: 542px;
-    left: 180px;
-  }
-  .heaidng h2{
-    font-size: 38px;
-    font-weight: 700;
-    color: #007744;
-  }
-  .heaidng p{
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ig-ink-400);
     font-size: 15px;
-    color: #999;
-  }
-  .heaidng h2 span{
-    color: #ffd525;
-    text-shadow: 2px 2px 0px #747474;
-    border-radius: 7px;
-  }
-  /****************flip css*********************/
-  .flip-container {
-	perspective: 1000;
+    pointer-events: none;
 }
-.flipper {
-  padding: 30px;
-
-
+.ig-input-with-icon{ padding-left: 38px !important; }
+.ig-input-group:focus-within .ig-input-icon{ color: var(--ig-green-600); }
+.ig-error{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:12px;
+    margin-top:4px;
+}
+/* ==========================================================================
+   Login page — cinematic CNG / energy scene
+   A layered, full-bleed animated backdrop (sky, hills, station, pipeline,
+   road traffic, particles) behind a floating premium login card. Everything
+   in .ig-auth-scene is decorative (aria-hidden) and respects
+   prefers-reduced-motion. Built with scalable inline SVG + %-based layout so
+   it holds up cleanly from small phones to 2560px+ screens without the
+   per-breakpoint pixel patch-work the old raster-image version needed.
+   ========================================================================== */
+.ig-auth{
   position: relative;
+  /* Hard viewport cap, not a floor: min-height let this box grow taller
+     than the viewport whenever the card's real (browser-rendered) content
+     height exceeded the estimate, which is exactly what was producing the
+     page scrollbar. height + overflow:hidden makes "never taller than the
+     viewport" true by construction instead of by hoping the content fits.
+     100vh is the fallback for browsers without dvh support; 100dvh (which
+     wins where supported) accounts for mobile browser chrome show/hide. */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(180deg,#eaf6f4 0%,#f7fbf6 45%,#fffaf0 100%);
+  padding: 32px 6vw;
+  gap: 4vw;
+  box-sizing: border-box;
+}
+.ig-auth-scene{ position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
 
-    -webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
-    border-radius: 20px;
-	
-	transition: 0.6s;
-	transform-style: preserve-3d;
+/* -- sky (bright daytime — energy & light, not a night scene) -- */
+.ig-sky{
+  position:absolute; inset:0 0 42% 0;
+  background:
+    radial-gradient(55% 60% at 20% 10%, rgba(255,224,115,.55), transparent 62%),
+    linear-gradient(180deg, #bfe7ff 0%, #dff3ec 48%, #fff3d6 100%);
+}
+.ig-sun{
+  position:absolute; top:8%; left:16%; width:clamp(80px,10vw,160px); height:clamp(80px,10vw,160px);
+  border-radius:50%;
+  background: radial-gradient(circle at 35% 30%, #fffbe6, #ffd525 42%, rgba(255,213,37,0) 72%);
+  filter: blur(.5px);
+  animation: ig-sun-pulse 6s ease-in-out infinite;
+}
+@keyframes ig-sun-pulse{ 0%,100%{ opacity:.92; transform:scale(1); } 50%{ opacity:1; transform:scale(1.06); } }
+.ig-star{ display:none; }
+
+.ig-cloud{
+  position:absolute;
+  fill: rgba(255,255,255,.92);
+  width: clamp(110px,13vw,220px);
+  filter: drop-shadow(0 6px 10px rgba(20,60,45,.08));
+  left:-25%;
+  animation-name: ig-cloud-drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.ig-cloud-a{ top:10%; opacity:.95; animation-duration: 70s; }
+.ig-cloud-b{ top:20%; opacity:.8; width: clamp(90px,10vw,170px); animation-duration: 95s; animation-delay:-30s; }
+.ig-cloud-c{ top:6%; opacity:.65; width: clamp(140px,16vw,260px); animation-duration: 130s; animation-delay:-60s; }
+@keyframes ig-cloud-drift{ from{ transform: translateX(0);} to{ transform: translateX(150vw);} }
+
+.ig-bird{ position:absolute; width: clamp(20px,2.4vw,32px); fill:none; stroke: rgba(15,40,30,.55); stroke-width:2.4; stroke-linecap:round; top:26%; left:-10%; animation: ig-bird-fly linear infinite; }
+.ig-bird-a{ animation-duration: 26s; top:22%; }
+.ig-bird-b{ animation-duration: 32s; top:30%; animation-delay:-9s; }
+.ig-bird-c{ animation-duration: 22s; top:16%; animation-delay:-15s; }
+.ig-bird .wing-l, .ig-bird .wing-r{ transform-origin: 20px 12px; animation: ig-bird-flap .5s ease-in-out infinite alternate; }
+.ig-bird .wing-r{ animation-delay:.02s; }
+@keyframes ig-bird-flap{ from{ transform: scaleY(1); } to{ transform: scaleY(.35); } }
+@keyframes ig-bird-fly{ from{ transform: translate(0,0);} 50%{ transform: translate(70vw,-18px);} to{ transform: translate(140vw,0);} }
+
+/* -- hills / skyline -- */
+.ig-hills{ position:absolute; left:0; right:0; bottom:16%; height:26%; width:100%; }
+.ig-hills .hill-far{ fill:#a9e3c3; opacity:.75; }
+.ig-hills .hill-near{ fill:#6fcf97; opacity:.9; }
+.ig-hills .ig-skyline rect{ fill:#3fae74; opacity:.55; }
+
+/* -- station -- */
+.ig-station{
+  position:absolute; left:0; right:0; bottom:12%; height:36%; width:100%;
+  filter: drop-shadow(0 18px 26px rgba(20,60,45,.18));
+}
+.ig-station .canopy{ fill:#ffffff; }
+.ig-station .canopy-glow{ fill: var(--ig-amber-500); opacity:.8; animation: ig-glow-pulse 2.6s ease-in-out infinite; filter: blur(3px); }
+.ig-station .pillar{ fill:#33443d; }
+.ig-station .backwall{ fill:#0f7a49; }
+.ig-station .station-sign{ fill:#eafbf3; font-size:22px; font-weight:700; letter-spacing:2px; font-family:'Montserrat',sans-serif; }
+.ig-station .pump-body{ fill:#0f7a49; }
+.ig-station .pump-screen{ fill:#0a3322; }
+.ig-station .gauge-ring{ fill:#eafbf3; stroke:#0a3322; stroke-width:3; }
+.ig-station-glow{
+  position:absolute; width:150px; height:80px; border-radius:50%;
+  transform: translate(-50%,-50%);
+  background: radial-gradient(ellipse, rgba(255,213,37,.5), transparent 72%);
+  filter: blur(4px);
+  animation: ig-glow-pulse 3.4s ease-in-out infinite;
+  pointer-events:none;
+}
+.ig-station .gauge-needle{ stroke:var(--ig-flame-500); stroke-width:2.4; stroke-linecap:round; transform-origin: 32px 70px; animation: ig-needle-sweep 3.2s ease-in-out infinite; }
+.ig-station .pump-unit-2 .gauge-needle{ animation-delay: -1.4s; }
+.ig-station .gauge-pin{ fill:#0a3322; }
+.ig-station .pump-hose{ fill:#1c2b26; }
+@keyframes ig-needle-sweep{ 0%,100%{ transform: rotate(-46deg);} 50%{ transform: rotate(46deg);} }
+@keyframes ig-glow-pulse{ 0%,100%{ opacity:.45;} 50%{ opacity:.9;} }
+
+.ig-station .flame-outer{ fill: var(--ig-flame-500); }
+.ig-station .flame-inner{ fill: var(--ig-amber-400); }
+.ig-station .flame-unit{ transform-box: fill-box; transform-origin: 50% 100%; animation: ig-flame-flicker 1.4s ease-in-out infinite; }
+.ig-station .flame-unit-2{ animation-duration: 1.7s; animation-delay:-.4s; }
+@keyframes ig-flame-flicker{
+  0%,100%{ transform: scale(1,1) rotate(0deg); }
+  30%{ transform: scale(.9,1.08) rotate(-3deg); }
+  60%{ transform: scale(1.06,.94) rotate(3deg); }
 }
 
-.front, .back {
-  /*background-color: rgba(0,0,0,.3);*/
-  position: absolute;
-    padding:10px 30px;
-  top: 0;
-  left: 0;
-  right: 0;
-	
-	backface-visibility: hidden;
+/* -- pipeline -- */
+.ig-pipeline{ position:absolute; left:0; right:0; bottom:9%; height:5%; width:100%; }
+.ig-pipeline .pipe-casing{ stroke:#3a4a44; stroke-width:9; fill:none; }
+.ig-pipeline .pipe-flow{
+  stroke: var(--ig-amber-500);
+  stroke-width:4; fill:none;
+  stroke-dasharray: 22 18;
+  animation: ig-pipe-flow 1.4s linear infinite;
+  opacity:.9;
+}
+.ig-pipeline .pipe-flange{ fill:#212f2a; stroke:#4a5b54; stroke-width:2; }
+@keyframes ig-pipe-flow{ to{ stroke-dashoffset: -80; } }
+
+/* -- road + traffic -- */
+.ig-road{ position:absolute; left:0; right:0; bottom:0; height:12%; width:100%; background: linear-gradient(180deg,#1a2320 0%, #101613 100%); }
+.ig-road-lane{
+  position:absolute; top:50%; left:0; right:0; height:3px; transform:translateY(-50%);
+  background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.5) 0 26px, transparent 26px 52px);
+  animation: ig-lane-move 1.4s linear infinite;
+}
+@keyframes ig-lane-move{ to{ background-position-x: -52px; } }
+
+.ig-car{ position:absolute; bottom:14%; width: clamp(56px,7vw,110px); filter: drop-shadow(0 6px 6px rgba(0,0,0,.35)); }
+.ig-car .car-body{ fill:#f4f6f5; }
+.ig-car.ig-car-2 .car-body{ fill:#ffd525; }
+.ig-car.ig-scooter .car-body{ fill:#3b6cff; }
+.ig-car .car-cabin{ fill:rgba(10,15,20,.85); }
+.ig-car .car-wheel{ fill:#12181a; }
+.ig-car .car-light{ fill:#fff6cf; }
+.ig-car .car-shadow{ fill: rgba(0,0,0,.28); filter: blur(2px); }
+
+.ig-car-1{ animation: ig-car-drive-1 16s cubic-bezier(.55,0,.2,1) infinite; }
+@keyframes ig-car-drive-1{
+  0%{ left:-15%; }
+  35%{ left:52%; }
+  60%{ left:52%; }
+  100%{ left:118%; }
+}
+.ig-car-2{ width: clamp(50px,6vw,96px); bottom:15%; animation: ig-car-drive-2 20s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-6s; }
+@keyframes ig-car-drive-2{
+  0%{ left:-18%; }
+  40%{ left:64%; }
+  62%{ left:64%; }
+  100%{ left:120%; }
+}
+.ig-car-3{ width: clamp(38px,4.4vw,68px); bottom:13.5%; animation: ig-car-drive-3 13s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-2s; }
+@keyframes ig-car-drive-3{
+  0%{ left:-10%; }
+  45%{ left:46%; }
+  64%{ left:46%; }
+  100%{ left:116%; }
 }
 
+.ig-refuel-glow{
+  position:absolute; bottom:16%; width:70px; height:70px; border-radius:50%;
+  background: radial-gradient(circle, rgba(255,213,37,.55), transparent 70%);
+  animation: ig-refuel-pulse 2.4s ease-in-out infinite;
+}
+.ig-refuel-glow-1{ left:50%; }
+.ig-refuel-glow-2{ left:62%; animation-delay:-1.2s; }
+@keyframes ig-refuel-pulse{ 0%,100%{ opacity:.25; transform:scale(.85);} 50%{ opacity:.7; transform:scale(1.1);} }
+
+/* -- truck: reuses .ig-car's positioning/animation mechanics (same
+      left-driving keyframe pattern, same wheel/light/shadow classes) with
+      its own art and a wider footprint. Pauses near pump island 1 (which
+      sits at roughly 42% of the station's width) so it reads as "also
+      stopping to refuel", not just passing through. -- */
+.ig-car.ig-truck{ width: clamp(78px,9.5vw,150px); bottom:13%; }
+.ig-truck .truck-cargo{ fill:#e5484d; }
+.ig-truck .truck-cab{ fill:#f4f6f5; }
+.ig-truck .truck-window{ fill:rgba(10,15,20,.85); }
+.ig-truck-1{ animation: ig-truck-drive 24s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-9s; }
+@keyframes ig-truck-drive{
+  0%{ left:-22%; }
+  38%{ left:40%; }
+  60%{ left:40%; }
+  100%{ left:124%; }
+}
+
+/* -- home + kitchen: the pipeline's destination. Sits clear of the CNG
+      station to its right; on desktop this lands in the open gap between
+      the heading text and the floating login card (see .ig-auth flex
+      layout below), and on <992px screens the whole scene sits full-width
+      above the stacked card so it's always fully visible there. -- */
+.ig-home{
+  /* Left side, deliberately: the login card floats on the right via
+     margin-left:auto and, depending on viewport width, its left edge can
+     start as far in as ~51% (at ~992px the card's fixed ~420px width eats
+     into the flex row, while the heading — capped at max-width:560px and
+     allowed to shrink — absorbs the squeeze). Anchoring the house to the
+     left edge instead of a "gap" position keeps it clear of the card at
+     every desktop width, not just the wider ones. This is a positioning
+     fix, not a stacking one — .ig-home never needs to out-rank the card. */
+  position:absolute; left:3%; bottom:10.5%; width:clamp(130px,15vw,220px); height:44%;
+  filter: drop-shadow(0 14px 20px rgba(20,60,45,.16));
+}
+.ig-home .home-riser-casing{ stroke:#3a4a44; stroke-width:9; fill:none; }
+.ig-home .home-riser-flow{
+  stroke: var(--ig-amber-500); stroke-width:4; fill:none;
+  stroke-dasharray: 16 12; animation: ig-pipe-flow 1.1s linear infinite; opacity:.9;
+}
+.ig-home .home-meter{ fill:#eafbf3; stroke:#0a3322; stroke-width:2; }
+.ig-home .home-roof{ fill:#33443d; }
+.ig-home .home-wall{ fill:#f6efdd; }
+.ig-home .home-kitchen{ fill:#fff3d6; }
+.ig-home .home-counter{ fill:#ffffff; stroke:var(--ig-border); stroke-width:2; }
+.ig-home .home-stove-pipe-casing{ stroke:#3a4a44; stroke-width:5; fill:none; }
+.ig-home .home-stove-pipe-flow{
+  stroke: var(--ig-amber-500); stroke-width:2.4; fill:none;
+  stroke-dasharray: 8 6; animation: ig-pipe-flow .8s linear infinite; opacity:.95;
+}
+.ig-home .home-stovetop{ fill:#33443d; }
+.ig-home .home-burner{ fill:none; stroke:#1c2b26; stroke-width:2; opacity:.5; }
+.ig-home .home-pot{ fill:#9aa7ad; }
+.ig-home .home-pot-handle{ fill:#8a97a0; }
+/* -- the actual bug: .flame-outer/.flame-inner only had a fill colour
+      defined scoped to ".ig-station" ancestors (see the outdoor burner
+      rules above). This home-scene flame lives under .ig-home instead, so
+      neither rule ever matched it and it was rendering with SVG's default
+      fill (black) — effectively invisible against the dark stovetop/burner
+      right underneath it. This is the actual fix, not a z-index/clip one. */
+.ig-home .flame-outer{ fill: var(--ig-flame-500); }
+.ig-home .flame-inner{ fill: var(--ig-amber-400); }
+.ig-home .home-flame{
+  transform-box: fill-box; transform-origin:50% 100%;
+  animation: ig-home-flame-flicker 1.2s ease-in-out infinite;
+  animation-delay:-.6s;
+}
+@keyframes ig-home-flame-flicker{
+  0%,100%{ transform: scale(1,1) rotate(0deg) translateY(0); opacity:1; }
+  30%{ transform: scale(.88,1.1) rotate(-4deg) translateY(-1px); opacity:.88; }
+  60%{ transform: scale(1.08,.92) rotate(4deg) translateY(.5px); opacity:1; }
+  80%{ transform: scale(.96,1.04) rotate(-1deg) translateY(-.5px); opacity:.95; }
+}
+
+/* -- floating energy particles -- */
+.ig-particle{
+  position:absolute; bottom:20%; width:5px; height:5px; border-radius:50%;
+  background: radial-gradient(circle, #ffe27a, rgba(255,213,37,0));
+  animation: ig-particle-rise 5.5s ease-in infinite;
+  opacity:0;
+}
+.ig-particle:nth-child(odd){ animation-duration: 6.6s; }
+.ig-particle:nth-child(1){ animation-delay: 0s; }
+.ig-particle:nth-child(2){ animation-delay: 1.1s; }
+.ig-particle:nth-child(3){ animation-delay: 2.2s; }
+.ig-particle:nth-child(4){ animation-delay: 3.3s; }
+.ig-particle:nth-child(5){ animation-delay: 4.4s; }
+@keyframes ig-particle-rise{
+  0%{ transform: translateY(0) translateX(0); opacity:0; }
+  15%{ opacity:.9; }
+  100%{ transform: translateY(-220px) translateX(18px); opacity:0; }
+}
+
+.ig-scene-fade{
+  position:absolute; inset:0;
+  /* a soft light bloom behind the card area instead of a dark vignette —
+     keeps the whole scene bright while still lifting the card off the
+     background for contrast */
+  background: radial-gradient(46% 60% at 84% 52%, rgba(255,255,255,.65), rgba(255,255,255,0) 72%);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .ig-sun,.ig-star,.ig-cloud,.ig-bird,.ig-bird .wing-l,.ig-bird .wing-r,
+  .ig-station .gauge-needle,.ig-station .flame-unit,.flame-unit-2,.ig-station-glow,
+  .ig-pipeline .pipe-flow,.ig-road-lane,.ig-car,.ig-refuel-glow,.ig-particle,
+  .ig-truck-1,.ig-home .home-riser-flow,.ig-home .home-stove-pipe-flow,.ig-home .home-flame,
+  .animate__animated{
+    animation: none !important;
+  }
+}
+
+/* -- heading + panel (foreground content) -- */
+.ig-auth-heading{
+  position:relative; z-index:2; flex:1 1 auto; color: var(--ig-ink-900); max-width:560px;
+}
+.ig-eyebrow{
+  display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  color: #8a6b00; background: rgba(255,213,37,.22); border:1px solid rgba(231,180,0,.35);
+  padding:6px 14px; border-radius: var(--ig-radius-pill); margin-bottom:18px;
+}
+.ig-auth-heading h2{ font-size: clamp(30px,3.6vw,48px); font-weight:800; letter-spacing:-1px; margin:0 0 12px; color: var(--ig-green-800); text-shadow: 0 2px 24px rgba(255,255,255,.6); }
+.ig-auth-heading h2 span{ color: #c98a00; }
+.ig-auth-heading p{ font-size:15.5px; color: var(--ig-ink-500); font-weight:600; max-width:420px; }
+
+.ig-auth-panel{ position:relative; z-index:2; flex:0 0 auto; width:min(420px,100%); margin-left:auto; }
+
+.ig-card{
+  width:100%;
+  background: var(--ig-surface);
+  padding: 32px 36px;
+  border-radius: var(--ig-radius-lg);
+  box-shadow: 0 40px 80px -20px rgba(0,0,0,.55);
+  border: 1px solid rgba(255,255,255,.08);
+  box-sizing: border-box;
+  /* Safety net, not the primary mechanism: .ig-auth above is now hard-capped
+     to the viewport, so this card must fit within it. This max-height +
+     scroll is what happens instead of the login button silently getting
+     clipped in an edge case (e.g. an unusually short window, large text
+     zoom, or a long validation message) — a small scroll confined to this
+     white card, never a page-level scrollbar. In the normal case the card
+     is shorter than this limit and the scrollbar never appears. */
+  max-height: calc(100dvh - 64px);
+  overflow-y: auto;
+}
+
+/****************flip css*********************
+   The front face stays in normal document flow (position:relative) so the
+   .flipper/.flip-container/.ig-auth-panel chain always has a real height
+   equal to the visible card — this is what stops the card from collapsing
+   to zero height and getting clipped. Only the back face (hidden until
+   flipped) is taken out of flow and overlaid on top of it.
+*********************/
+.flip-container{ perspective: 1400px; }
+.flipper{
+    position: relative;
+    transition: .6s var(--ig-ease);
+    transform-style: preserve-3d;
+}
 .front{
-	z-index: 2;
-	/* for firefox 31 */
-	transform: rotateY(0deg);
+    position: relative;
+    z-index: 2;
+    transform: rotateY(0deg);
+    backface-visibility: hidden;
 }
-
 .back{
+    position: absolute;
+    top: 0; left: 0; right: 0;
     transform: rotateY(180deg);
+    backface-visibility: hidden;
+    max-height: 100%;
+    overflow-y: auto;
 }
-.flip{
-		transform: rotateY(180deg);
-}
+.flip{ transform: rotateY(180deg); }
 input{
     width:100%;
     margin-bottom:15px;
@@ -457,1376 +627,1420 @@ input{
     box-sizing: border-box;
     padding:10px;
 }
-
-.title{
-  text-align: center;
-}
+.title{ text-align: center; }
 .flipbutton{
-    color:#4096ee;
+    color: var(--ig-green-600);
     text-decoration:none;
     text-align:left !important;
     font-weight: 700;
 }
+.flipbutton:hover{ color: var(--ig-green-700); text-decoration: underline; }
 
 /*****************************************responsive code css*******************************/
-@media only screen and (max-width: 480px) and (min-width: 320px){
-  .heaidng {
-  display:none;
+@media only screen and (max-width: 991px){
+  .ig-auth{ flex-direction:column; justify-content:center; padding: 32px 24px; text-align:center; gap:28px; }
+  .ig-auth-heading{ max-width:100%; }
+  .ig-auth-heading p{ margin:0 auto; }
+  .ig-auth-panel{ margin:0 auto; }
+  .ig-sky{ inset:0 0 30% 0; }
+  .ig-station{ height:30%; }
+  .ig-hills{ bottom:12%; }
+  /* Below 991px .ig-auth stacks to a column — heading above, card below,
+     both centered — instead of sitting side-by-side. That changes which
+     axis matters: the card is no longer to the right of the scene, it's
+     *within* it vertically, roughly in the lower-middle of the stack. The
+     ground-level elements (road/station/home) are bottom-anchored across
+     the whole scene height, so keeping their footprint short and close to
+     the true bottom edge — matching .ig-station's existing 30% here — is
+     what keeps them clear of wherever the centered card ends up, rather
+     than relying on the desktop left/right split. */
+  .ig-home{ height:28%; width:clamp(100px,20vw,190px); }
+  /* The card's max-height safety net (base rule: calc(100dvh - 64px)) was
+     sized for the desktop side-by-side layout, where the card is the only
+     thing sharing .ig-auth's height budget. Stacked here, the heading
+     block and the 28px gap above the card eat into that same budget, so
+     the reserve needs to account for them too or the combined stack can
+     still overflow .ig-auth's hard cap and get clipped by its
+     overflow:hidden instead of the card's own scroll kicking in. */
+  .ig-card{ max-height: calc(100dvh - 260px); }
 }
-.login {
-  width: 100%;
-  background: #fff;
-  padding: 32px;
-  margin: auto;
-  border-radius: 16px;
+@media only screen and (max-width: 767px){
+  /* Phones have the least vertical slack between the centered
+     heading+card cluster and the bottom edge, so the home/kitchen scene
+     gets an extra, phone-specific reduction on top of the 991px rule
+     above rather than just inheriting the tablet size. */
+  .ig-home{ height:20%; width:clamp(84px,22vw,150px); }
 }
-.front, .back {
-  /* background-color: rgba(0,0,0,.3); */
-  position: absolute;
-  padding: 0;
-  top: 0;
-  left: 0;
-  right: 0;
-  backface-visibility: hidden;
-}
-.images_manage .img5 {
-  width: 239px;
-  position: absolute;
-  right: 0;
-  bottom: 47px;
-  z-index: 9;
-}
-.images_manage .img7 {
-  width: 100%;
-  position: absolute;
-  left: 0;
-  bottom: 23px;
-  z-index: 2;
-}
-}
-.fontforget_passowrd{
-  font-size: 13px;
+@media only screen and (max-width: 480px){
+  .ig-card{ padding: 30px 22px; }
+  .ig-auth-heading h2{ font-size:28px; }
+  .ig-eyebrow{ display:none; }
+  .ig-cloud-c{ display:none; }
+  .ig-bird-c{ display:none; }
+  /* simplify rather than shrink: on the smallest phones drop the truck
+     (secondary vehicle) so the road doesn't feel cluttered at this scale —
+     the car, scooter, station and home/kitchen story beats stay intact. */
+  .ig-truck{ display:none; }
 }
 
-.logo_nav{
-  width: 57px;
-  margin: 2px 5px 0;
-}
+.fontforget_passowrd{ font-size: 13px; color: var(--ig-ink-500); }
+
+/* ==========================================================================
+   Top navbar
+   ========================================================================== */
+.logo_nav{ width: 50px; margin: 2px 5px 0; }
 a.navbarmenu {
   font-size: 13px;
   font-weight: 600;
-  color: #949494;
+  color: var(--ig-ink-400);
   margin: 0 6px;
   padding-bottom: 15px;
-    margin-top: 11px;
+  margin-top: 11px;
+  transition: color var(--ig-fast) var(--ig-ease);
 }
+a.navbarmenu:hover{ color: var(--ig-green-700); }
 .navbarmenu.active{
-  border-bottom: 3px solid #ffd525;
-  color: #097a43 !important;
+  border-bottom: 3px solid var(--ig-amber-500);
+  color: var(--ig-green-700) !important;
 }
-.navbar {
-  border-bottom: 1px solid #e4e4e4;
-  padding: 0 !important;
-  background:#fff !important;
+.navbar{
+  border-bottom: 1px solid var(--ig-border);
+  padding: 10px 0 !important;
+  background: var(--ig-surface) !important;
+  box-shadow: 0 1px 0 rgba(16,24,32,.02);
 }
+
+/* ==========================================================================
+   Cards / panels
+   ========================================================================== */
 .bgwhite2{
-  background-color: #fff;
+  background-color: var(--ig-surface);
   margin-top: 19px;
-  padding: 16px;
-  border-radius: 18px;
-  box-shadow: 0px 2px 0px #f1f1f1;
+  padding: 20px;
+  border-radius: var(--ig-radius-lg);
+  border: 1px solid var(--ig-border);
+  box-shadow: var(--ig-shadow-sm);
+  transition: box-shadow var(--ig-med) var(--ig-ease), transform var(--ig-med) var(--ig-ease);
 }
 .bgblack2{
-  background-color: #555;
+  position: relative;
+  background: linear-gradient(160deg, #1a2320 0%, #23302b 55%, #2b3a33 100%);
+  color:#fff;
   margin-top: 19px;
   padding: 16px;
-  border-radius: 18px;
-  box-shadow: 0px 2px 0px #f1f1f1;
+  border-radius: var(--ig-radius-lg);
+  box-shadow: var(--ig-shadow-md);
+  overflow: hidden;
 }
-.heading_two h2{
-  font-size: 17px;
-  font-weight: 600;
+/* faint amber pilot-light glow, echoing the login scene's energy palette */
+.bgblack2::before{
+  content:"";
+  position:absolute; top:-40%; right:-10%; width:55%; height:140%;
+  background: radial-gradient(circle, rgba(255,213,37,.10), transparent 70%);
+  pointer-events:none;
 }
-th {
-  font-size: 14px;
-  font-weight: 600;
+.bgblack2 .row{ row-gap: 10px; position:relative; z-index:1; }
+.bgblack2 .values{
+  animation: ig-fade-up var(--ig-slow) var(--ig-ease) both;
+  height: 100%;
 }
-td {
-  font-size: 13px;
-  color: #000;
+.bgblack2 .col-md-4:nth-child(1) .values{ animation-delay: 0ms; }
+.bgblack2 .col-md-4:nth-child(2) .values{ animation-delay: 80ms; }
+.bgblack2 .col-md-4:nth-child(3) .values{ animation-delay: 160ms; }
+@media (prefers-reduced-motion: reduce){ .bgblack2 .values{ animation:none; } }
+.heading_two h2{ font-size: 17px; font-weight: 700; letter-spacing:-.2px; }
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+th{
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ig-ink-500);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  border-color: var(--ig-border) !important;
+  background: #fafbfd;
+}
+td{
+  font-size: 13.5px;
+  color: var(--ig-ink-900);
+  vertical-align: middle;
 }
 .table{
-  border: 1px solid #d7d7d7;
+  border: 1px solid var(--ig-border);
+  border-radius: var(--ig-radius-sm);
+  /* deliberately NOT overflow:hidden — that would clip any dropdown menu
+     (row action gear icons) whose menu opens near the bottom edge of the
+     table. The rounded corners still read fine without it. */
+  --bs-table-hover-bg: var(--ig-green-50);
 }
-.iconsmenu ul li {
-  list-style: none;
-  float: left;
-  margin: 0 4px;
+.table > :not(caption) > * > *{
+  padding: .85rem .9rem;
 }
-.iconsmenu ul{
-  padding: 0;
-  margin: 0;
+.table tbody tr{ transition: background var(--ig-fast) var(--ig-ease); }
+table{ width: 100%; }
+thead{ white-space: nowrap; }
+th{ white-space: nowrap; }
+table th, table td{ }
+.table-responsive{
+  padding-bottom: 54px;
+  border-radius: var(--ig-radius-sm);
+  position: relative;
+  /* a visible, on-brand scrollbar instead of the bare OS default — this is
+     the affordance that tells people the table scrolls, without resorting
+     to hiding columns or letting content spill outside the card */
+  scrollbar-width: thin;
+  scrollbar-color: var(--ig-green-100) transparent;
 }
-.iconsmenu{
-  float:right;
+.table-responsive::-webkit-scrollbar{ height: 9px; }
+.table-responsive::-webkit-scrollbar-track{ background: transparent; }
+.table-responsive::-webkit-scrollbar-thumb{ background: var(--ig-green-100); border-radius: 10px; border: 2px solid #fff; }
+.table-responsive:hover::-webkit-scrollbar-thumb,
+.table-responsive:focus-within::-webkit-scrollbar-thumb{ background: var(--ig-green-500); }
+
+/* -- edge fade shadows: pure-CSS "scroll shadow" trick. Two gradients that
+      scroll WITH the content (so they sit right at the table's real edges)
+      layered under two gradients that stay fixed to the viewport of the
+      scroller (so they only render once there is more to see). No JS, and
+      they vanish automatically once you've scrolled to an edge. -- */
+.table-responsive.ig-scroll-x{
+  background:
+    linear-gradient(to right, #fff 30%, rgba(255,255,255,0)) left,
+    linear-gradient(to left, #fff 30%, rgba(255,255,255,0)) right,
+    radial-gradient(farthest-side at left, rgba(16,24,32,.12), rgba(16,24,32,0)) left,
+    radial-gradient(farthest-side at right, rgba(16,24,32,.12), rgba(16,24,32,0)) right;
+  background-repeat: no-repeat;
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-attachment: local, local, scroll, scroll;
 }
+
+/* -- mobile "swipe for more" hint: appears only while the table actually
+      overflows (JS adds .ig-has-scroll after measuring it) and only until
+      the person scrolls it once (JS then adds .ig-scrolled). Decorative
+      only — the table works identically with or without JS. -- */
+.table-responsive.ig-has-scroll:not(.ig-scrolled)::after{
+  /* sits in the wrapper's own reserved bottom padding (see padding-bottom
+     above) so it can never be clipped by the wrapper's own overflow:auto —
+     an element positioned outside the box (e.g. a negative top) would be */
+  content: "Scroll for more \2192";
+  position: absolute;
+  bottom: 14px;
+  right: 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  color: var(--ig-green-700);
+  background: var(--ig-green-100);
+  padding: 4px 10px;
+  border-radius: var(--ig-radius-pill);
+  pointer-events: none;
+  animation: ig-hint-nudge 1.6s ease-in-out infinite;
+  display: none;
+}
+@media (max-width: 767px){
+  .table-responsive.ig-has-scroll:not(.ig-scrolled)::after{ display: inline-block; }
+}
+@keyframes ig-hint-nudge{
+  0%, 100%{ transform: translateX(0); opacity:1; }
+  50%{ transform: translateX(3px); opacity:.75; }
+}
+@media (prefers-reduced-motion: reduce){
+  .table-responsive.ig-has-scroll:not(.ig-scrolled)::after{ animation: none; }
+}
+
+/* -- sticky first column: the row's identity/actions column stays put while
+      the rest of a wide table scrolls underneath it, so you never lose
+      track of which row you're looking at. Applies to the redesigned
+      .ig-table component only. -- */
+.ig-table thead th:first-child,
+.ig-table tbody td:first-child{
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+.ig-table thead th:first-child{ z-index: 3; background: var(--ig-bg); }
+.ig-table tbody td:first-child{ background: #fff; }
+.ig-table tbody tr:hover td:first-child{ background: var(--ig-green-50); }
+.ig-table tbody td:first-child,
+.ig-table thead th:first-child{
+  box-shadow: 2px 0 6px -2px rgba(16,24,32,.10);
+}
+
+/* ==========================================================================
+   Icon menus / action rows
+   ========================================================================== */
+.iconsmenu ul li{ list-style: none; float: left; margin: 0 4px; }
+.iconsmenu ul{ padding: 0; margin: 0; }
+.iconsmenu{ float:right; }
 .iconsmenu ul li i{
-    /* background: #efefef; */
-    padding: 4px 7px;
-    border-radius: 9px;
-    border: 1px solid #e5e5e5;
     padding: 6px 9px;
+    border-radius: var(--ig-radius-xs);
+    border: 1px solid var(--ig-border);
+    color: var(--ig-ink-500);
+    transition: all var(--ig-fast) var(--ig-ease);
 }
-.iconsmenu2 ul li {
-  list-style: none;
-  float: left;
-  margin: 0 4px;
-}
-.iconsmenu2 ul{
-  padding: 0;
-  margin: 0;
-}
-.iconsmenu2 ul li i{
-  /* background: #efefef; */
-  padding: 4px 7px;
-
-
-  padding: 6px 9px;
-}
+.iconsmenu ul li i:hover{ background: var(--ig-green-50); border-color: var(--ig-green-500); color: var(--ig-green-700); }
+.iconsmenu2 ul li{ list-style: none; float: left; margin: 0 4px; }
+.iconsmenu2 ul{ padding: 0; margin: 0; }
+.iconsmenu2 ul li i{ padding: 6px 9px; }
 .iconsmenu2 .bi-star{
   padding: 4px 7px;
-  border-radius: 9px;
-  border: 1px solid #e5e5e5;
+  border-radius: var(--ig-radius-xs);
+  border: 1px solid var(--ig-border);
   padding: 6px 9px;
 }
+
+/* ==========================================================================
+   Sidebar — same navigation behaviour as the original app, restyled:
+
+   Desktop: collapsed by default to a compact icon rail — hovering an icon
+   reveals a floating tooltip (Bootstrap tooltip, restyled below). Clicking
+   the hamburger EXPANDS the same rail in place to show icons + labels
+   (content shifts over via #main's margin-left, exactly like the app's
+   original expand/collapse), clicking it again collapses it back. Tooltips
+   are disabled while expanded (the label is already visible) and
+   re-enabled on collapse — see setSidebarTooltips() in the layout script.
+   Mobile / tablet: the rail becomes an off-canvas drawer with full labels,
+   opened by the hamburger and closed via the × button or the backdrop.
+   A single body.sidenav-toggled class drives both states, interpreted
+   differently per breakpoint below — see toggleNav()/openNav()/closeNav()
+   in the layout script.
+   ========================================================================== */
+:root{ --ig-rail-w: 76px; --ig-drawer-w: 272px; }
+
 .sidenav {
   height: 100%;
-  width: 63px;
   position: fixed;
-  z-index: 1;
+  z-index: 1030;
   top: 0;
   left: 0;
-  background-color: #fff;
+  /* deep ink-green field with a faint pilot-light glow near the brand mark —
+     the same energy-theme language as the login scene, just turned down for
+     a working nav rather than a hero moment */
+  background: radial-gradient(120% 60% at 0% 0%, rgba(255, 213, 37, .10), transparent 55%), linear-gradient(180deg, #FFDB58 0%, #318000 55%, #081210 83%);
   overflow-x: hidden;
-  transition: 0.5s;
-
-  border-right: 1px solid #e4e4e4;
+  overflow-y: auto;
+  overflow-y: overlay;
+  border-right: 1px solid rgba(255,255,255,.05);
+  box-shadow: var(--ig-shadow-lg);
+  transition: width .32s var(--ig-ease), transform .32s var(--ig-ease);
 }
+.sidenav::-webkit-scrollbar{ width: 5px; }
+.sidenav::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.12); border-radius: 10px; }
+.sidenav::-webkit-scrollbar-track{ background: transparent; }
 
 .sidenav a {
-  padding: 12px 29px;
+  position: relative;
   text-decoration: none;
-  font-size: 14px;
-  color: #000000;
-  display: block;
-  transition: 0.3s;
-  font-weight: 500;
+  font-size: 13.5px;
+  color: rgba(234,242,238,.62);
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  transition: background var(--ig-fast) var(--ig-ease), color var(--ig-fast) var(--ig-ease), transform var(--ig-fast) var(--ig-ease);
+  font-weight: 600;
   white-space: nowrap;
-
+  margin: 3px 10px;
+  padding: 10px 12px;
+  border-radius: var(--ig-radius-sm);
 }
+/* icon "chip" — a soft rounded backdrop behind every glyph so collapsed
+   icons carry real visual weight instead of floating bare on dark ink */
+.sidenav a i{
+  font-size:16px; width:34px; height:34px; flex:none;
+  display:inline-flex; align-items:center; justify-content:center;
+  border-radius: var(--ig-radius-sm);
+  background: rgba(255,255,255,.05);
+  transition: background var(--ig-fast) var(--ig-ease), color var(--ig-fast) var(--ig-ease), transform var(--ig-fast) var(--ig-ease);
+}
+.sidenav a:hover{
+  background: rgba(255,255,255,.06);
+  color:#fff;
+  transform: translateX(2px);
+}
+.sidenav a:hover i{ background: rgba(255,213,37,.14); color: var(--ig-amber-400); }
 .sidenav a.active{
-  background: linear-gradient(to left, #fff7d6 0%, #ffffff 100%) ;
-  border-right: 5px solid #ffd525;
+  background: linear-gradient(135deg, rgba(15,148,87,.22), rgba(10,92,57,.14));
+  color: #fff;
 }
-.sidenav a:hover {
-  background: linear-gradient(to left, #fff7d6 0%, #ffffff 100%) ;
-
-  border-right: 5px solid #ffd525;
+.sidenav a.active i{
+  background: linear-gradient(135deg, var(--ig-green-500), var(--ig-green-700));
+  color:#fff;
+  box-shadow: 0 4px 12px -3px rgba(15,148,87,.65);
 }
+.sidenav a.active:hover{ transform:none; }
+/* left accent bar — the active item's real "you are here" marker, a thin
+   amber-to-green taper that reads clearly even when the rail is collapsed */
+.sidenav a.active::before{
+  content:"";
+  position:absolute; left:-10px; top:50%; transform:translateY(-50%);
+  width:4px; height:22px; border-radius:0 4px 4px 0;
+  background: linear-gradient(180deg, var(--ig-amber-500), var(--ig-green-500));
+}
+.sidenav a:focus-visible{ outline: 2px solid var(--ig-amber-500); outline-offset: 2px; }
 
 .sidenav .closebtn {
+  display:none;
   position: absolute;
-  top: 0;
+  top: 12px;
+  right: 12px;
+  width: 32px; height: 32px;
+  align-items:center; justify-content:center;
   padding: 0;
-  left: 160px;
-  font-size: 36px;
-  margin-left: 50px;
+  font-size: 22px;
+  line-height:1;
+  color: rgba(255,255,255,.55);
+  border-radius: 50%;
+  transition: all var(--ig-fast) var(--ig-ease);
 }
-.sidenav .closebtn:hover {
-   background: none !important;
-   border:none !important;
-}
-#main {
-  transition: .5s;
-  margin-left:63px;
-}
-.menu {
-  margin-top: 23px;
-}
-.menu i{
-  margin-right: 16px;
-}
-.padd000{
+.sidenav .closebtn:hover{ background: rgba(255,255,255,.1) !important; border:none !important; color:#fff; transform: rotate(90deg); }
 
+#main{ transition: margin-left .32s var(--ig-ease); }
+.menu{ margin-top: 6px; padding-bottom: 24px; }
+.padd000{}
+
+.sidenav-brand{
+  position: relative;
+  display:flex; align-items:center; gap:12px;
+  padding: 20px 20px 16px;
+  margin-bottom: 6px;
+}
+/* soft gradient divider instead of a flat hairline — fades at both edges so
+   it never reads as a harsh ruled line across a dark panel */
+.sidenav-brand::after{
+  content:"";
+  position:absolute; left:16px; right:16px; bottom:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+}
+.sidenav-brand .logo_nav{ filter: brightness(0) invert(1); position:relative; z-index:1; }
+.sidenav-brand-text{
+  font-weight:800;
+  font-size:15px;
+  color:#fff;
+  letter-spacing:.3px;
+  white-space:nowrap;
+}
+.nav-section-label{
+  position: relative;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: rgba(255,213,37,.55);
+  margin: 20px 22px 9px;
+  white-space: nowrap;
+  padding-left: 2px;
 }
 
-.iconsbg{
-  background: #ffefae;
-  margin-right: 10px;
-  padding: 5px 7px;
-  border-radius: 60px;
-  font-size: 17px;
+/* -- toggle / hamburger button -- */
+.ig-nav-toggle-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:42px; height:42px;
+  border-radius: var(--ig-radius-sm);
+  cursor:pointer;
+  transition: background var(--ig-fast) var(--ig-ease), transform var(--ig-fast) var(--ig-ease);
 }
-.iconsbg2{
-  background: #00774430;
-  margin-right: 10px;
-  padding: 5px 7px;
-  border-radius: 60px;
-  font-size: 17px;
+.ig-nav-toggle-btn:hover{ background: var(--ig-green-50); }
+.ig-nav-toggle-btn .menuicons{ transition: transform var(--ig-med) var(--ig-ease); }
+body.sidenav-toggled .ig-nav-toggle-btn .menuicons{ transform: rotate(90deg); }
+
+/* -- desktop: collapsed icon rail by default, expands to icons+labels -- */
+@media only screen and (min-width: 992px){
+  .sidenav{ width: var(--ig-rail-w); transform:none; overflow-x:hidden; }
+  #main{ margin-left: var(--ig-rail-w); }
+  .sidenav-text{ display:none; }
+  .sidenav-brand{ justify-content:center; padding: 20px 0 16px; }
+  .sidenav a{ justify-content:center; margin:4px 14px; }
+  .nav-section-label{ display:none; }
+  .sidenav-backdrop{ display:none; }
+
+  /* expanded state — same rail, wider, labels revealed */
+  body.sidenav-toggled .sidenav{ width: var(--ig-drawer-w); }
+  body.sidenav-toggled #main{ margin-left: var(--ig-drawer-w); }
+  body.sidenav-toggled .sidenav-text{ display:inline-block; opacity:1; transition: opacity .2s var(--ig-ease) .1s; }
+  body.sidenav-toggled .nav-section-label{ display:block; }
+  body.sidenav-toggled .sidenav-brand{ justify-content:flex-start; padding: 18px 20px 14px; }
+  body.sidenav-toggled .sidenav a{ justify-content:flex-start; margin:3px 10px; }
+
+  .sidenav-text{ opacity:0; }
 }
-.form-check-input{
-  padding: 7px 7px;
+
+/* -- mobile / tablet: off-canvas drawer with full labels -- */
+@media only screen and (max-width: 991px){
+  .sidenav{
+    width: var(--ig-drawer-w);
+    transform: translateX(-100%);
+  }
+  #main{ margin-left: 0; }
+  .sidenav .closebtn{ display:flex; }
+  .sidenav a{ justify-content:flex-start; }
+
+  body.sidenav-toggled .sidenav{ transform: translateX(0); }
+
+  .sidenav-backdrop{
+    position: fixed;
+    inset: 0;
+    background: rgba(4,14,10,.55);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--ig-med) var(--ig-ease);
+    z-index: 1020;
+  }
+  body.sidenav-toggled .sidenav-backdrop{
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
+
+/* -- premium tooltip styling (Bootstrap tooltip component, used for the
+      collapsed rail's hover labels) -- */
+.tooltip{ z-index: 1080; }
+.tooltip .tooltip-inner{
+  background: var(--ig-ink-900);
+  color:#fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing:.2px;
+  padding: 7px 12px;
+  border-radius: var(--ig-radius-xs);
+  box-shadow: var(--ig-shadow-md);
+}
+.tooltip .tooltip-arrow::before{ border-right-color: var(--ig-ink-900) !important; }
+.bs-tooltip-end .tooltip-arrow::before,
+.bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before{ border-right-color: var(--ig-ink-900) !important; }
+
+/* ==========================================================================
+   Icon chips / badges used on stat rows
+   ========================================================================== */
+.iconsbg{ background: var(--ig-amber-100); margin-right: 10px; padding: 6px 9px; border-radius: var(--ig-radius-pill); font-size: 16px; color:#8a6b00; }
+.iconsbg2{ background: var(--ig-green-100); margin-right: 10px; padding: 6px 9px; border-radius: var(--ig-radius-pill); font-size: 16px; color: var(--ig-green-700); }
+.form-check-input{ padding: 7px 7px; }
+.form-check-input:checked{ background-color: var(--ig-green-600); border-color: var(--ig-green-600); }
+
 .formsearch{
   margin: 0;
-  background: #fff !important;
-  border: 1px solid #d7d7d7 !important;
-  border-radius: 4px !important;
+  background: var(--ig-bg) !important;
+  border: 1px solid var(--ig-border) !important;
+  border-radius: var(--ig-radius-sm) !important;
   font-size: 14px;
   width: 323px;
   padding-left: 104px;
   padding-right: 37px;
+  transition: box-shadow var(--ig-fast) var(--ig-ease), border-color var(--ig-fast) var(--ig-ease), background var(--ig-fast) var(--ig-ease);
 }
-.menuicons{
-  
-  width: 29px;
+.formsearch:focus{ background:#fff !important; border-color: var(--ig-green-500) !important; box-shadow: 0 0 0 4px var(--ig-green-100) !important; }
+.menuicons{ width: 26px; transition: transform var(--ig-fast) var(--ig-ease); }
+.navbar-brand:hover .menuicons{ transform: scale(1.08); }
+.postioninner{ position:relative; }
+.postioninner i{ position: absolute; right: 47px; top: 8px; color: var(--ig-ink-400); }
 
-}
-.postioninner{
-  position:relative;  
-}
-.postioninner i{
-  position: absolute;
-  right: 47px;
-  top: 8px;
-}
-.modal-header{
-  border-bottom:none;
-}
-.modal-footer{
-  border-top:none;
-
-}
+/* ==========================================================================
+   Modals
+   ========================================================================== */
+.modal-header{ border-bottom:1px solid var(--ig-border); padding: 18px 24px; }
+.modal-footer{ border-top:1px solid var(--ig-border); padding: 16px 24px; }
+.modal-body{ padding: 20px 24px; }
 .modal-content{
-  border-radius: 4px !important;
+  border-radius: var(--ig-radius-lg) !important;
+  border: none !important;
+  box-shadow: var(--ig-shadow-lg);
 }
+.modal-title{ font-weight: 700; font-size: 17px; }
+
+/* ==========================================================================
+   Filter modals — genuinely redesigned, not just recoloured. Applies
+   app-wide to every filter modal that uses the existing .filter/.nav-pills/
+   .tab-content/.modal-footer markup (Social Tickets, Leads, Social Post,
+   Reports, etc.) with no HTML changes required, so every one of them
+   benefits at once. Same fields, same form actions, same validation —
+   only the shell around them changed.
+   ========================================================================== */
+
+/* -- segmented icon-pill tabs instead of an underlined tab strip -- */
+.filter{ padding-top: 2px; }
 .filter .nav-pills{
-  border-bottom: 1px solid #e5e5e5;
+  display:flex; flex-wrap:wrap; gap:6px;
+  background: var(--ig-ink-100);
+  border-bottom: none;
+  border-radius: var(--ig-radius-pill);
+  padding: 4px;
+  margin-bottom: 20px;
 }
-.filter .nav-pills .nav-link.active{
-  background: transparent;
-  color: #000;
-  border-bottom: 3px solid #ffd525;
-  border-radius: 0 !important;
-  color: #067943;
-  font-weight: 500;
-}
+.filter .nav-pills .nav-item{ flex: 1 1 auto; }
 .filter .nav-pills .nav-link{
-  color: #000;
-  font-size: 14px;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  color: var(--ig-ink-500);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align:center;
+  border-radius: var(--ig-radius-pill) !important;
+  padding: 9px 14px;
+  transition: all var(--ig-fast) var(--ig-ease);
 }
+.filter .nav-pills .nav-link i{ font-size: 14px; }
+.filter .nav-pills .nav-link.active,
+.filter .nav-pills .nav-link.active2{
+  background: var(--ig-surface);
+  color: var(--ig-green-700);
+  border-bottom: none;
+  box-shadow: var(--ig-shadow-xs);
+  font-weight: 700;
+}
+.filter .nav-pills .nav-link:not(.active):not(.active2):hover{ background: rgba(255,255,255,.65); color: var(--ig-green-700); }
+
+/* -- spacious field grid: real breathing room between fields instead of
+      the cramped default Bootstrap gutters -- */
+.filter .tab-content{ padding-top: 2px; }
+.filter .tab-pane .row{ --bs-gutter-x: 1.5rem; }
+.filter .tab-pane .mb-3,
+.filter .tab-pane .mt-3{ margin-bottom: 20px !important; margin-top: 0 !important; }
+.filter .form-label{
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: .06em;
+  color: var(--ig-ink-400);
+  font-weight: 700;
+}
+.filter .form-control,
+.filter .form-select{ transition: border-color var(--ig-fast) var(--ig-ease), box-shadow var(--ig-fast) var(--ig-ease), transform var(--ig-fast) var(--ig-ease); }
+.filter .form-control:focus,
+.filter .form-select:focus{ transform: translateY(-1px); }
+
+/* -- a bounded, internally-scrolling body for long filter forms: the
+      header/tabs stay put and only the field grid scrolls, so a tall
+      filter form can never get cut off below the fold or force the whole
+      page to scroll to reach Apply/Reset. Progressive enhancement — browsers
+      without :has() just get the previous (still fully working) layout. -- */
+.modal-body:has(.filter){
+  max-height: min(72vh, 640px);
+  overflow-y: auto;
+}
+
+/* -- footer stays reachable: sticky to the bottom of the scrolling area
+      above, with a clear divider so it never blends into the field grid -- */
+.filter .modal-footer{
+  position: sticky;
+  bottom: -1px;
+  background: var(--ig-surface);
+  margin: 22px -24px -20px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--ig-border);
+  z-index: 2;
+  gap: 8px;
+}
+.filter .modal-footer .btn{ min-width: 96px; }
+
+/* -- modal open/close: a shorter drop + gentle scale instead of Bootstrap's
+      default 50px translate, with a springier easing so the dialog feels
+      like it's arriving rather than just fading in place. Bootstrap's own
+      .fade/.show classes still drive when this transition runs — nothing
+      about the modal's open/close triggers or timing changed. -- */
+.modal.fade .modal-dialog{
+  transform: translateY(-30px) scale(.98);
+  transition: transform .28s cubic-bezier(.34,1.2,.4,1), opacity .2s linear;
+}
+.modal.show .modal-dialog{ transform: translateY(0) scale(1); }
+
+/* -- tab switch: a short fade+lift replayed via JS toggling this class
+      every time a pill is activated (see ui-enhance.js), independent of
+      whether the pane itself uses Bootstrap's .fade or not -- */
+.ig-tab-in{ animation: ig-fade-up .28s var(--ig-ease) both; }
+@media (prefers-reduced-motion: reduce){
+  .modal.fade .modal-dialog{ transition: opacity .15s linear; transform:none !important; }
+  .ig-tab-in{ animation:none; }
+}
+
+/* -- Apply button: brief busy state on click, purely visual feedback while
+      the form's normal submit/navigation is already underway -- */
+.ig-btn-busy{ position:relative; color:transparent !important; pointer-events:none; }
+.ig-btn-busy::after{
+  content:"";
+  position:absolute; top:50%; left:50%; width:16px; height:16px;
+  margin:-8px 0 0 -8px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.5);
+  border-top-color:#fff;
+  animation: ig-spin .6s linear infinite;
+}
+@keyframes ig-spin{ to{ transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce){
+  .ig-btn-busy::after{ animation-duration: 1.2s; }
+}
+
+/* -- Close / secondary button: a bit more tactile press feedback -- */
+.filter .modal-footer .btn-secondary:active,
+.filter .modal-footer .btn-danger:active{ transform: scale(.97); }
+
+/* ==========================================================================
+   Buttons (Bootstrap classes are re-themed here so every page benefits)
+   ========================================================================== */
+.btn{ border-radius: var(--ig-radius-sm); font-weight:600; transition: all var(--ig-fast) var(--ig-ease); }
 .btn-danger{
-  background: #ffd525;
+  background: linear-gradient(135deg, var(--ig-amber-500) 0%, var(--ig-amber-600) 100%);
   border: none;
   font-size: 14px;
-  color: #000;
-  font-weight: 500;
-  padding: 8px 17px;
+  color: #17210d;
+  font-weight: 600;
+  padding: 9px 18px;
+  box-shadow: 0 6px 14px -6px rgba(231,180,0,.5);
 }
 .btn-danger:hover{
-  background: #ffd525;
-  color: #000;
-
+  background: linear-gradient(135deg, var(--ig-amber-400) 0%, var(--ig-amber-500) 100%);
+  color: #17210d;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px -6px rgba(231,180,0,.55);
 }
-.btn-danger:focus{
-  background: #ffd525;
-  color: #000;
-}
+.btn-danger:focus{ background: var(--ig-amber-500); color: #17210d; }
 .btn-secondary{
-
   font-size: 14px;
   background: transparent;
-  border: none;
-  color: #000;
+  border: 1px solid var(--ig-border);
+  color: var(--ig-ink-700);
 }
-.navbarmenu .bi-bell{
-  font-size: 17px;
-}
+.btn-secondary:hover{ background: var(--ig-ink-100); color: var(--ig-ink-900); }
+.navbarmenu .bi-bell{ font-size: 17px; }
+
 .spantext{
   font-size: 10px;
-  background: #ffdc4773;
+  background: var(--ig-amber-100);
   border-radius: 41px;
   padding: 2px 9px;
-  /* margin-top: -127px; */
   position: relative;
   top: -3px;
+  color:#8a6b00;
+  font-weight:700;
 }
-.tabscircle .nav-pills{
-  background: #f1f1f1;
-  /* text-align: center; */
-  border-radius: 70px;
-  max-width: fit-content;
-  padding: 2px;
-}
-.tabscircle .nav-item .nav-link{
-  font-size: 14px;
-  color: #5a5a5a;
-  padding: 9px 14px;
-}
-.tabscircle .nav-item .nav-link.active{
-  background: #fff;
-  border-radius: 70px;
-  color: #000;
-  padding: 9px 14px;
-}
-.tabscircle2 .nav-pills{
-  background: #f1f1f1;
-  /* text-align: center; */
-  border-radius: 70px;
-  max-width: fit-content;
-  padding: 2px;
-  float: right;
-}
-.tabscircle2 .nav-item .nav-link{
-  font-size: 12px;
-  color: #5a5a5a;
-  padding: 6px 14px;
-}
-.tabscircle2 .nav-item .nav-link.active{
-  background: #fff;
-  border-radius: 70px;
-  color: #000;
-  padding: 6px 14px;
-}
-.peragraph_content{
-  font-size: 14px;
-  font-weight: 500;
-}
-.nodata{
-  width: 54px;
-  margin: auto;
-  display: block;
-  margin-top: 53px;
-}
-.maincontent2 h6{
-  text-align: center;
-  margin-top: 22px;
-}
-.maincontent2 p{
-  font-size: 13px;
-  text-align: center;
-  color: #999;
-}
-.maincontent2{
-  width: 263px;
-  margin: auto;
-}
-.steps li{
-   float:left;
-   list-style: none;
-    margin: 0 16px;
-    text-align: center;
-    width: 5%;
-    position:relative;
-}
-.steps li p{
-  font-size: 12px;
-  text-align: center;
-}
-.steps{
-  padding: 0;
-  width: 100%;
-  margin: 0;
-}
-.steps_inner{
-  background: #ffd525;
-  width: 36px;
-  height: 36px;
-  border-radius: 50px;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  margin: auto;
-  margin-bottom: 9px;
 
-  border: 6px solid #ffed9f;
+/* ==========================================================================
+   Pill tab groups
+   ========================================================================== */
+.tabscircle .nav-pills{ background: var(--ig-ink-100); border-radius: 70px; max-width: fit-content; padding: 3px; }
+.tabscircle .nav-item .nav-link{ font-size: 14px; color: var(--ig-ink-500); padding: 9px 16px; font-weight:600; border-radius:70px; transition: all var(--ig-fast) var(--ig-ease); }
+.tabscircle .nav-item .nav-link.active{ background: var(--ig-surface); border-radius: 70px; color: var(--ig-green-700); padding: 9px 16px; box-shadow: var(--ig-shadow-xs); }
+.tabscircle2 .nav-pills{ background: var(--ig-ink-100); border-radius: 70px; max-width: fit-content; padding: 3px; float: right; }
+.tabscircle2 .nav-item .nav-link{ font-size: 12px; color: var(--ig-ink-500); padding: 6px 14px; font-weight:600; }
+.tabscircle2 .nav-item .nav-link.active{ background: var(--ig-surface); border-radius: 70px; color: var(--ig-green-700); padding: 6px 14px; box-shadow: var(--ig-shadow-xs); }
+
+.peragraph_content{ font-size: 14px; font-weight: 500; }
+
+/* ==========================================================================
+   Empty states
+   ========================================================================== */
+.nodata{ width: 64px; margin: auto; display: block; margin-top: 53px; opacity:.75; }
+.maincontent2 h6{ text-align: center; margin-top: 18px; font-weight:700; color: var(--ig-ink-700); }
+.maincontent2 p{ font-size: 13px; text-align: center; color: var(--ig-ink-400); }
+.maincontent2{ width: 263px; margin: auto; }
+
+/* ==========================================================================
+   Stepper (used in multi-step forms)
+   ========================================================================== */
+.steps li{ float:left; list-style: none; margin: 0 16px; text-align: center; width: 5%; position:relative; }
+.steps li p{ font-size: 12px; text-align: center; color: var(--ig-ink-500); font-weight:600; }
+.steps{ padding: 0; width: 100%; margin: 0; }
+.steps_inner{
+  background: linear-gradient(135deg, var(--ig-amber-500), var(--ig-amber-600));
+  width: 36px; height: 36px; border-radius: 50px;
+  justify-content: center; align-items: center; display: flex;
+  margin: auto; margin-bottom: 9px;
+  border: 6px solid var(--ig-amber-100);
+  color:#17210d; font-weight:700;
 }
 .steps li:before{
   content: '';
   position: absolute;
-  width: 83%;
-  height: 1px;
-  background-color: #ffd525;
-  top: 18px;
-  left: 78%;
+  width: 83%; height: 1px;
+  background-color: var(--ig-amber-500);
+  top: 18px; left: 78%;
 }
-.steps li:last-child:before{
-  content: '';
-  position: absolute;
-  width: 0% !important;
-  height: 1px;
-  background-color: #fff;
-  top: 18px;
-  left: 64px;
-}
+.steps li:last-child:before{ content:none; }
 .steps_inner_inactive{
+  background: var(--ig-ink-100);
+  width: 36px; height: 36px; border-radius: 50px;
+  justify-content: center; align-items: center; display: flex;
+  margin: auto; margin-bottom: 9px;
+  border: 6px solid #f5f6f8;
+  color: var(--ig-ink-400);
+}
+.socialticketview{ margin-top:24px; }
+.btncustom{ background: var(--ig-amber-500); font-weight: 700; padding: 7px 20px; border-radius: var(--ig-radius-sm); }
+.editbtns{ text-align: right; }
+.editer_file i{ font-size: 16px; margin: 0 5px; color: var(--ig-info); }
 
-  background: #e7e7e7;
-    width: 36px;
-    height: 36px;
-    border-radius: 50px;
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    margin: auto;
-    margin-bottom: 9px;
-    border: 6px solid #fbfbfb;
-}
-.socialticketview{
-  margin-top:24px;
-}
-.btncustom{
-  background: #ffd525;
-    font-weight: 600;
-    padding: 6px 20px;
-}
-.editbtns{
-  text-align: right;
-}
-.editer_file i{
-  font-size: 16px;
-  margin: 0 5px;    color: #3c5dff;
-}
-
-.dropdownmenu_innner li{
-  width: 94%;
-
-  padding: 5px 0px;
-}
-
-.dropdownmenu_innner li a.dropdown-item {
-  font-size: 14px;
-}
-
+.dropdownmenu_innner li{ width: 94%; padding: 5px 0px; }
+.dropdownmenu_innner li a.dropdown-item{ font-size: 14px; border-radius: var(--ig-radius-xs); padding: 8px 12px; }
+.dropdownmenu_innner li a.dropdown-item:hover{ background: var(--ig-green-50); color: var(--ig-green-700); }
 .dropdownmenu_innner{
   border:none !important;
-  box-shadow: rgb(231, 231, 231) 1px 10px 20px !important;
-  border-radius: 4px;
+  box-shadow: var(--ig-shadow-md) !important;
+  border-radius: var(--ig-radius-md);
+  padding: 8px;
+}
+.dropdownmenu_innner li a i{ background: none !important; padding: 0 !important; margin-right: 13px !important; }
+.bgwhite2 .my-2 svg{ width:23px; }
+.widthsmall{ padding: 28px; }
+.buttons_prime{ margin-top: 23px; text-align: right; border-top: 1px solid var(--ig-border); padding-top: 25px; }
 
-}
-.dropdownmenu_innner li a i{
-  background: none !important;
-  padding: 0 !important;
-  margin-right: 13px !important;
-}
-.bgwhite2 .my-2 svg{
-width:23px;
-}
-.widthsmall{
-  padding: 28px;
-}
-.buttons_prime{
-  margin-top: 23px;
-  text-align: right;
-  border-top: 1px solid #f3f3f3;
-  padding-top: 25px;
-}
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+input[type=number]{ -moz-appearance: textfield; }
 
-/* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
-}
-.controlicons{
-  width: 72%;
-  float: left;
-  border-radius: 4px 0 0 4px !important;
-}
-.socialicons{
-  margin-top: 8px;
-}
-.socialicons i{
-  padding: 10px 7px;
-  background: #efefef;
-  height: 80px;
-  margin: 0;
-}
-.modalwidth{
-  width: 80%;
-  max-width: 56%;
-}
-.marginalign{
-  margin-top: 25px;
-}
-.modalforms{
-  border-bottom: 1px solid #f7f7f7;
-}
-.displayedvalue ul li .custombtn {
+.controlicons{ width: 72%; float: left; border-radius: var(--ig-radius-xs) 0 0 var(--ig-radius-xs) !important; }
+.socialicons{ margin-top: 8px; }
+.socialicons i{ padding: 10px 7px; background: var(--ig-ink-100); height: 80px; margin: 0; border-radius: var(--ig-radius-xs); }
+.modalwidth{ width: 80%; max-width: 56%; }
+.marginalign{ margin-top: 25px; }
+.modalforms{ border-bottom: 1px solid var(--ig-border); }
 
-  background: #ffd52526;
-  border: 1px solid #ffd525;
-  padding: 3px 14px;
-  margin-right: 9px;
-  margin-bottom: 10px;
-  font-size: 14px;
-  border-radius: 5px;
-  color: #000;
+.displayedvalue ul li .custombtn{
+  background: var(--ig-amber-100);
+  border: 1px solid var(--ig-amber-500);
+  padding: 4px 14px;
+  margin-right: 9px; margin-bottom: 10px;
+  font-size: 13px; font-weight:600;
+  border-radius: var(--ig-radius-pill);
+  color: #6b5300;
 }
-.displayedvalue ul{
-  padding:0;
+.displayedvalue ul{ padding:0; }
+.displayedvalue ul li{ float: left; list-style: none; }
+.hiddenvalue ul li{ float: left; list-style: none; }
+.hiddenvalue ul li .custombtn2{
+  background: #fafafa;
+  border: 1px solid var(--ig-border);
+  padding: 4px 14px;
+  margin-right: 9px; margin-bottom: 10px;
+  font-size: 13px;
+  border-radius: var(--ig-radius-pill);
+  color: var(--ig-ink-400);
 }
-.displayedvalue ul li {
-  float: left;
-  list-style: none;
-}
-.hiddenvalue ul li {
-  float: left;
-  list-style: none;
-}
-.hiddenvalue ul li .custombtn2 {
-
-  background: #cdcdcd14;
-  border: 1px solid #e1e1e1;
-  padding: 3px 14px;
-  margin-right: 9px;
-  margin-bottom: 10px;
-  font-size: 14px;
-  border-radius: 5px;
-  color: #adadad;
-}
-.hiddenvalue ul{
-  padding:0;
-}
-
-.hiddenvalue ul li .active {
-  background-color: yellow;
-}
-.byname{
-  background: #ffd52573;
-  padding: 3px 10px;
-  border-radius: 40px;
-  font-size: 12px;
-}
-.fontmain{
-  font-size: 14px;
-}
-.newupdate_steps li{
-  width: 11%;
-}
-.last_line:before{
-  content: '';
-  position: absolute;
-  width: 83%;
-  height: 1px;
-  background-color: #ffffff !important;
-  top: 18px;
-  left: 64px;
-}
-.newupdate_steps{
-  margin-left: 145px;
-}
+.hiddenvalue ul{ padding:0; }
+.hiddenvalue ul li .active{ background-color: var(--ig-amber-400); }
+.byname{ background: var(--ig-amber-100); padding: 3px 10px; border-radius: 40px; font-size: 12px; font-weight:600; color:#6b5300; }
+.fontmain{ font-size: 14px; }
+.newupdate_steps li{ width: 11%; }
+.last_line:before{ content: ''; position: absolute; width: 83%; height: 1px; background-color: #ffffff !important; top: 18px; left: 64px; }
+.newupdate_steps{ margin-left: 145px; }
 .activebutton{
-  background: #0077441f !important;
-  border: 1px solid #074 !important ;
-  padding: 3px 14px;
-  margin-right: 9px;
-  margin-bottom: 10px;
-  font-size: 14px;
-  border-radius: 5px;
-  color: #000 !important;
-  position:relative;
+  background: var(--ig-green-100) !important;
+  border: 1px solid var(--ig-green-600) !important;
+  padding: 4px 14px; margin-right: 9px; margin-bottom: 10px;
+  font-size: 13px; border-radius: var(--ig-radius-pill);
+  color: var(--ig-green-800) !important;
+  position:relative; font-weight:600;
 }
 .activebutton:after{
   content: '\F26A';
   position: absolute;
   font-family: bootstrap-icons !important;
   font-size: 14px;
-  top: -14px;
-  right: -6px;
-  color: #074;
+  top: -14px; right: -6px;
+  color: var(--ig-green-600);
 }
+.settingicons{ background: transparent; padding: 0; border: none; margin: 0; }
 
-.settingicons{
-  background: transparent;
-  padding: 0;
-  border: none;
-  margin: 0;
-}
-
-.imgsuccess{
-  width: 273px;
-  margin: auto;
-  display: block;
-}
-.successfull h4{
-  font-size: 20px;
-  text-align: center;
-  margin: 30px 0px;
-}
-.bi-gear{
-   margin:5px 0;
-}
-.content_past_activity h6{
-  font-size: 14px;
-}
-.content_past_activity p{
-  font-size: 12px;
-}
+.imgsuccess{ width: 260px; margin: auto; display: block; }
+.successfull h4{ font-size: 20px; text-align: center; margin: 30px 0px; font-weight:700; }
+.bi-gear{ margin:5px 0; }
+.content_past_activity h6{ font-size: 14px; font-weight:700; }
+.content_past_activity p{ font-size: 12px; }
 .iconswidthalign{
-  background: #f1f1f3 !important;
+  background: var(--ig-ink-100) !important;
   padding: 0px 19px !important;
-  border-radius: 4px;
-  line-height: 4;
-  justify-content: center;
-  align-items: center;
-  display: flex;
+  border-radius: var(--ig-radius-xs);
+  line-height: 4; justify-content: center; align-items: center; display: flex;
 }
-.pastactivity{
-  margin-top: 40px;
-}
-.linebreak{
-  /* width: 18%; */
-}
-.mainstyle{
-  padding: 0 9px;
-}
- th{
-  border-color: #d7d7d7 !important; 
-
-}
-.widthtd{
-  width: 8%;
-}
+.pastactivity{ margin-top: 40px; }
+.linebreak{}
+.mainstyle{ padding: 0 9px; }
+.widthtd{ width: 8%; }
 .coulams_form2{
-  padding: 4px 13px;
-  background: #fbfbfb;
+  padding: 6px 14px;
+  background: #fbfbfc;
   margin-bottom: 24px;
-  border-radius: 6px;    border: 1px solid #e9e9e9;
+  border-radius: var(--ig-radius-md);
+  border: 1px solid var(--ig-border);
 }
+
+/* ==========================================================================
+   Dashboard stat cards
+   ========================================================================== */
 .states_inner{
-  background: #fff;
-    padding: 20px;
-    border-radius: 18px;
-    box-shadow: 0px 2px 0px #f1f1f1;
-cursor:pointer;
+  background: var(--ig-surface);
+  padding: 22px;
+  border-radius: var(--ig-radius-lg);
+  border: 1px solid var(--ig-border);
+  box-shadow: var(--ig-shadow-sm);
+  cursor:pointer;
+  transition: transform var(--ig-med) var(--ig-ease), box-shadow var(--ig-med) var(--ig-ease), border-color var(--ig-med) var(--ig-ease);
+  position:relative;
+  overflow:hidden;
+}
+.states_inner:hover,
+.states_inner.ig-touch-active{
+  transform: translateY(-3px);
+  box-shadow: var(--ig-shadow-md);
+  border-color: var(--ig-green-500);
+}
+.states_inner h6{ font-size: 26px; font-weight: 800; margin-top: 10px; letter-spacing:-.5px; }
+.states_inner p{ font-size: 13.5px; margin: 0; color: var(--ig-ink-500); margin-top: 10px; font-weight: 600; }
 
+/* -- restructured stat cards: icon badge + arrow row, big number, label -- */
+.ig-stat-link{ text-decoration:none; display:block; }
+.ig-stat-card{ padding: 22px; border-top: 3px solid transparent; }
+.ig-stat-top{ display:flex; align-items:center; justify-content:space-between; }
+.ig-stat-icon{
+  width:44px; height:44px; border-radius: var(--ig-radius-sm);
+  display:flex; align-items:center; justify-content:center; font-size:19px;
 }
-.states_inner h6{
-  font-size: 24px;
-  font-weight: 700;
-  margin-top: 9px;    margin-top: 10px;
+.ig-stat-arrow{
+  width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  color: var(--ig-ink-400); background: var(--ig-ink-100); font-size:12px;
+  transition: all var(--ig-med) var(--ig-ease);
 }
-.states_inner p{
-  font-size: 14px;
-  margin: 0;
-  color: #000;
-  margin-top: 17px;
-  font-weight: 500;
+.ig-stat-card:hover .ig-stat-arrow{ background: var(--ig-green-600); color:#fff; transform: rotate(45deg); }
+.ig-stat-card h6{ margin-top:16px; margin-bottom:2px; }
+.ig-stat-card.bgone{ border-top-color: var(--ig-amber-500); }
+.ig-stat-card.bgtwo{ border-top-color: var(--ig-danger); }
+.ig-stat-card.bgthree{ border-top-color: var(--ig-info); }
+.ig-stat-card.bgfour{ border-top-color: var(--ig-green-600); }
+
+/* -- page header -- */
+.ig-page-header{ padding: 4px 2px 18px; }
+.ig-page-header h1{ font-size: clamp(22px,2.4vw,30px); font-weight:800; letter-spacing:-.6px; margin:6px 0 4px; color: var(--ig-ink-900); }
+.ig-page-header p{ font-size:14px; color: var(--ig-ink-500); margin:0; font-weight:500; }
+.ig-eyebrow-light{
+  display:inline-block; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  color: var(--ig-green-700); background: var(--ig-green-50); border:1px solid var(--ig-green-100);
+  padding:4px 12px; border-radius: var(--ig-radius-pill);
 }
-.icon1{
-  background: #ffd52540;
-  padding: 9px 11px;
-  border-radius: 50px;
-  color: #565656;
+
+/* -- generic panel toolbar (Statistics card header, etc.) -- */
+.ig-panel-toolbar{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.ig-panel-title{ display:flex; align-items:center; gap:8px; margin:0; font-weight:700; }
+.ig-panel-title i{ color: var(--ig-green-600); }
+.ig-panel-icon{ color: var(--ig-green-600); margin-right:2px; }
+.ig-count-pill{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:22px; height:22px; padding:0 7px; margin-left:6px;
+  border-radius: var(--ig-radius-pill); background: var(--ig-ink-100); color: var(--ig-ink-700);
+  font-size:11.5px; font-weight:700;
 }
-.socialticketinner h6{
-  font-size: 14px;
-}
-.socialticketinner p{
-  margin-bottom: 0;
-  font-size: 12px;
-}
+
+.icon1{ background: var(--ig-amber-100); padding: 10px 12px; border-radius: 50px; color:#8a6b00; }
+.socialticketinner h6{ font-size: 14px; font-weight:700; }
+.socialticketinner p{ margin-bottom: 0; font-size: 12.5px; color: var(--ig-ink-500); }
 .iconi{
-  font-size: 27px;
-    background: #fff4c8;
-    padding: 10px 17px;
-    border-radius: 7px;
-    float: left;
-    margin-right: 13px;
+  font-size: 25px;
+  background: var(--ig-amber-100);
+  padding: 10px 17px;
+  border-radius: var(--ig-radius-sm);
+  float: left; margin-right: 13px;
+  color:#8a6b00;
 }
-.socialticketinner {
-  margin-bottom: 12px;
-  /* border-left: 3px solid #ffd525; */
-  padding: 4px 10px;
-  border-bottom: 1px solid #e5e5e5;
-  padding-bottom: 13px;
+/* NOTE: the full .socialticketinner card treatment (background, border,
+   radius, hover lift, entrance animation) now lives in one place further
+   below, next to the other right-panel/recent-data component rules — see
+   the block starting near .ig-panel-empty — so there's a single source of
+   truth instead of two competing declarations. */
+.alertnew{ background: var(--ig-danger-100); font-size: 11.5px; padding: 3px 9px; border-radius: 30px; float: right; color: var(--ig-danger); font-weight:700; }
 
-}
-.alertnew{
-  background: #ffafaf33;
-  font-size: 12px;
-  padding: 2px 7px;
-  border-radius: 30px;
-  float: right;
-  color: #f30000;
-}
-.heightscroll{
-  height: 410px;
-  overflow: auto;
-}
+.heightscroll{ height: 410px; overflow: auto; }
+.heightscroll::-webkit-scrollbar{ width: 4px; }
+.heightscroll::-webkit-scrollbar-track{ background: transparent; }
+.heightscroll::-webkit-scrollbar-thumb{ background: #ccc; border-radius: 10px; }
+.heightscroll::-webkit-scrollbar-thumb:hover{ background: #ccc; }
 
-/* width */
-.heightscroll::-webkit-scrollbar {
-  width: 4px;
+.dashboard{ margin-bottom: 40px; }
+.seeview{ background: #fff; position: absolute; bottom: 13px; width: 91%; padding: 5px; margin: 0; text-align: center; font-size: 15px; }
+a.seeall{
+  font-size: 11px; text-decoration: none; float: right;
+  border: 1px solid var(--ig-border); padding: 5px 12px; color: var(--ig-ink-700);
+  border-radius: var(--ig-radius-pill); font-weight:600; transition: all var(--ig-fast) var(--ig-ease);
 }
+a.seeall:hover{ background: var(--ig-green-50); border-color: var(--ig-green-500); color: var(--ig-green-700); }
+.icon2{ background: var(--ig-danger-100); padding: 10px 12px; border-radius: 50px; color: var(--ig-danger); }
+.icon3{ background: var(--ig-info-100); padding: 10px 12px; border-radius: 50px; color: var(--ig-info); }
+.icon4{ background: var(--ig-green-100); padding: 10px 12px; border-radius: 50px; color: var(--ig-green-700); }
+.headingsec{ border-bottom: 1px solid var(--ig-border); padding-bottom: 10px; }
+.values h1{ color: #fff; font-size: 32px; font-weight: 800; }
+.values p{ color: rgba(255,255,255,.85); margin-bottom: 0; font-weight:500; }
+.marginmain{ margin-top: 26px; }
 
-/* Track */
-.heightscroll::-webkit-scrollbar-track {
-  background: transparent; 
-}
- 
-/* Handle */
-.heightscroll::-webkit-scrollbar-thumb {
-  background: #cccccc;
-  border-radius: 10px; 
-}
-
-/* Handle on hover */
-.heightscroll::-webkit-scrollbar-thumb:hover {
-  background: #cccccc; 
-}
-.dashboard {
-  margin-bottom: 40px;
-}
-.seeview{
-  background: #fff;
-    position: absolute;
-    bottom: 13px;
-    width: 91%;
-    padding: 5px;
-    margin: 0;
-    text-align: center;
-    font-size: 15px;
-}
-a.seeall {
-  font-size: 11px;
-  text-decoration: none;
-  float: right;
-  border: 1px solid #dfdfdf;
-  padding: 5px 11px;
-  color: #000;
-  border-radius: 5px;
-}
-.icon2{
-  background: #ff25251c;
-  padding: 9px 11px;
-  border-radius: 50px;
-  color: #565656;
-}
-.icon3{
-  background: #3225ff17;
-  padding: 9px 11px;
-  border-radius: 50px;
-  color: #565656;
-}
-.icon4{
-  background: #25ff3629;
-  padding: 9px 11px;
-  border-radius: 50px;
-  color: #565656;
-}
-.headingsec {
-  border-bottom: 1px solid #e7e7e7;
-    padding-bottom: 8px;
-}
-.values h1{
-  color: #fff;
-  font-size: 31px;
-  font-weight: 700;
-}
-.values p{
-  color: #fff;
-  margin-bottom: 0;
-}
-.marginmain{
-  margin-top: 26px;
-}
-
-.newform{
-  height: 31px;
-  font-size: 12px;
-}
-.formh6{
-  margin-top: 5px;
-}
+.newform{ height: 34px; font-size: 12px; }
+.formh6{ margin-top: 5px; }
 .dates{
-  background: #ffffff;
+  background: var(--ig-surface);
   max-width: fit-content;
-  padding: 3px 10px;
+  padding: 4px 11px;
   border-radius: 30px;
   margin-top: 8px;
-  font-weight: 500;
-  border: 1px solid #e3e3e3;
-}
-.socialticketinner .bi-twitter{
-  color: #1DA1F2;
-  margin-right: 3px;
-    background: #1da1f21a;
-    padding: 4px 6px;
-    border-radius: 50px;
-}
-.marginten{
-  margin-top: 49px;
-}
-.bgone{
-  background: #ffd52540;
-}
-.bgtwo{
-  background: #ff25251c;
-}
-.bgthree{
-
-  background: #3225ff17;
-}
-.bgfour{
-  background: #25ff3629;
-}
-.delete_post_ticket h3{
-  font-size: 16px;
   font-weight: 600;
-  text-align: center;
-  line-height: 23px;
+  font-size:12px;
+  border: 1px solid var(--ig-border);
+  color: var(--ig-ink-500);
 }
-.deleteimg{
-  width: 63px;
-    margin: auto;
-    display: block;
-    margin-bottom: 22px;
-}
-.widthdialoge{
-  width: 19%;
-}
-.dates .bi-calendar{
-  margin-right: 12px;
-}
-.dates .bi-person-fill{
-  margin-right: 12px;
-}
-.floatmain{
-  float:right;
-}
-.alignprofilecon{
-  margin: 0 !important;
-  padding: 0;
-  margin-top: 5px !important;
-}
-.profileiconss{
-  font-size: 24px;
-  margin-right: 10px;
-  position: relative;
-  top: 5px;
-}
+.socialticketinner .bi-twitter{ color: #1DA1F2; margin-right: 3px; background: #1da1f21a; padding: 4px 6px; border-radius: 50px; }
+.marginten{ margin-top: 49px; }
+.bgone{ background: var(--ig-amber-100); }
+.bgtwo{ background: var(--ig-danger-100); }
+.bgthree{ background: var(--ig-info-100); }
+.bgfour{ background: var(--ig-green-100); }
+
+.delete_post_ticket h3{ font-size: 16px; font-weight: 700; text-align: center; line-height: 23px; }
+.deleteimg{ width: 63px; margin: auto; display: block; margin-bottom: 22px; }
+.widthdialoge{ width: 24%; }
+.dates .bi-calendar{ margin-right: 8px; }
+.dates .bi-person-fill{ margin-right: 8px; }
+.floatmain{ float:right; }
+.alignprofilecon{ margin: 0 !important; padding: 0; margin-top: 5px !important; }
+.profileiconss{ font-size: 24px; margin-right: 10px; position: relative; top: 5px; color: var(--ig-green-700); }
 
 input[type="search"]::-webkit-search-decoration,
 input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-results-button,
-input[type="search"]::-webkit-search-results-decoration {
-  -webkit-appearance:none;
-}
+input[type="search"]::-webkit-search-results-decoration{ -webkit-appearance:none; }
+
 .tabsassigned .nav-item .nav-link.active{
-  background: #555 !important;
-  border-radius: 70px;
-  color: #fff !important;
-  padding: 9px 14px;
+  background: var(--ig-ink-900) !important;
+  border-radius: 70px; color: #fff !important; padding: 9px 14px;
 }
-.tabsmaininner{
-  background: #fff;
-  padding: 24px;
-  border-radius: 18px;
-}
-.headingin h4{
-  font-size: 18px;
-    margin: 6px 0 17px;
-    color: #fff;
-}
-.headingin2 h4{
-  font-size: 18px;
-    margin: 6px 0 17px;
-    color: #000;
-}
-.buttonset{
-  background: none;
-  border: 1px solid #d7d7d7;
-  padding: 7px 13px;
-  border-radius: 7px;
-}
-.buttonset:hover{
-  background: #f6f6f6;
-  border: 1px solid #d7d7d7;
-  padding: 7px 13px;
-  border-radius: 7px;
-}
-.hide{
-  display:none;
-}
-.tabsmaininner2 {
-  background: #fff;
-  padding: 4px;
-  border-radius: 18px;
-}
-.offcanvas-title{
-  font-size: 18px;
-  font-weight: 600;
-}
-.offcanvas-header{
-  border-bottom: 1px solid #ebebeb;
-}
-.alertnew2{
-  background: #b0fda233;
-  font-size: 12px;
-  padding: 2px 7px;
-  border-radius: 30px;
-  float: right;
-  color: #5bf300;
-}
-select.readonly {
-  opacity: 0.8;
-  pointer-events: none;
-} 
-.widthtall{
-  width:812px;
-  padding: 35px;
-}
-.password_correcter li {
-  font-size: 14px;
-  margin-bottom: 8px;
-  color: #999;
-}
-.password_correcter ul{
-  padding: 0;
-    list-style: none;
-}
-.password_correcter i.bi.bi-check {
-  font-size: 21px;
-  position: relative;
-  top: 5px;
-  color: #6284d1;
-}
-.password_correcter{
-  margin-top: 20px;
-}
-.values {
-  /* border: 11px solid #ffffff; */
-  padding: 14px;
-  background: #686868;
-  border-radius: 18px;
+.tabsmaininner{ background: var(--ig-surface); padding: 24px; border-radius: var(--ig-radius-lg); }
+.headingin h4{ font-size: 18px; margin: 6px 0 17px; color: #fff; font-weight:700; }
+.headingin2 h4{ font-size: 18px; margin: 6px 0 17px; color: var(--ig-ink-900); font-weight:700; }
+.buttonset{ background: none; border: 1px solid var(--ig-border); padding: 7px 13px; border-radius: var(--ig-radius-sm); transition: all var(--ig-fast) var(--ig-ease); }
+.buttonset:hover{ background: var(--ig-bg); border: 1px solid var(--ig-border); padding: 7px 13px; border-radius: var(--ig-radius-sm); }
+.hide{ display:none; }
+.tabsmaininner2{ background: var(--ig-surface); padding: 6px; border-radius: var(--ig-radius-lg); }
+.offcanvas-title{ font-size: 18px; font-weight: 700; }
+.offcanvas-header{ border-bottom: 1px solid var(--ig-border); }
+.alertnew2{ background: var(--ig-green-100); font-size: 11.5px; padding: 3px 9px; border-radius: 30px; float: right; color: var(--ig-green-700); font-weight:700; }
+
+select.readonly{ opacity: 0.8; pointer-events: none; }
+.widthtall{ width:812px; padding: 35px; }
+.password_correcter li{ font-size: 14px; margin-bottom: 8px; color: var(--ig-ink-400); }
+.password_correcter ul{ padding: 0; list-style: none; }
+.password_correcter i.bi.bi-check{ font-size: 21px; position: relative; top: 5px; color: var(--ig-info); }
+.password_correcter{ margin-top: 20px; }
+.values{
+  padding: 18px;
+  background: linear-gradient(160deg, #26313a 0%, #3a4750 100%);
+  border-radius: var(--ig-radius-lg);
   text-align:center;
+  transition: transform var(--ig-fast) var(--ig-ease);
 }
-.buttonset .bi-list-task{
-  margin-right: 9px;
+.values:hover{ transform: translateY(-2px); }
+.values > i{
+  display:flex; align-items:center; justify-content:center;
+  width:34px; height:34px; margin:0 auto 8px;
+  border-radius:50%; background: rgba(255,255,255,.1); color: var(--ig-amber-400); font-size:15px;
 }
-.form-select{
-  font-size: 14px !important;
-  height: 40px;
+.ig-panel{ }
+
+/* -- date-range toolbar above each chart: a proper mini-toolbar rather than
+      a bare Bootstrap row of inputs -- */
+.ig-panel .dastpicker{
+  background: var(--ig-bg);
+  border: 1px solid var(--ig-border);
+  border-radius: var(--ig-radius-md);
+  padding: 14px 14px 2px;
+  margin-bottom: 16px;
 }
-.content_past_activity p{
-  margin-bottom: 4px;
+.ig-panel .dastpicker form .row{ align-items:flex-end; }
+.ig-panel .dastpicker .form-label{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; color: var(--ig-ink-400); font-weight:700; }
+.ig-panel .dastpicker .form-control{ background: var(--ig-surface) !important; }
+.ig-panel .dastpicker .btn-danger{
+  width:100%; display:flex; align-items:center; justify-content:center;
+  height:40px; padding:0 !important;
 }
-.content_past_activity p:not(:first-child):not(:last-child){
-  background: #f9f9f9;
-  padding: 3px 9px;
-  border-radius: 6px;
-}
-.tabslist ul{
-  padding: 0;
-  margin: 0;
-  background: #f1f1f1;
-  display: flex;
-  padding: 2px 0px;
-  border-radius: 70px;
-  max-width: fit-content;
-}
-.tabslist ul li{
-  font-size: 13px;
-  /* float: left; */
-  list-style: none;
-  border-radius: 60px;
-  padding: 4px 11px;
-  margin-left: 3px;
-  font-weight: 500;
-  cursor:pointer;
-}
-.tabslist ul li .nav-link.active{
-  font-size: 13px;
-  /* float: left; */
-  list-style: none;
-  background: #fff;
-  border-radius: 60px;
-  padding: 4px 11px;
-  margin-left: 3px;
-}
-.tabslist {
-  float:right;
-}
-.canvatextremove{
+
+/* -- chart shell: gives the CanvasJS canvas a defined "stage" to sit in
+      (soft backdrop + entrance) instead of floating loose against the
+      panel's own white background -- */
+.ig-chart-shell{
   position:relative;
+  background: linear-gradient(180deg, var(--ig-green-50) 0%, transparent 65%);
+  border-radius: var(--ig-radius-md);
+  padding: 8px 0 4px;
+  animation: ig-fade-up var(--ig-slow) var(--ig-ease) both;
 }
-.canvatextremove:before{
-  content: '';
-  position: absolute;
-  background-color: #ffffff;
-  height: 14px;
-  width: 100px;
-  top: -11px;
-}
-.canvatextremove:after{
-  content: '';
-  position: absolute;
-  background-color: #ffffff;
-  height: 14px;
-  width: 100px;
-  top: -11px;
-  right: 10px;
-}
-.twitmsg{
-  font-size: 14px;
-  border-bottom: 1px solid #e9e9e9;
-  padding-bottom: 19px;
-  margin-top: 16px;
-  color: #999;
+@media (prefers-reduced-motion: reduce){ .ig-chart-shell{ animation:none; } }
 
-}
-.hidedesktop{
-  display:none;
-}
-.profileimg h4{
-  font-size: 18px;
-  color: #555;
-}
-.profileimg p{
-  font-size: 14px;
-  text-align: center;
-}
-.profileimg i{
-  font-size: 66px;
-  text-align: center;
-  margin: auto;
-  display: block;
-  color: #646464;
-}
-.profileimg{
-  text-align: center;
-  border-right: 1px solid #999
-}
+/* -- compact empty state for the tighter chart-panel context -- */
+.ig-empty-state-sm{ padding: 30px 16px; }
+.ig-empty-state-sm i{ width:52px; height:52px; font-size:22px; margin-bottom:10px; }
+.ig-empty-state-sm h6{ font-size:13.5px; }
+.ig-empty-state-sm p{ font-size:12px; }
+.buttonset .bi-list-task{ margin-right: 9px; }
+.form-select{ font-size: 14px !important; height: 40px; border-radius: var(--ig-radius-sm) !important; border-color: var(--ig-border) !important; }
+.form-select:focus{ border-color: var(--ig-green-500) !important; box-shadow: 0 0 0 4px var(--ig-green-100) !important; }
+.content_past_activity p{ margin-bottom: 4px; }
+.content_past_activity p:not(:first-child):not(:last-child){ background: var(--ig-bg); padding: 4px 10px; border-radius: var(--ig-radius-xs); }
+
+.tabslist ul{ padding: 0; margin: 0; background: var(--ig-ink-100); display: flex; padding: 3px; border-radius: 70px; max-width: fit-content; }
+.tabslist ul li{ font-size: 12.5px; list-style: none; border-radius: 60px; padding: 5px 12px; margin-left: 3px; font-weight: 600; cursor:pointer; color: var(--ig-ink-500); }
+.tabslist ul li .nav-link.active{ font-size: 12.5px; list-style: none; background: var(--ig-surface); border-radius: 60px; padding: 5px 12px; margin-left: 3px; color: var(--ig-green-700); box-shadow: var(--ig-shadow-xs); }
+.tabslist{ float:right; }
+
+.canvatextremove{ position:relative; }
+.canvatextremove:before{ content: ''; position: absolute; background-color: var(--ig-surface); height: 14px; width: 100px; top: -11px; }
+.canvatextremove:after{ content: ''; position: absolute; background-color: var(--ig-surface); height: 14px; width: 100px; top: -11px; right: 10px; }
+
+.twitmsg{ font-size: 14px; border-bottom: 1px solid var(--ig-border); padding-bottom: 19px; margin-top: 16px; color: var(--ig-ink-400); }
+.hidedesktop{ display:none; }
+.profileimg h4{ font-size: 18px; color: var(--ig-ink-700); }
+.profileimg p{ font-size: 14px; text-align: center; color: var(--ig-ink-400); }
+.profileimg i{ font-size: 66px; text-align: center; margin: auto; display: block; color: var(--ig-green-600); }
+.profileimg{ text-align: center; border-right: 1px solid var(--ig-border); }
 .profileimg h4 span{
-  font-size: 13px;
-  background: #ffeaea;
-  padding: 5px 12px;
-  margin-left: 9px;
-  border-radius: 60px;
-  color: #ff2525;
-  display: block;
-  max-width: fit-content;
-  margin: auto;
+  font-size: 12px; background: var(--ig-danger-100); padding: 5px 12px; margin-left: 9px; border-radius: 60px;
+  color: var(--ig-danger); display: block; max-width: fit-content; margin: auto; font-weight:700;
 }
-#chartContainer1{
-  width:333px !important;
-  height:250px !important;
-}
+#chartContainer1{ width:333px !important; height:250px !important; }
 
-table {
-  width: 100%;
-}
+.line_break{ line-break: anywhere; }
+.namehistory{ font-size: 14px !important; font-weight: 700; }
+.datehistory{ font-size: 12px; float: right; font-weight: 500; color: var(--ig-ink-400); }
+.texthistory{ font-size: 13px !important; }
 
-thead {
-  white-space: nowrap; /* Prevent header text from wrapping */
+.buttonset:focus{ border: 1px solid var(--ig-border) !important; }
+.btn-check:focus+.btn-danger, .btn-danger:focus{
+  color: #17210d; background-color: var(--ig-amber-500); border-color: #ffffff !important; box-shadow: 0 0 0 0.25rem rgb(225 83 97 / 0%) !important;
 }
+.newdesign{ position: absolute; right:0; width:40%; z-index: 9999; border-radius: var(--ig-radius-sm) !important; box-shadow: var(--ig-shadow-md); }
 
-th {
-  white-space: nowrap; /* Prevent cell content from wrapping */
-}
-table th, table td {
-  /* width: 50.33%;  */
-}
-.line_break{
-  line-break: anywhere;
-}
-.namehistory{
-  font-size: 14px !important;
-  font-weight: 600;
-}
-.datehistory{
-  font-size: 14px;
-  float: right;
-  font-weight: 500;
-  color: #999;
-  font-size: 12px;
+.address_neeew{ border-top: 1px solid var(--ig-border); margin-top: 24px; padding-top: 24px; }
+.address_primary{ padding: 19px; background: var(--ig-bg); border-radius: var(--ig-radius-md); }
+.btnplus{ text-align: right; }
+.socialtypemain ul li{ border: 1px solid var(--ig-border); padding: 1px 12px; max-width: max-content; border-radius: 40px; margin-bottom: 8px; font-size:13px; }
+.socialtypemain ul{ padding: 0; list-style: none; }
+.socialticketinner .bi-facebook{ color: #1877F2; margin-right: 3px; background: #1877f221; padding: 4px 6px; border-radius: 50px; }
+.socialticketinner .bi-instagram{ color: #E4405F; margin-right: 3px; background: #e4405f12; padding: 4px 6px; border-radius: 50px; }
+.socialticketinner .bi-whatsapp{ color: #25D366; margin-right: 3px; background: #25d36614; padding: 4px 6px; border-radius: 50px; }
+.socialticketinner .bi-linkedin{ color: #0A66C2; margin-right: 3px; background: #0a66c21a; padding: 4px 6px; border-radius: 50px; }
 
-}
-.texthistory{
-  font-size: 13px !important;
-}
-
-.buttonset:focus {
-  border: 1px solid #d7d7d7 !important;
-
-}
-.btn-check:focus+.btn-danger, .btn-danger:focus {
-  color: #000;
-  background-color: #ffd525;
-  border-color: #ffffff !important;
-  box-shadow: 0 0 0 0.25rem rgb(225 83 97 / 0%) !important;
-}
-.newdesign{
-  position: absolute;
-  right:0;
-  width:40%;
-  z-index: 9999;
-}
-
-.steps li:last-child:before{
-  content:none;
-
-}
-.address_neeew{
-  border-top: 1px solid #d9d9d9;
-    margin-top: 24px;
-    padding-top: 24px;
-}
-.address_primary{
-  padding: 19px;
-  background: #fbfbfb;
-  border-radius: 10px;
-}
-.btnplus{
-   text-align: right;
-}
-.socialtypemain ul li{
-  border: 1px solid #c9c9c9;
-  padding: 6px;
-  max-width: max-content;
-  border-radius: 40px;
-  padding: 1px 12px;
-  margin-bottom: 8px;
-}
-.socialtypemain ul{
-  padding: 0;
-  list-style: none;
-}
-.socialticketinner .bi-facebook{
-  color: #1877F2;
-    margin-right: 3px;
-    background: #1877f221;
-    padding: 4px 6px;
-    border-radius: 50px;
-}
-.socialticketinner .bi-instagram{
-  color: #E4405F;
-    margin-right: 3px;
-    background: #e4405f12;
-    padding: 4px 6px;
-    border-radius: 50px;
-}
-.socialticketinner .bi-whatsapp{
-  color: #25D366;
-    margin-right: 3px;
-    background: #25d36614;
-    padding: 4px 6px;
-    border-radius: 50px;
-}
-.socialticketinner .bi-linkedin{
-  color: #0A66C2;
-    margin-right: 3px;
-    background: #0a66c21a;
-    padding: 4px 6px;
-    border-radius: 50px;
-}
-.states_inner.admin_states {
+.states_inner.admin_states{
   height: 423px;
-  background:url(../images/bguser.png);
+  background: linear-gradient(180deg, var(--ig-green-50), var(--ig-surface)), url(../images/bguser.png);
   background-repeat: no-repeat;
-  background-size:cover;
+  background-size: cover;
 }
-.admin_states img{
-  max-width: 100%;
-  height: auto;
-  width: 203px;
-  margin: auto;
-  display: block;
-  margin-top: 33px;
+.admin_states img{ max-width: 100%; height: auto; width: 203px; margin: auto; display: block; margin-top: 33px; }
+.admin_states p{ font-size: 19px; text-align: center; font-weight: 700; margin-top: 91px; }
+.alignbuttonmain{ text-align: right; margin-top: 16px; border-top: 1px solid var(--ig-border); padding-top: 22px; }
+.alignbuttonmain .btn-danger{ width: 142px; }
+.btnchange{ padding: 6px 9px; border-radius: var(--ig-radius-xs); border: 1px solid var(--ig-border); }
+.dangeriline{ width:100px; }
+.width50{ width:50%; }
+.table_width_align th:nth-child(1){ width: 26%; }
+.table_width_align th:nth-child(2){ width: 27%; }
+.table_width_align th:nth-child(5){ width: 47%; }
+.filter_popup{ max-width: 724px !important; }
+.heightscroll2{ height: 502px; overflow: auto; }
+.starred{ color: var(--ig-flame-500); }
+.star-empty:before{ content: "\f006"; }
+.star-filled:before{ content: "\f005"; display: none; }
+.ullinks{ list-style: none; padding:0; }
+.verticalmenu{ border: 1px solid var(--ig-border); padding: 23px; border-radius: var(--ig-radius-lg); }
+.ullinks li{ margin-bottom: 0; border-bottom: 1px solid var(--ig-border); padding: 10px 0; }
+.tabsnew .nav-item .nav-link{ font-size:14px; }
+.dash{ margin: 21px; line-height: 60px; background: var(--ig-amber-500); padding: 9px 11px; font-size: 17px; border-radius: var(--ig-radius-sm); }
+.innerinput{ width: 92px; position: absolute; border-left: 0; left: 1px; border-radius: var(--ig-radius-sm) 0px 0px var(--ig-radius-sm); }
+.btnhoverser:hover{ background:none !important; color: var(--ig-green-700) !important; }
+.btnhoverser:focus{ background:none !important; color: var(--ig-green-700) !important; box-shadow: none !important; }
+.secondstar{ width: 34px; border-radius: var(--ig-radius-xs); justify-content: center; align-items: center; display: flex; }
+
+/* permission-gated visibility helpers — behaviour preserved exactly */
+.READ_ONLY{ text-decoration: none; pointer-events: none; opacity:.6; }
+.HIDDEN{ display: none !important; }
+
+img.newimg{ width: 27px; height: 27px; background: var(--ig-ink-100); padding: 1px; object-fit: contain; border-radius: 60px; margin-right: 5px; }
+
+.moreinfo .table thead, .moreinfo .table tbody{ vertical-align: middle; }
+.moreinfo .table tbody tr td{ vertical-align: middle; padding: 0.5rem 0.6rem; }
+.documentType ul li{ list-style: none; float: left; border: 1px solid var(--ig-border); padding: 0 15px; margin: 0 3px 8px; border-radius: 40px; font-size: 12.5px; font-weight: 600; color: var(--ig-ink-700); }
+.documentType ul{ padding:0; }
+.documentType ul li i.bi.bi-x-lg{ background: var(--ig-ink-100); color: var(--ig-ink-700); padding: 3px 4px; border-radius: 40px; font-size: 9px; margin-left: 8px; cursor: pointer; margin-bottom: 8px; }
+.socialusertd{ width: 50.33% !important; }
+.socialusertd i{ margin-right: 0.25rem!important; }
+.socialusertd a{ word-break: break-all; color: var(--ig-info); }
+.tickettable{ word-break: break-word; }
+
+/* ==========================================================================
+   Page header (used at the top of list/detail pages app-wide)
+   ========================================================================== */
+.ig-page-header{ padding: 6px 2px 20px; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px; }
+.ig-page-header h1{
+  font-size: clamp(21px,2.2vw,28px); font-weight:800; letter-spacing:-.5px; margin:6px 0 4px; color: var(--ig-ink-900);
+  display:flex; align-items:center; gap:10px;
 }
-.admin_states p{
-  font-size: 20px;
-  text-align: center;
-  font-weight: 600;
-  margin-top: 91px;
+.ig-page-header h1 i{ color: var(--ig-green-600); font-size: .85em; }
+.ig-page-header p{ font-size:13.5px; color: var(--ig-ink-500); margin:0; font-weight:500; }
+
+/* ==========================================================================
+   Toolbar / icon-button system (replaces the bare <i> icon rows used across
+   list pages with real, accessible, tappable controls)
+   ========================================================================== */
+.ig-toolbar-actions{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.ig-icon-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:38px; border-radius: var(--ig-radius-sm);
+  background: var(--ig-surface); border:1px solid var(--ig-border); color: var(--ig-ink-600);
+  font-size:15px; transition: all var(--ig-fast) var(--ig-ease); cursor:pointer;
 }
-.alignbuttonmain{
-  text-align: right;
-  margin-top: 16px;
-  border-top: 1px solid #ededed;
-  padding-top: 22px;
+.ig-icon-btn:hover{ background: var(--ig-green-50); border-color: var(--ig-green-500); color: var(--ig-green-700); }
+.ig-icon-btn-danger:hover{ background: var(--ig-danger-100); border-color: var(--ig-danger); color: var(--ig-danger); }
+.ig-btn-add{ display:inline-flex; align-items:center; gap:7px; }
+.ig-row-menu-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:50%; color: var(--ig-ink-400);
+  transition: all var(--ig-fast) var(--ig-ease); flex:none;
 }
-.alignbuttonmain .btn-danger{
-  width: 142px;
+.ig-row-menu-btn:hover{ background: var(--ig-ink-100); color: var(--ig-ink-900); }
+
+.ig-table-toolbar{
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  margin: 4px 0 14px;
 }
-.btnchange{
-    /* background: #efefef; */
-    padding: 4px 7px;
-    border-radius: 9px;
-    border: 1px solid #e5e5e5;
-    padding: 6px 9px;
+.ig-table-toolbar .pagination{ margin-bottom:0; }
+.ig-table-toolbar .pagination-info{ margin:0; white-space:nowrap; }
+
+/* ==========================================================================
+   Modern table shell
+   ========================================================================== */
+.ig-table thead th{
+  background: var(--ig-bg);
+  border-bottom: 2px solid var(--ig-border);
+  position: sticky; top:0; z-index:1;
 }
-.dangeriline{
-  width:100px;
+.ig-table tbody tr{ border-bottom: 1px solid var(--ig-border); }
+.ig-table tbody tr:last-child{ border-bottom:none; }
+.ig-table tbody tr:hover{ background: var(--ig-green-50); }
+.ig-table tbody td{ vertical-align: middle; }
+
+/* ==========================================================================
+   ig-table-tools: per-table search box, sortable headers, column filter row
+   (all injected client-side by /js/ig-table-tools.js — purely presentational
+   here, no layout/query logic lives in CSS)
+   ========================================================================== */
+.ig-table-search-wrap{ display:flex; justify-content:flex-end; }
+.ig-table-search{
+  position:relative; width:100%; max-width:280px;
 }
-.width50{
-  width:50%;
+.ig-table-search i{
+  position:absolute; left:10px; top:50%; transform:translateY(-50%);
+  font-size:12.5px; color: var(--ig-ink-400); pointer-events:none;
 }
-.table_width_align th:nth-child(1){
-  width: 26%;
+.ig-table-search input{ padding-left:30px; }
+
+/* IMPORTANT: the <th> itself must stay `display: table-cell` (its browser
+   default) so the header row, the filter row, and the body rows all size
+   their columns from the same table-layout algorithm and stay pixel-aligned.
+   All the visual styling (pointer cursor, spacing between the label and the
+   sort icon) is scoped to an inner wrapper — .ig-th-content — that the script
+   injects inside the <th>, never to the cell itself. */
+.ig-table thead th.ig-th-sort{ cursor:pointer; user-select:none; }
+.ig-table thead th.ig-th-sort:hover{ color: var(--ig-green-700); }
+.ig-table thead th.ig-th-sorted{ color: var(--ig-green-700); }
+.ig-th-content{
+  display:flex; align-items:center; justify-content:space-between; gap:6px;
+  white-space:nowrap;
 }
-.table_width_align th:nth-child(2){
-  width: 27%;
+.ig-sort-icon{ display:inline-flex; flex:none; font-size:12px; opacity:.55; }
+.ig-th-sorted .ig-sort-icon{ opacity:1; }
+
+/* Filter row: real <tr>/<th> cells that line up 1:1 with the header and body
+   columns via the table's own layout — no independent widths, no offsets. */
+.ig-table thead tr.ig-filter-row th{
+  position: static;              /* don't inherit the header row's sticky top:0 */
+  background: #fff;
+  border-bottom: 1px solid var(--ig-border);
+  padding: 6px 8px;
+  vertical-align: middle;
+  font-weight:400;
+  white-space:normal;
+}
+.ig-filter-cell{ font-weight:400; }
+.ig-filter-input{ font-size:12.5px; width:100%; min-width:84px; box-sizing:border-box; }
+select.ig-filter-input{ min-width:96px; }
+.ig-filter-range{ display:flex; gap:4px; flex-wrap:nowrap; }
+.ig-filter-range input{ width:50%; min-width:56px; }
+
+.ig-no-match-row td{ border:none !important; }
+
+/* -- status badges: colour-coded by common CRM status values, class is a
+      slug of the live status text so this works for any status without
+      needing to enumerate every possible value up front -- */
+.ig-badge{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11.5px; font-weight:700; letter-spacing:.02em;
+  padding: 4px 11px; border-radius: var(--ig-radius-pill);
+  background: var(--ig-ink-100); color: var(--ig-ink-600);
+  white-space:nowrap;
+}
+.ig-badge::before{ content:""; width:6px; height:6px; border-radius:50%; background: currentColor; }
+.ig-badge-new{ background: var(--ig-info-100); color:#1c3fa8; }
+.ig-badge-assigned, .ig-badge-in-process, .ig-badge-pending-with-team{ background: var(--ig-amber-100); color:#8a6b00; }
+.ig-badge-converted, .ig-badge-resolved, .ig-badge-active{ background: var(--ig-green-100); color: var(--ig-green-800); }
+.ig-badge-dead, .ig-badge-rejected, .ig-badge-duplicate{ background: var(--ig-danger-100); color:#a3242a; }
+.ig-badge-recycled, .ig-badge-move-to-internal-team{ background: var(--ig-info-100); color:#1c3fa8; }
+.ig-badge-inactive{ background: var(--ig-ink-100); color: var(--ig-ink-500); }
+
+/* ==========================================================================
+   Empty state (used inside a table body / panel when there's no data)
+   ========================================================================== */
+.ig-empty-row td{ border:none !important; padding:0 !important; }
+.ig-empty-state{
+  text-align:center; padding: 54px 20px;
+}
+.ig-empty-state i{
+  font-size:30px; color: var(--ig-green-500);
+  width:64px; height:64px; display:flex; align-items:center; justify-content:center;
+  margin:0 auto 16px; border-radius:50%; background: var(--ig-green-50);
+}
+.ig-empty-state h6{ font-weight:700; color: var(--ig-ink-700); margin-bottom:6px; }
+.ig-empty-state p{ font-size:13px; color: var(--ig-ink-400); margin:0; }
+
+/* ==========================================================================
+   Bootstrap component re-skin (applies everywhere automatically)
+   ========================================================================== */
+.card{ border: 1px solid var(--ig-border); border-radius: var(--ig-radius-lg); box-shadow: var(--ig-shadow-sm); }
+.card-header{ background: #fafbfd; border-bottom: 1px solid var(--ig-border); font-weight:700; border-radius: var(--ig-radius-lg) var(--ig-radius-lg) 0 0 !important; }
+
+.badge{ font-weight:600; letter-spacing:.02em; padding:.42em .7em; border-radius: var(--ig-radius-pill); }
+
+.pagination{ gap:4px; }
+.page-link{
+  border: 1px solid var(--ig-border);
+  color: var(--ig-ink-700);
+  border-radius: var(--ig-radius-xs) !important;
+  font-weight:600;
+  font-size:13.5px;
+}
+.page-item.active .page-link{ background: var(--ig-green-600); border-color: var(--ig-green-600); }
+.page-link:hover{ background: var(--ig-green-50); color: var(--ig-green-700); }
+.pagination-info{ color: var(--ig-ink-400); font-size:12.5px; }
+
+.alert{ border-radius: var(--ig-radius-md); border:none; box-shadow: var(--ig-shadow-sm); }
+.alert-success{ background: var(--ig-green-100); color: var(--ig-green-800); }
+.alert-info{ background: var(--ig-info-100); color: #1c3fa8; }
+.alert-danger{ background: var(--ig-danger-100); color: #a3242a; }
+
+.dropdown-menu{ border:none; border-radius: var(--ig-radius-md); box-shadow: var(--ig-shadow-md); padding:8px; }
+.dropdown-item{ border-radius: var(--ig-radius-xs); font-size:13.5px; padding:.5rem .7rem; }
+.dropdown-item:hover{ background: var(--ig-green-50); color: var(--ig-green-700); }
+
+.offcanvas{ border: none !important; box-shadow: var(--ig-shadow-lg); }
+.offcanvas-backdrop.show{
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  opacity: .45;
 }
 
-.table_width_align th:nth-child(5){
-  width: 47%;
+/* ==========================================================================
+   Right-side panels — "Assigned to Me" / "Favourite" (and any other
+   offcanvas built on the same markup). Same data, same actions; the shell,
+   item cards, empty state and motion are what changed.
+   ========================================================================== */
+.ig-side-panel{
+  width: min(420px, 92vw) !important;
+  border-radius: var(--ig-radius-lg) 0 0 var(--ig-radius-lg);
+  overflow: hidden;
 }
-.filter_popup{
-  max-width: 724px !important;
+.ig-side-panel .offcanvas-header{
+  align-items:center;
+  padding: 18px 22px;
+  background: linear-gradient(180deg, var(--ig-green-50), var(--ig-surface));
+  border-bottom: 1px solid var(--ig-border);
 }
-.table-responsive{
-  padding-bottom: 54px;
+.ig-panel-heading{ display:flex; align-items:center; gap:12px; }
+.ig-side-panel-icon{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:38px; border-radius: var(--ig-radius-sm); flex:none;
+  background: linear-gradient(135deg, var(--ig-green-500), var(--ig-green-700));
+  color:#fff; font-size:16px;
+  box-shadow: 0 6px 14px -5px rgba(15,148,87,.55);
 }
-.heightscroll2{
-  height: 502px;
-  overflow: auto;
+.ig-side-panel-icon-amber{
+  background: linear-gradient(135deg, var(--ig-amber-500), var(--ig-amber-600));
+  color:#3a2c00;
+  box-shadow: 0 6px 14px -5px rgba(231,180,0,.5);
 }
-.starred{
-   color:red;
+.ig-side-panel .offcanvas-title{ font-size:16.5px; }
+.ig-side-panel .btn-close{
+  width:34px; height:34px; border-radius:50%;
+  background-size: 12px;
+  opacity:.55;
+  transition: all var(--ig-fast) var(--ig-ease);
 }
-/* Replace with your own icon font classes or SVG classes if not using Font Awesome */
+.ig-side-panel .btn-close:hover{ opacity:1; background-color: var(--ig-ink-100); transform: rotate(90deg); }
+.ig-side-panel .offcanvas-body{
+  padding: 18px 20px 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ig-green-100) transparent;
+}
+.ig-side-panel .offcanvas-body::-webkit-scrollbar{ width:6px; }
+.ig-side-panel .offcanvas-body::-webkit-scrollbar-thumb{ background: var(--ig-green-100); border-radius:10px; }
+.ig-side-panel .offcanvas-body::-webkit-scrollbar-track{ background:transparent; }
 
-/* Empty star icon */
-.star-empty:before {
-  content: "\f006";
+/* -- item cards -- */
+.socialticketinner{
+  background: var(--ig-surface);
+  border: 1px solid var(--ig-border);
+  border-radius: var(--ig-radius-md);
+  margin-bottom: 10px;
+  padding: 13px 14px;
+  transition: border-color var(--ig-fast) var(--ig-ease), box-shadow var(--ig-fast) var(--ig-ease), transform var(--ig-fast) var(--ig-ease);
+  animation: ig-fade-up var(--ig-slow) var(--ig-ease) both;
+  animation-delay: calc(var(--ig-i, 0) * 55ms);
+}
+.socialticketinner:hover{
+  background: var(--ig-surface);
+  border-color: var(--ig-green-500);
+  box-shadow: var(--ig-shadow-sm);
+  transform: translateY(-2px);
+}
+.socialticketinner:active{ transform: translateY(0) scale(.99); }
+@media (prefers-reduced-motion: reduce){
+  .socialticketinner{ animation:none; }
 }
 
-/* Filled star icon */
-.star-filled:before {
-  content: "\f005";
-  display: none; /* Initially hidden */
+/* -- empty state -- */
+.ig-panel-empty{
+  text-align:center;
+  padding: 52px 20px;
+  color: var(--ig-ink-400);
 }
-.ullinks{
-  list-style: none;
-  padding:0;
+.ig-panel-empty i{
+  font-size:34px;
+  display:inline-flex; align-items:center; justify-content:center;
+  width:64px; height:64px; border-radius:50%;
+  background: var(--ig-ink-100); color: var(--ig-ink-400);
+  margin-bottom:14px;
 }
-.verticalmenu{
-  border: 1px solid #e9e9e9;
-  padding: 23px;
-  border-radius: 21px;
+.ig-panel-empty h6{ font-size:14px; font-weight:700; color: var(--ig-ink-700); margin-bottom:4px; }
+.ig-panel-empty p{ font-size:12.5px; margin:0; }
 
+.downloadbtn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:34px; height:34px; padding:0 !important; border-radius:50% !important;
 }
-.ullinks li{
-  margin-bottom: 0;
-  border-bottom: 1px solid #e1e1e1;
-  padding: 10px 0;
-}
-.tabsnew .nav-item .nav-link{
-font-size:14px;
-}
-.dash{
-  margin: 21px;
-  line-height: 60px;
-  background: #ffd525;
-  padding: 9px 11px;
-  font-size: 17px;
-  border-radius: 6px;
-}
-.innerinput{
-  width: 92px;
-  position: absolute;
-  border-left: 0;
-  left: 1px;
-  border-radius: 4px 0px 0px 4px;
-}
-.btnhoverser:hover{
-background:none !important;
-color: #000 !important;
-  }
-  .btnhoverser:focus{
-    background:none !important;
-    color: #000 !important;
-    box-shadow: none !important;
-      }
-      .secondstar{
-        
-        width: 34px;
-        border-radius: 9px;
-        justify-content: center;
-        align-items: center;
-        display: flex;
-      }
 
- .READ_ONLY {   
-      text-decoration: none; /* Remove underline */
-      pointer-events: none; /* Disable click functionality */
-    }
-
- .HIDDEN {   
-    display: none !important;  
- }
-
- img.newimg {
-      width: 40px;
-      background: #0000000f;
-      padding: 1px;
-      width: 27px;
-      height: 27px;
-      object-fit: contain;
-      border-radius: 60px;
-      margin-right: 5px;
-  }
-  
-.moreinfo .table thead, tbody{
-	  vertical-align: middle;
-  }
-   .moreinfo .table tbody tr td
-   {
-	vertical-align: middle;
-    padding: 0.3rem;
-
-   }
-   .documentType ul li{
-    list-style: none;
-    float: left;
-    border: 1px solid #ddd;
-    padding: 0 15px;
-    margin: 0 3px;
-    border-radius: 40px;
-    font-size: 13px;
-    font-weight: 600;
-   }
-   
-   .documentType ul{
-     padding:0;
-   }
-   .documentType ul li i.bi.bi-x-lg {
-    background: #f1f1f1;
-    color: #000;
-    padding: 3px 4px;
-    border-radius: 40px;
-    font-size: 9px;
-    margin-left: 8px;
-    cursor: pointer;
-    margin-bottom: 8px;
-
+/* ==========================================================================
+   Motion utility classes — pure CSS, no JS dependency, so content is never
+   left invisible if a script fails to load. The JS enhancer (ui-enhance.js)
+   only adds an optional stagger delay on top of this.
+   ========================================================================== */
+.ig-animate-in{
+  animation: ig-fade-up var(--ig-slow) var(--ig-ease) both;
 }
-.socialusertd{
-  width: 50.33% !important;
-}
-.socialusertd i{
-  margin-right: 0.25rem!important;
-}
-.socialusertd a{
-  word-break: break-all;
-}
-.tickettable{
-  word-break: break-word; 
+.ig-animate-in:nth-child(1){ animation-delay: 0ms; }
+.ig-animate-in:nth-child(2){ animation-delay: 60ms; }
+.ig-animate-in:nth-child(3){ animation-delay: 120ms; }
+.ig-animate-in:nth-child(4){ animation-delay: 180ms; }
+.ig-animate-in:nth-child(5){ animation-delay: 240ms; }
+.ig-animate-in:nth-child(6){ animation-delay: 300ms; }
+@keyframes ig-fade-up{ from{ opacity:0; transform: translateY(10px); } to{ opacity:1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce){
+  .ig-animate-in{ opacity:1; transform:none; animation:none; }
 }

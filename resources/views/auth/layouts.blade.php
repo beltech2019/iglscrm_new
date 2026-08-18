@@ -48,7 +48,7 @@ $roleInfo = \App\Models\Role::find($loggedUser->role);
     <div id="main">
         <nav class="navbar navbar-expand-lg sticky-top">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#"> <span style="font-size:30px;cursor:pointer" onclick="openNav()"><img
+                <a class="navbar-brand" href="#"> <span class="ig-nav-toggle-btn" role="button" aria-label="Toggle navigation" onclick="toggleNav()"><img
                             src="/images/menu.png" class="menuicons"></span>
                     <img src="/images/fav-logo.png" class="logo_nav mt-0 hidedesktop"></a>
 
@@ -126,30 +126,42 @@ $roleInfo = \App\Models\Role::find($loggedUser->role);
         </nav>
         <div id="mySidenav" class="sidenav">
             <div class="">
-                <img src="/images/fav-logo.png" class="logo_nav">
+                <div class="sidenav-brand">
+                    <img src="/images/fav-logo.png" class="logo_nav">
+                    <span class="sidenav-text sidenav-brand-text">IGL SCRM</span>
+                </div>
                 <div class="menu">
-                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()" aria-label="Close menu">&times;</a>
+
+                    <p class="nav-section-label sidenav-text">Overview</p>
                     <a href="/countDashboard" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard"
                         class=" {{ addUIComponent('DASHBOARD') }}" id="dashboard"><i class="bi bi-columns-gap"></i>
-                        Dashboard</a>
+                        <span class="sidenav-text sidenav-label">Dashboard</span></a>
+
+                    <p class="nav-section-label sidenav-text">Workspace</p>
                     <a href="/dashboard" id="post" data-bs-toggle="tooltip" data-bs-placement="right"
                         title="Social Post" class=" {{ addUIComponent('SOCIALPOST') }}"><i class="bi bi-mailbox"></i>
-                        Social Post</a>
+                        <span class="sidenav-text sidenav-label">Social Post</span></a>
                     <a href="/getSocialTicket" id="ticket" data-bs-toggle="tooltip" data-bs-placement="right"
                         title="Social Ticket" class=" {{ addUIComponent('SOCIALTICKET') }}"><i class="bi bi-ticket"></i>
-                        Social Ticket</a>
+                        <span class="sidenav-text sidenav-label">Social Ticket</span></a>
                     <a href="/getLeads" data-bs-toggle="tooltip" data-bs-placement="right" title="Leads"
-                        class=" {{ addUIComponent('LEAD') }}" id="lead"><i class="bi bi-funnel"></i> Leads</a>
+                        class=" {{ addUIComponent('LEAD') }}" id="lead"><i class="bi bi-funnel"></i> <span class="sidenav-text sidenav-label">Leads</span></a>
+
+                    <p class="nav-section-label sidenav-text">Administration</p>
                     <a href="{{ route('adminManagement') }}" data-bs-toggle="tooltip" data-bs-placement="right"
                         title="Admin Management" id="admin" class=" {{ addUIComponent('ADMINMANAGEMENT') }}"><i
-                            class="bi bi-person-workspace"></i> Admin Management</a>
+                            class="bi bi-person-workspace"></i> <span class="sidenav-text sidenav-label">Admin Management</span></a>
+
+                    <p class="nav-section-label sidenav-text">Insights</p>
                     <a href="/getSocialPostReport" data-bs-toggle="tooltip" data-bs-placement="right"
                         title="Reports" id="PredefineReports" class=" {{ addUIComponent('PREDEFINE_REPORT') }}"><i class="bi bi-file-bar-graph"></i>
-                        Reports</a>
+                        <span class="sidenav-text sidenav-label">Reports</span></a>
 
                 </div>
             </div>
         </div>
+        <div class="sidenav-backdrop" id="sidenavBackdrop" onclick="closeNav()"></div>
         <div class="container-fluid ">
             @if(Session::has('success'))
             <div class="row">
@@ -166,6 +178,8 @@ $roleInfo = \App\Models\Role::find($loggedUser->role);
         </div>
 
         <x-template-component />
+        <script src="/js/ui-enhance.js"></script>
+        <script src="/js/ig-table-tools.js"></script>
         <script>
         // Initialize tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -178,10 +192,13 @@ $roleInfo = \App\Models\Role::find($loggedUser->role);
             });
         });
         </script>
-        <div class="offcanvas offcanvas-end" id="demo">
-            <div class="offcanvas-header ">
-                <h1 class="offcanvas-title">Assigned to Me</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        <div class="offcanvas offcanvas-end ig-side-panel" id="demo">
+            <div class="offcanvas-header">
+                <div class="ig-panel-heading">
+                    <span class="ig-side-panel-icon"><i class="bi bi-list-task"></i></span>
+                    <h1 class="offcanvas-title">Assigned to Me</h1>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
                 <div class="tabsmaininner2">
@@ -195,9 +212,9 @@ $roleInfo = \App\Models\Role::find($loggedUser->role);
                             <h4 style="display: flex; justify-content: space-between; align-items: center;">
                                 Social Ticket
                                 <div style="display: flex; gap: 10px;">
-                                    <a href="/getSocialTicket?user_id={{ Auth::user()->id }}" class="seeall">See All</a>
+                                    <a href="/getSocialTicket?user_id={{ Auth::user()->id }}" class="seeall"><i class="bi bi-arrow-up-right"></i> See All</a>
                                     <form method="GET" action="/getSocialTicket/{{ Auth::user()->id }}">
-                                        <button type="submit" class="btn btn-danger downloadbtn" name="download" value="download">
+                                        <button type="submit" class="btn btn-danger downloadbtn" name="download" value="download" title="Download">
                                             <i class="bi bi-download"></i> <!-- Bootstrap Icons Download Icon -->
                                         </button>
                                     </form>
@@ -208,7 +225,7 @@ $roleInfo = \App\Models\Role::find($loggedUser->role);
                     </div>
                     @if(!empty($assignedToMe) && count($assignedToMe))
                     @foreach($assignedToMe as $key => $assignedToMes)
-                    <div class="socialticketinner">
+                    <div class="socialticketinner" style="--ig-i:{{ $key }}">
                         <h6>
                             @if($assignedToMes->source == 'Twitter')
                             <img src="/images/{{ getSocialIcon($assignedToMes->source,true) }}" class="newimg">
@@ -221,21 +238,29 @@ $roleInfo = \App\Models\Role::find($loggedUser->role);
                         <p class="dates"><i class="bi bi-person-fill"></i>{{$assignedToMes->getTweet_id}}</p>
                     </div>
                     @endforeach
+                    @else
+                    <div class="ig-panel-empty">
+                        <i class="bi bi-inbox"></i>
+                        <h6>Nothing assigned right now</h6>
+                        <p>Tickets assigned to you will show up here.</p>
+                    </div>
                     @endif
 
                 </div>
             </div>
         </div>
-        <div class="offcanvas offcanvas-end" id="start_wise">
+        <div class="offcanvas offcanvas-end ig-side-panel" id="start_wise">
             <div class="offcanvas-header">
-                <h1 class="offcanvas-title">Favourite<span class="ms-3"><a href="/getFavourite" class="seeall">See
-                            All</a></span></h1>
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                <div class="ig-panel-heading">
+                    <span class="ig-side-panel-icon ig-side-panel-icon-amber"><i class="bi bi-star-fill"></i></span>
+                    <h1 class="offcanvas-title">Favourite<span class="ms-3"><a href="/getFavourite" class="seeall"><i class="bi bi-arrow-up-right"></i> See All</a></span></h1>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
                 @if(!empty($favouriteToMe) && count($favouriteToMe))
                 @foreach($favouriteToMe as $key => $favouriteToMes)
-                <div class="socialticketinner">
+                <div class="socialticketinner" style="--ig-i:{{ $key }}">
                     <h6>
                         @if($favouriteToMes->source == 'Twitter')
                         <img src="/images/{{getSocialIcon($favouriteToMes->ticketSource,true) }}" class="newimg">
@@ -253,6 +278,12 @@ $roleInfo = \App\Models\Role::find($loggedUser->role);
                     </p>
                 </div>
                 @endforeach
+                @else
+                <div class="ig-panel-empty">
+                    <i class="bi bi-star"></i>
+                    <h6>No favourites yet</h6>
+                    <p>Items you favourite will be pinned here for quick access.</p>
+                </div>
                 @endif
             </div>
         </div>
@@ -260,15 +291,64 @@ $roleInfo = \App\Models\Role::find($loggedUser->role);
 
 </html>
 <script>
+// Desktop: the sidebar is a collapsed icon-only rail by default (labels
+// appear as tooltips on hover). The hamburger EXPANDS the same rail in
+// place to show icons + labels, pushing #main over — the same
+// expand/collapse behaviour the app originally had, just restyled.
+// Mobile/tablet: the rail becomes a slide-in drawer with full labels,
+// opened by the hamburger and closed via the × button or the backdrop.
+// A single body class drives both states; only what the class *means*
+// differs per breakpoint (handled entirely in CSS).
+function isSidebarOpen() {
+    return document.body.classList.contains("sidenav-toggled");
+}
+
+// Collapsed-rail tooltips only make sense on desktop, and only while the
+// rail is collapsed (the label is already on-screen once expanded, so a
+// tooltip repeating it would just be clutter). Purely cosmetic — if the
+// tooltip instances aren't ready yet for any reason this is a no-op.
+function setSidebarTooltips(enabled) {
+    if (window.innerWidth < 992 || !window.tooltipList) return;
+    window.tooltipList.forEach(function (t) {
+        if (enabled) {
+            t.enable();
+        } else {
+            t.hide();
+            t.disable();
+        }
+    });
+}
+
 function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
-    document.getElementById("main").style.marginLeft = "250px";
+    document.body.classList.add("sidenav-toggled");
+    setSidebarTooltips(false);
 }
 
 function closeNav() {
-    document.getElementById("mySidenav").style.width = "64px";
-    document.getElementById("main").style.marginLeft = "64px";
+    document.body.classList.remove("sidenav-toggled");
+    setSidebarTooltips(true);
 }
+
+function toggleNav() {
+    if (isSidebarOpen()) {
+        closeNav();
+    } else {
+        openNav();
+    }
+}
+
+// Keep the drawer/rail state sane if the viewport crosses the responsive
+// breakpoint while open (e.g. rotating a tablet).
+(function () {
+    var lastIsDesktop = window.innerWidth >= 992;
+    window.addEventListener("resize", function () {
+        var isDesktop = window.innerWidth >= 992;
+        if (isDesktop !== lastIsDesktop) {
+            closeNav();
+            lastIsDesktop = isDesktop;
+        }
+    });
+})();
 </script>
 <div class="modal" id="commonModal" tabindex="-1">
     <div class="modal-dialog widthdialoge">

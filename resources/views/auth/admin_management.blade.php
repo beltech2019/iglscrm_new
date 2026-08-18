@@ -17,6 +17,14 @@ body{
 
     <div class="div_container">
 
+        <div class="ig-page-header">
+            <div>
+                <span class="ig-eyebrow-light">Administration</span>
+                <h1><i class="bi bi-person-workspace"></i> Admin Management</h1>
+                <p>Configure users, rules and application settings.</p>
+            </div>
+        </div>
+
         <div class="">
             <div class="dashboard">
 

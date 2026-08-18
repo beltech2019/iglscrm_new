@@ -7,7 +7,8 @@
         <h3>Template List</h3>
         <a href="/createUpdateTemplate" class="btn btn-primary mb-3 " id="pry">Add New Template</a>
 
-        <table class="table {{ addUIComponent('TEMPLATE_TABLE') }}">
+        <div class="table-responsive">
+        <table class="table ig-table {{ addUIComponent('TEMPLATE_TABLE') }}" data-ig-tabletools>
             <thead>
                 <tr>
                     <th>Name</th>
@@ -37,6 +38,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     </div>
     </div> </div>
 <script>

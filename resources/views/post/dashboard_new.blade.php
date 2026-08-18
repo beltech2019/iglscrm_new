@@ -2,556 +2,341 @@
 
 @section('content')
 
+<style>
+/* ==========================================================================
+   Dashboard redesign — scoped entirely to .ig-dash2 so nothing here can
+   leak into any other page. No shared stylesheet was touched for this.
+   ========================================================================== */
+.ig-dash2{ --d-border:#e6eaf0; --d-ink-900:#101820; --d-ink-700:#33404b; --d-ink-500:#5c6a76; --d-ink-400:#8994a1; --d-ink-100:#eef1f5; --d-surface:#ffffff; --d-green-600:#0d7a49; --d-green-100:#e3f7ec; --d-danger:#e5484d; --d-danger-100:#fdecec; --d-amber-600:#e7b400; --d-amber-100:#fff6d6; --d-info:#3b6cff; --d-info-100:#eaf0ff; --d-radius:14px; --d-fast:150ms; --d-ease:cubic-bezier(.4,0,.2,1); }
 
+.ig-dash-header-row{ display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; }
+.ig-dash-datefilter{ display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap; margin:0; }
+.ig-dash-datefilter-field{ display:flex; flex-direction:column; gap:4px; }
+.ig-dash-datefilter-field label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--d-ink-400); margin:0; }
+.ig-dash-datefilter-field input{ height:38px; padding:6px 12px; }
+.ig-dash-datefilter-btn{ height:38px; padding:0 16px; display:flex; align-items:center; gap:6px; }
 
+.ig-dash-stats-row{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:14px; margin:18px 0; }
+.ig-dstat{ display:flex; align-items:flex-start; gap:12px; background:var(--d-surface); border:1px solid var(--d-border); border-radius:var(--d-radius); padding:16px; text-decoration:none; color:inherit; box-shadow:0 1px 2px rgba(16,24,32,.04); transition:transform var(--d-fast) var(--d-ease), box-shadow var(--d-fast) var(--d-ease), border-color var(--d-fast) var(--d-ease); min-height:96px; }
+.ig-dstat:hover{ transform:translateY(-2px); box-shadow:0 8px 18px -8px rgba(16,24,32,.16); border-color:var(--d-ink-100); color:inherit; }
+.ig-dstat-icon{ flex:none; width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:15px; }
+.ig-dstat-icon-posts{ background:var(--d-info-100); color:var(--d-info); }
+.ig-dstat-icon-tickets{ background:var(--d-danger-100); color:var(--d-danger); }
+.ig-dstat-icon-resolved{ background:var(--d-green-100); color:var(--d-green-600); }
+.ig-dstat-icon-totalposts{ background:var(--d-amber-100); color:var(--d-amber-600); }
+.ig-dstat-icon-tottickets{ background:var(--d-ink-100); color:var(--d-ink-500); }
+.ig-dstat-body{ min-width:0; }
+.ig-dstat-body h6{ margin:0; font-size:22px; font-weight:800; letter-spacing:-.4px; color:var(--d-ink-900); line-height:1.15; }
+.ig-dstat-body p{ margin:2px 0 0; font-size:12.5px; font-weight:600; color:var(--d-ink-500); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ig-dstat-sub{ display:inline-block; margin-top:4px; font-size:11px; font-weight:600; color:var(--d-ink-400); }
 
-<div class="">
+.ig-dash-card{ background:var(--d-surface); border:1px solid var(--d-border); border-radius:var(--d-radius); padding:20px; box-shadow:0 1px 2px rgba(16,24,32,.04); height:100%; box-sizing:border-box; }
+.ig-dash-charts-row{ display:grid; grid-template-columns:1.6fr 1fr; gap:16px; margin-bottom:16px; align-items:stretch; }
+.ig-dash-social-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+.ig-dash2 .ig-panel-toolbar{ margin-bottom:14px; }
+
+.ig-donut-filter{ margin-bottom:10px; }
+.ig-donut-wrap{ display:flex; flex-direction:column; align-items:center; gap:14px; }
+.ig-donut-canvas-wrap{ position:relative; width:100%; max-width:230px; margin:0 auto; }
+.ig-donut-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
+.ig-donut-center b{ font-size:24px; font-weight:800; color:var(--d-ink-900); line-height:1.1; }
+.ig-donut-center span{ font-size:11.5px; font-weight:600; color:var(--d-ink-400); }
+.ig-donut-legend{ width:100%; display:flex; flex-direction:column; gap:9px; }
+.ig-donut-legend-row{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--d-ink-700); }
+.ig-donut-dot{ width:9px; height:9px; border-radius:50%; flex:none; }
+.ig-donut-legend-row span{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ig-donut-legend-row b{ font-weight:700; color:var(--d-ink-900); }
+
+.ig-overview-chart{ width:100%; }
+
+@media (max-width:1024px){
+  .ig-dash-stats-row{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+  .ig-dash-charts-row{ grid-template-columns:1fr; }
+}
+@media (max-width:767px){
+  .ig-dash-header-row{ flex-direction:column; align-items:stretch; }
+  .ig-dash-datefilter{ width:100%; }
+  .ig-dash-datefilter-field{ flex:1 1 40%; }
+  .ig-dash-datefilter-btn{ flex:0 0 auto; }
+  .ig-dash-stats-row{ grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
+  .ig-dash-social-row{ grid-template-columns:1fr; gap:14px; }
+  .ig-dash-card{ padding:16px; }
+  .ig-dstat{ padding:13px; min-height:84px; }
+  .ig-dstat-body h6{ font-size:19px; }
+}
+@media (max-width:414px){
+  .ig-dash-stats-row{ grid-template-columns:1fr; }
+  .ig-dash-datefilter-field{ flex:1 1 100%; }
+}
+@media (prefers-reduced-motion: reduce){
+  .ig-dstat{ transition:none; }
+}
+</style>
+
+<div class="ig-dash2">
     <div class="div_container">
 
-        <div class="">
-            <div class="dashboard">
-				<?php
-				$typeCount = [addUIComponent('DASHBOARD_RECENT_POSTS'),addUIComponent('DASHBOARD_RECENT_TICKETS'),addUIComponent('DASHBOARD_RECENT_LEADS'),addUIComponent('DASHBOARD_RESOLVED_TICKETS')];
-				$counts = array_count_values($typeCount);
-				$countVal = 0;
-				if(isset($counts['READ_WRITE']))
-				{
-					$countVal = $countVal+$counts['READ_WRITE'];
-				}
-				if(isset($counts['READ_ONLY']))
-				{
-					$countVal = $countVal+$counts['READ_ONLY'];
-				}
-				?>
-                <div class="row">
-                    <div class="col-md-{{addUIComponent('DASHBOARD_STATICS') == 'HIDDEN'?12:8}}">
-                        <div class="states mt-3">
-							@if($countVal > 0)
-                            <div class="row">
-                                <div class="col-md-{{12/$countVal}} col-{{12/($countVal*2)}} {{ addUIComponent('DASHBOARD_RECENT_POSTS') }}">
-                                    <a herf="" onclick="location.href='/recentdashboard';">
-                                        <div class="states_inner bgone">
-                                            <i class="bi bi-mailbox icon1"></i>
-                                            <p>Recent Posts</p>
-                                            <h6 class="counter" data-target="{{$getSocailRecentData->count()}}">
-                                            {{$getSocailRecentData->count()}}</h6>
-                                        </div>
-                                    </a>
-                                </div>
-                                <div class="col-md-{{12/$countVal}} col-{{12/($countVal*2)}} {{ addUIComponent('DASHBOARD_RECENT_TICKETS') }}">
-                                    <a herf="" onclick="location.href='/getRecentSocialTicket';">
-                                        <div class="states_inner bgtwo">
-                                            <i class="bi bi-ticket icon2"></i>
-                                            <p>Recent Tickets</p>
-                                            <h6 class="counter" data-target="{{$getTicketRecentData->count()}}">
-                                                {{$getTicketRecentData->count()}}</h6>
-                                        </div>
-                                    </a>
-                                </div>
-                                <div class="col-md-{{12/$countVal}} col-{{12/($countVal*2)}} {{ addUIComponent('DASHBOARD_RECENT_LEADS') }}">
-                                <a herf="" onclick="location.href='/getRecentLeads';">  
-                                    <div class="states_inner bgthree">
-                                        <i class="bi bi-funnel icon3"></i>
-                                        <p>Recent Leads</p>
-                                        <h6 class="counter" data-target="{{$getLeadRecentData->count()}}">{{$getLeadRecentData->count()}}</h6>
-                                    </div>
-                                </a>    
-                                </div>
-                                <div class="col-md-{{12/$countVal}} col-{{12/($countVal*2)}} {{ addUIComponent('DASHBOARD_RESOLVED_TICKETS') }}">
-                                <a herf="" onclick="location.href='/getRecentSocialTicket?status=Resolved';">    
-                                    <div class="states_inner bgfour">
-                                        <i class="bi bi-flag icon4"></i>
-                                        <p>Resolved Tickets</p>
-                                        <h6 class="counter" data-target="{{$getTicketGraphResolvedData->count()}}">{{$getTicketGraphResolvedData->count()}}</h6>
-                                    </div>
-                                </a>    
-                                </div>
-                            </div>
-							@endif
-                        </div>
-						<?php
-				$typeCount = [addUIComponent('DASHBOARD_SOCIAL_POSTS'),addUIComponent('DASHBOARD_SOCIAL_TICKETS')];
-				$counts = array_count_values($typeCount);
-				$countVal = 0;
-				if(isset($counts['READ_WRITE']))
-				{
-					$countVal = $countVal+$counts['READ_WRITE'];
-				}
-				if(isset($counts['READ_ONLY']))
-				{
-					$countVal = $countVal+$counts['READ_ONLY'];
-				}
-				?>
-                        <div class="row">
-                            <div class="col-md-{{$countVal>1?6:12}}  {{ addUIComponent('DASHBOARD_SOCIAL_POSTS') }}">
-                                <div class="socialticket_mini">
-                                    <div class="bgwhite2 heightscroll">
-                                        <div class="headingmain headingsec mb-3">
-                                            <h6>Social Posts ({{$totalPostCount->count()}})<a href="/dashboard"
-                                                    class="seeall">See All</a>
-                                            </h6>
-                                        </div>
-                                        <?php $count = 0; ?>
-                                        @if(!empty($getSocailData) && $getSocailData->count())
-                                        @foreach($getSocailData as $getSocail)
-                                        @if( $count > 4)
-                                        <?php continue;?>
-                                        @endif
-                                        <div class="socialticketinner">
+        <div class="ig-page-header ig-animate-in ig-dash-header-row">
+            <div>
+                <span class="ig-eyebrow ig-eyebrow-light">Control Center</span>
+                <h1>Dashboard</h1>
+                <p>A live view of posts, tickets and leads flowing through the desk.</p>
+            </div>
 
-                                            <h6>
-                                            @if($getSocail->source == 'Twitter')        
-                                               <img src="/images/{{ getSocialIcon($getSocail->source,true) }}" class="newimg">
-                                              @else        
-                                               <i class="{{ getSocialIcon($getSocail->source) }}"></i>
-                                            @endif 
-                                             {{$getSocail->socialUser_name}}<span
-                                                    class="alertnew">New Post</span></h6>
-                                            <p>{!! getUrlinString($getSocail->postMessage)!!} </p>
-                                            <p class="dates"><i
-                                                    class="bi bi-person-fill"></i>{{$getSocail->getTweet_id}}</p>
-                                        </div>
-                                        <?php $count++;?>
-                                        @endforeach
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-{{$countVal>1?6:12}} {{ addUIComponent('DASHBOARD_SOCIAL_TICKETS') }}">
-                                <div class="socialticket_mini">
-                                    <div class="bgwhite2 heightscroll">
-                                        <div class="headingmain headingsec mb-3">
-                                            <h6>Social Tickets ({{$totalTicketCount->count()}})
-                                                <a href="/getSocialTicket" class="seeall">See All</a>
-                                            </h6>
-                                        </div>
-                                        <?php $count = 0;?>
-                                        @if(!empty($getTicketData) && $getTicketData->count())
+            <form method="GET" action="/countDashboard" id="igDashDateForm" class="ig-dash-datefilter">
+                @csrf
+                <div class="ig-dash-datefilter-field">
+                    <label for="igDashFrom">From</label>
+                    <input type="date" class="form-control" id="igDashFrom" name="startDate" value="{{$startDate}}" max="{{ date('Y-m-d') }}">
+                </div>
+                <div class="ig-dash-datefilter-field">
+                    <label for="igDashTo">To</label>
+                    <input type="date" class="form-control" id="igDashTo" name="endDate" value="{{$endDate}}" max="{{ date('Y-m-d') }}">
+                </div>
+                <button type="submit" class="btn btn-danger ig-dash-datefilter-btn"><i class="bi bi-funnel"></i> Apply</button>
 
-                                        @foreach($getTicketData as $getSocail)
-                                        @if( $count > 4)
-                                        <?php continue;?>
-                                        @endif
-                                        <div class="socialticketinner">
-                                            <h6>
-                                            @if($getSocail->source == 'Twitter')        
-                                               <img src="/images/{{ getSocialIcon($getSocail->source,true) }}" class="newimg">
-                                              @else        
-                                              <i class="{{ getSocialIcon($getSocail->source) }}"></i>
-                                            @endif        
-                                                
-                                                {{$getSocail->socialUser}}<span
-                                                    class="alertnew">New Ticket</span></h6>
-                                            <p>{!! getUrlinString($getSocail->postMessage)!!} </p>
-                                            <p class="dates"><i class="bi bi-calendar"></i>{{$getSocail->date_Created}}</p>
-                                        </div>
-                                        <?php $count++;?>
-                                        @endforeach
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <input type="hidden" name="startGraphDate" id="igMirrorStartGraphDate">
+                <input type="hidden" name="endGraphDate" id="igMirrorEndGraphDate">
+                <input type="hidden" name="startPostGraphDate" id="igMirrorStartPostGraphDate">
+                <input type="hidden" name="endPostGraphDate" id="igMirrorEndPostGraphDate">
+                <input type="hidden" name="startGraphLeadDate" id="igMirrorStartGraphLeadDate">
+                <input type="hidden" name="endGraphLeadDate" id="igMirrorEndGraphLeadDate">
+                <input type="hidden" name="startGraphSentimateDate" id="igMirrorStartGraphSentimateDate">
+                <input type="hidden" name="endGraphSentimateDate" id="igMirrorEndGraphSentimateDate">
+            </form>
+        </div>
 
-                    </div>
-                    <div class="col-md-{{$countVal > 0?4:12}}  {{ addUIComponent('DASHBOARD_STATICS') }}">
-                        <div class="bgwhite2 mt-3">
-                            <div class="headingmain headingsec mb-3">
-                                <div class="row">
-                                    <div class="col-md-2">
-                                        <h6 class="formh6">Statistics</h6>
-                                    </div>
-                                    <div class="col-md-10">
-                                        <div class="tabscircle2">
-                                            <ul class="nav nav-pills" id="pills-tab" role="tablist">
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link {{$ticketActive}} {{ addUIComponent('DASHBOARD_TICKETS') }}" id="pills-home-tab"
-                                                        data-bs-toggle="pill" data-bs-target="#pills-home" type="button"
-                                                        role="tab" aria-controls="pills-home"
-                                                        aria-selected="true">Tickets</button>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link {{$postActive}} {{ addUIComponent('DASHBOARD_POSTS') }}" id="pills-profile-tab"
-                                                        data-bs-toggle="pill" data-bs-target="#pills-profile"
-                                                        type="button" role="tab" aria-controls="pills-profile"
-                                                        aria-selected="false">Posts</button>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link {{$leadActive}} {{ addUIComponent('DASHBOARD_LEADS') }}" id="pills-contact-tab"
-                                                        data-bs-toggle="pill" data-bs-target="#pills-contact"
-                                                        type="button" role="tab" aria-controls="pills-contact"
-                                                        aria-selected="false">Leads</button>
-                                                </li>
-                                                <li class="nav-item" role="presentation">
-                                                    <button class="nav-link {{$sentimateActive}} {{ addUIComponent('DASHBOARD_SENTIMENTS') }}" id="tab_sentimants" data-bs-toggle="pill" data-bs-target="#sentimants" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Sentiments</button>
-                                                </li>
-                                            </ul>
+        <div class="ig-dash-stats-row ig-animate-in">
+            @if(addUIComponent('DASHBOARD_RECENT_POSTS') != 'HIDDEN')
+            <a href="javascript:void(0)" onclick="location.href='/recentdashboard';" class="ig-dstat">
+                <span class="ig-dstat-icon ig-dstat-icon-posts"><i class="bi bi-mailbox"></i></span>
+                <div class="ig-dstat-body">
+                    <h6 class="counter" data-target="{{$getSocailRecentData->count()}}">{{$getSocailRecentData->count()}}</h6>
+                    <p>Recent Posts</p>
+                    <span class="ig-dstat-sub">Selected range</span>
+                </div>
+            </a>
+            @endif
+            @if(addUIComponent('DASHBOARD_RECENT_TICKETS') != 'HIDDEN')
+            <a href="javascript:void(0)" onclick="location.href='/getRecentSocialTicket';" class="ig-dstat">
+                <span class="ig-dstat-icon ig-dstat-icon-tickets"><i class="bi bi-ticket"></i></span>
+                <div class="ig-dstat-body">
+                    <h6 class="counter" data-target="{{$getTicketRecentData->count()}}">{{$getTicketRecentData->count()}}</h6>
+                    <p>Recent Tickets</p>
+                    <span class="ig-dstat-sub">Selected range</span>
+                </div>
+            </a>
+            @endif
+            @if(addUIComponent('DASHBOARD_RESOLVED_TICKETS') != 'HIDDEN')
+            <a href="javascript:void(0)" onclick="location.href='/getRecentSocialTicket?status=Resolved';" class="ig-dstat">
+                <span class="ig-dstat-icon ig-dstat-icon-resolved"><i class="bi bi-flag"></i></span>
+                <div class="ig-dstat-body">
+                    <h6 class="counter" data-target="{{$getTicketGraphResolvedData->count()}}">{{$getTicketGraphResolvedData->count()}}</h6>
+                    <p>Resolved Tickets</p>
+                    <span class="ig-dstat-sub">Selected range</span>
+                </div>
+            </a>
+            @endif
+            <a href="javascript:void(0)" onclick="location.href='/dashboard';" class="ig-dstat">
+                <span class="ig-dstat-icon ig-dstat-icon-totalposts"><i class="bi bi-mailbox"></i></span>
+                <div class="ig-dstat-body">
+                    <h6 class="counter" data-target="{{$totalPostCount->count()}}">{{$totalPostCount->count()}}</h6>
+                    <p>Total Posts</p>
+                    <span class="ig-dstat-sub">All Time</span>
+                </div>
+            </a>
+            <a href="javascript:void(0)" onclick="location.href='/getSocialTicket';" class="ig-dstat">
+                <span class="ig-dstat-icon ig-dstat-icon-tottickets"><i class="bi bi-ticket"></i></span>
+                <div class="ig-dstat-body">
+                    <h6 class="counter" data-target="{{$totalTicketCount->count()}}">{{$totalTicketCount->count()}}</h6>
+                    <p>Total Tickets</p>
+                    <span class="ig-dstat-sub">All Time</span>
+                </div>
+            </a>
+        </div>
 
-                                        </div>
-                                    </div>
-                                </div>
+        <div class="ig-dash-charts-row ig-animate-in">
+            <div class="ig-dash-card ig-panel">
+                <div class="ig-panel-toolbar">
+                    <h6 class="formh6 ig-panel-title"><i class="bi bi-graph-up-arrow"></i> Statistics Overview</h6>
+                </div>
 
+                @if($getSocailGraphData->count() > 0 || $getTicketGraphData->count() > 0)
+                <div class="ig-chart-shell">
+                    <div id="chartContainerOverview" class="ig-overview-chart" style="height: 300px;"></div>
+                </div>
+                @else
+                <div class="ig-empty-state ig-empty-state-sm">
+                    <i class="bi bi-bar-chart"></i>
+                    <h6>No record found</h6>
+                    <p>Try a different date range to see activity here.</p>
+                </div>
+                @endif
+            </div>
 
+            <div class="ig-dash-card ig-panel ig-donut-card">
+                <div class="ig-panel-toolbar">
+                    <h6 class="formh6 ig-panel-title"><i class="bi bi-pie-chart"></i> Category Breakdown</h6>
+                </div>
 
-
-                            </div>
-
-                            <div class="tab-content" id="pills-tabContent">
-
-                                <div class="tab-pane fade {{$ticketshowActive}}" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-
-                                    <div class="dastpicker">
-                                        <form method="GET" action="/countDashboard">
-                                            @csrf
-                                            <div class="row">
-                                                <div class="col-md-5 col-5">
-                                                    <div class="mb-3">
-                                                        <label for="exampleInputEmail1" class="form-label">From</label>
-                                                        <input type="date" class="form-control" id="exampleInputEmail1"
-                                                            aria-describedby="emailHelp" name="startGraphDate"
-                                                            placeholder="From date" value="{{$startGraphDate}}">
-                                                            <input type="hidden" class="form-control" id="ticket"
-                                                            value="ticket" name="tab_type">    
-
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-5 col-5">
-                                                    <div class="mb-3">
-                                                        <label for="exampleInputEmail1" class="form-label">To</label>
-                                                        <input type="date" class="form-control" id="exampleInputEmail1"
-                                                            aria-describedby="emailHelp" name="endGraphDate"
-                                                            placeholder="To date" value="{{$endGraphDate}}"
-                                                            max="{{ date('Y-m-d') }}">
-
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 col-2 ps-0">
-                                                    <button type="submit" class="btn btn-danger marginmain"><i
-                                                            class="bi bi-funnel"></i></button>
-                                                </div>
-                                            </div>
- 
-                                        </form>
-                                        @if($getTicketGraphNewData->count()>0 || $getTicketGraphPendingData->count()>0 || $getTicketGraphMoveData->count()>0 || $getTicketGraphResolvedData->count()>0 || $getTicketGraphRejectedData->count()>0 || $getTicketGraphDuplicateData->count()>0 || $getTicketGraphAssignedData->count()>0)
-                                        <div id="chartContainer" style="height: 250px; width: 90%;"></div>
-                                        <div class="canvatextremove"></div>
-                                        @else
-                                        <h5>No Record Found</h5>
-                                        @endif
-                                        <div class="bgblack2">
-                                            <div class="row">
-                                            <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_POST_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getPostNewBoxData1->count()}}</h1>
-                                                        <p> Posts</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_TICKET_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getTicketNewBoxData1->count()}}</h1>
-                                                        <p> Tickets</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_LEAD_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getLeadNewBoxData1->count()}}</h1>
-                                                        <p>Leads</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                                <div class="tab-pane fade {{$postshowActive}}" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                                <div class="dastpicker">
-                                        <form method="GET" action="/countDashboard">
-                                            @csrf
-                                            <div class="row">
-                                                <div class="col-md-5 col-5">
-                                                    <div class="mb-3">
-                                                        <label for="exampleInputEmail1" class="form-label">From</label>
-                                                        <input type="date" class="form-control" id="exampleInputEmail1"
-                                                            aria-describedby="emailHelp" name="startPostGraphDate"
-                                                            placeholder="From date" value="{{$startPostGraphDate}}"
-                                                            max="{{ date('Y-m-d') }}">
-                                                            <input type="hidden" class="form-control" id="post"
-                                                            value="post" name="tab_type">
-
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-5 col-5">
-                                                    <div class="mb-3">
-                                                        <label for="exampleInputEmail1" class="form-label">To</label>
-                                                        <input type="date" class="form-control" id="exampleInputEmail1"
-                                                            aria-describedby="emailHelp" name="endPostGraphDate"
-                                                            placeholder="To date" value="{{$endPostGraphDate}}"
-                                                            max="{{ date('Y-m-d') }}">
-
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 col-2 ps-0">
-                                                    <button type="submit" class="btn btn-danger marginmain"><i
-                                                            class="bi bi-funnel"></i></button>
-                                                </div>
-                                            </div>
-
-                                        </form>
-                                        @if($getPostGraphDuplicateData->count()>0 || $getPostGraphConvertedData->count()>0 || $getPostGraphNewData->count()>0 || $getPostGraphconvertLeadData->count()>0)
-                                        <div id="chartContainer1" style="height: 250px; width: 90%;"></div>
-                                        <div class="canvatextremove"></div>
-                                        @else
-                                        <h5>No Record Found</h5>
-                                        @endif
-                                        <div class="bgblack2">
-                                            <div class="row">
-                                            <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_POST_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getPostNewBoxData2->count()}}</h1>
-                                                        <p> Posts</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_TICKET_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getTicketNewBoxData2->count()}}</h1>
-                                                        <p> Tickets</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_LEAD_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getLeadNewBoxData2->count()}}</h1>
-                                                        <p>Leads</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                         <div class="tab-pane fade {{$leadshowActive}}" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
-
-
-                                      
-                                    <div class="dastpicker">
-                                        <form method="GET" action="/countDashboard">
-                                            @csrf
-                                            <div class="row">
-                                                <div class="col-md-5 col-5">
-                                                    <div class="mb-3">
-                                                        <label for="exampleInputEmail1" class="form-label">From</label>
-                                                        <input type="date" class="form-control" id="exampleInputEmail1"
-                                                            aria-describedby="emailHelp" name="startGraphLeadDate"
-                                                            placeholder="From date" value="{{$startGraphLeadDate}}"
-                                                            max="{{ date('Y-m-d') }}">
-                                                            <input type="hidden" class="form-control" id="lead"
-                                                            value="lead" name="tab_type">
-
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-5 col-5">
-                                                    <div class="mb-3">
-                                                        <label for="exampleInputEmail1" class="form-label">To</label>
-                                                        <input type="date" class="form-control" id="exampleInputEmail1"
-                                                            aria-describedby="emailHelp" name="endGraphLeadDate"
-                                                            placeholder="To date" value="{{$endGraphLeadDate}}"
-                                                            max="{{ date('Y-m-d') }}">
-
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 col-2 ps-0">
-                                                    <button type="submit" class="btn btn-danger marginmain"><i
-                                                            class="bi bi-funnel"></i></button>
-                                                </div>
-                                            </div>
-
-                                        </form>
-                                        @if($getLeadGraphNewData->count()>0 || $getLeadGraphAssignedData->count()>0 || $getLeadGraphInProcessData->count()>0 || $getLeadGraphCovertedData->count()>0 || $getLeadGraphRecycledData->count()>0 || $getLeadGraphDuplicateData->count()>0 || $getLeadGraphDeadData->count()>0)
-                                        <div id="chartContainer2" style="height: 250px; width: 90%;"></div>
-                                        <div class="canvatextremove"></div>
-                                        @else
-                                        <h5>No Record Found</h5>
-                                        @endif
-                                        <div class="bgblack2">
-                                            <div class="row">
-                                            <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_POST_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getPostNewBoxData3->count()}}</h1>
-                                                        <p> Posts</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_TICKET_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getTicketNewBoxData3->count()}}</h1>
-                                                        <p> Tickets</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_LEAD_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getLeadNewBoxData3->count()}}</h1>
-                                                        <p>Leads</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                   </div>
-
-                                  <div class="tab-pane fade {{$sentimateShowActive}}" id="sentimants" role="tabpanel" aria-labelledby="tab_sentimants">
-
-                                       <form method="GET" action="/countDashboard">
-                                            @csrf
-                                            <div class="row">
-                                                <div class="col-md-5 col-5">
-                                                    <div class="mb-3">
-                                                        <label for="startGraphSentimateDate" class="form-label">From</label>
-                                                        <input type="date" class="form-control" id="startGraphSentimateDate"
-                                                            aria-describedby="emailHelp" name="startGraphSentimateDate"
-                                                            placeholder="From date" value="{{$startGraphSentimateDate}}">
-                                                            <input type="hidden" class="form-control" id="sentimate"
-                                                            value="sentimate" name="tab_type">    
-
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-5 col-5">
-                                                    <div class="mb-3">
-                                                        <label for="endGraphSentimateDate" class="form-label">To</label>
-                                                        <input type="date" class="form-control" id="endGraphSentimateDate"
-                                                            aria-describedby="emailHelp" name="endGraphSentimateDate"
-                                                            placeholder="To date" value="{{$endGraphSentimateDate}}"
-                                                            max="{{ date('Y-m-d') }}">
-
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 col-2 ps-0">
-                                                    <button type="submit" class="btn btn-danger marginmain"><i
-                                                            class="bi bi-funnel"></i></button>
-                                                </div>
-                                            </div>
-
-                                        </form>
-                                        @if($getSentimateGraphNagativeData->count()>0 || $getSentimateGraphPositiveData->count()>0 || $getSentimateGraphComplaintData->count()>0 || $getSentimateGraphQueryData->count()>0 || $getSentimateGraphInformationData->count()>0 || $getSentimateGraphSpamData->count()>0)
-                                        <div id="chartContainer3" style="height: 250px; width: 90%;"></div>
-                                        <div class="canvatextremove"></div>
-                                        @else
-                                        <h5>No Record Found</h5>
-                                        @endif
-                                        <div class="bgblack2">
-                                            <div class="row">
-                                            <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_POST_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getPostNewBoxData4->count()}}</h1>
-                                                        <p> Posts</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_TICKET_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getTicketNewBoxData4->count()}}</h1>
-                                                        <p> Tickets</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 col-4 {{ addUIComponent('DASHBOARD_NEW_LEAD_COUNT') }}">
-                                                    <div class="values">
-                                                        <h1>{{$getLeadNewBoxData4->count()}}</h1>
-                                                        <p>Leads</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-  </div>
-
-                            </div>
-                            <!-- <div class="bgblack2">
-                    <div class="assignedbyticketpost">
-                        <div class="headingin">
-                            <h4>Assined to Me</h4>
-                        </div>
-                        <div class="tabsassigned tabscircle">
-                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Social Ticket</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Social Post</button>
-                            </li>
-                           
-                            </ul>
-                            <div class="tab-content" id="pills-tabContent">
-                                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                                        <div class="tabsmaininner">
-                                        <div class="socialticketinner">
-
-                                <h6><i class="bi bi-twitter"></i> deepesh jangid<span class="alertnew">New Post</span></h6>
-                                <p>@bel_technology hello2 </p>
-                                <p class="dates"><i class="bi bi-person-fill"></i>1677906711011622912</p>
-                                </div>
-                                <div class="socialticketinner">
-
-                                <h6><i class="bi bi-twitter"></i> deepesh jangid<span class="alertnew">New Post</span></h6>
-                                <p>@bel_technology hello2 </p>
-                                <p class="dates"><i class="bi bi-person-fill"></i>1677906711011622912</p>
-                                </div>
-                                <div class="socialticketinner">
-
-                                <h6><i class="bi bi-twitter"></i> deepesh jangid<span class="alertnew">New Post</span></h6>
-                                <p>@bel_technology hello2 </p>
-                                <p class="dates"><i class="bi bi-person-fill"></i>1677906711011622912</p>
-                                </div>
-                                        </div>
-
-                                </div>
-                                <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                                <div class="tabsmaininner">
-                                <div class="socialticketinner">
-                                            <h6><i class="bi bi-twitter"></i> deepesh jangid<span class="alertnew">New Ticket</span></h6>
-                                            <p>@bel_technology good </p>
-                                            <p class="dates"><i class="bi bi-calendar"></i>2023-07-08 08:59:27 AM</p>
-                                        </div>
-                                        <div class="socialticketinner">
-                                            <h6><i class="bi bi-twitter"></i> deepesh jangid<span class="alertnew">New Ticket</span></h6>
-                                            <p>@bel_technology good </p>
-                                            <p class="dates"><i class="bi bi-calendar"></i>2023-07-08 08:59:27 AM</p>
-                                        </div>
-                                        <div class="socialticketinner">
-                                            <h6><i class="bi bi-twitter"></i> deepesh jangid<span class="alertnew">New Ticket</span></h6>
-                                            <p>@bel_technology good </p>
-                                            <p class="dates"><i class="bi bi-calendar"></i>2023-07-08 08:59:27 AM</p>
-                                        </div>
-                                </div>
-                                </div>
-
-                            </div>
+                <?php
+                    $sentiTotal = $getSentimateGraphNagativeData->count() + $getSentimateGraphPositiveData->count() + $getSentimateGraphComplaintData->count() + $getSentimateGraphQueryData->count() + $getSentimateGraphInformationData->count() + $getSentimateGraphSpamData->count();
+                    $sentiSlices = [
+                        ['label' => 'Feedback Negative', 'count' => $getSentimateGraphNagativeData->count(), 'color' => '#0a5c39'],
+                        ['label' => 'Feedback Positive', 'count' => $getSentimateGraphPositiveData->count(), 'color' => '#ffd525'],
+                        ['label' => 'Complaint', 'count' => $getSentimateGraphComplaintData->count(), 'color' => '#0f9457'],
+                        ['label' => 'Query', 'count' => $getSentimateGraphQueryData->count(), 'color' => '#e7b400'],
+                        ['label' => 'Information', 'count' => $getSentimateGraphInformationData->count(), 'color' => '#3b6cff'],
+                        ['label' => 'Spam', 'count' => $getSentimateGraphSpamData->count(), 'color' => '#0d7a49'],
+                    ];
+                ?>
+                @if($sentiTotal > 0)
+                <div class="ig-donut-wrap">
+                    <div class="ig-donut-canvas-wrap">
+                        <div id="chartContainer3" style="height:230px;"></div>
+                        <div class="ig-donut-center">
+                            <b>{{$sentiTotal}}</b>
+                            <span>Total</span>
                         </div>
                     </div>
-                </div> -->
-
+                    <div class="ig-donut-legend">
+                        @foreach($sentiSlices as $slice)
+                        <div class="ig-donut-legend-row">
+                            <span class="ig-donut-dot" style="background:{{$slice['color']}}"></span>
+                            <span>{{$slice['label']}}</span>
+                            <b>{{ $sentiTotal > 0 ? round(($slice['count']/$sentiTotal)*100) : 0 }}%</b>
                         </div>
+                        @endforeach
                     </div>
+                </div>
+                @else
+                <div class="ig-empty-state ig-empty-state-sm">
+                    <i class="bi bi-pie-chart"></i>
+                    <h6>No record found</h6>
+                    <p>Try a different date range to see category activity here.</p>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="ig-dash-social-row ig-animate-in">
+            <div class="socialticket_mini {{ addUIComponent('DASHBOARD_SOCIAL_POSTS') }}">
+                <div class="bgwhite2 heightscroll ig-panel">
+                    <div class="headingmain headingsec mb-3">
+                        <h6><i class="bi bi-mailbox ig-panel-icon"></i> Social Posts <span class="ig-count-pill">{{$totalPostCount->count()}}</span><a href="/dashboard"
+                                class="seeall">See All</a>
+                        </h6>
+                    </div>
+                    <?php $count = 0; ?>
+                    @if(!empty($getSocailData) && $getSocailData->count())
+                    @foreach($getSocailData as $getSocail)
+                    @if( $count > 4)
+                    <?php continue;?>
+                    @endif
+                    <div class="socialticketinner" style="--ig-i:{{ $count }}">
+
+                        <h6>
+                        @if($getSocail->source == 'Twitter')
+                           <img src="/images/{{ getSocialIcon($getSocail->source,true) }}" class="newimg">
+                          @else
+                           <i class="{{ getSocialIcon($getSocail->source) }}"></i>
+                        @endif
+                         {{$getSocail->socialUser_name}}<span
+                                class="alertnew">New Post</span></h6>
+                        <p>{!! getUrlinString($getSocail->postMessage)!!} </p>
+                        <p class="dates"><i
+                                class="bi bi-person-fill"></i>{{$getSocail->getTweet_id}}</p>
+                    </div>
+                    <?php $count++;?>
+                    @endforeach
+                    @else
+                    <div class="ig-panel-empty">
+                        <i class="bi bi-mailbox"></i>
+                        <h6>No recent posts</h6>
+                        <p>New social posts will appear here as they come in.</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            <div class="socialticket_mini {{ addUIComponent('DASHBOARD_SOCIAL_TICKETS') }}">
+                <div class="bgwhite2 heightscroll ig-panel">
+                    <div class="headingmain headingsec mb-3">
+                        <h6><i class="bi bi-ticket ig-panel-icon"></i> Social Tickets <span class="ig-count-pill">{{$totalTicketCount->count()}}</span>
+                            <a href="/getSocialTicket" class="seeall">See All</a>
+                        </h6>
+                    </div>
+                    <?php $count = 0;?>
+                    @if(!empty($getTicketData) && $getTicketData->count())
+
+                    @foreach($getTicketData as $getSocail)
+                    @if( $count > 4)
+                    <?php continue;?>
+                    @endif
+                    <div class="socialticketinner" style="--ig-i:{{ $count }}">
+                        <h6>
+                        @if($getSocail->source == 'Twitter')
+                           <img src="/images/{{ getSocialIcon($getSocail->source,true) }}" class="newimg">
+                          @else
+                          <i class="{{ getSocialIcon($getSocail->source) }}"></i>
+                        @endif
+
+                            {{$getSocail->socialUser}}<span
+                                class="alertnew">New Ticket</span></h6>
+                        <p>{!! getUrlinString($getSocail->postMessage)!!} </p>
+                        <p class="dates"><i class="bi bi-calendar"></i>{{$getSocail->date_Created}}</p>
+                    </div>
+                    <?php $count++;?>
+                    @endforeach
+                    @else
+                    <div class="ig-panel-empty">
+                        <i class="bi bi-ticket"></i>
+                        <h6>No recent tickets</h6>
+                        <p>New social tickets will appear here as they come in.</p>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
+
     </div>
+</div>
 
-    <script>
-    $("#dashboard").addClass("active");
-
-    
-    </script>
+<script>
+$("#dashboard").addClass("active");
+</script>
 
 <script>
 
+// Presentation-only chart theming — registers an on-brand colour set for
+// the existing CanvasJS charts below. This changes how the same data
+// points are painted (colours/background/tooltip chrome), never what data
+// is fetched, computed or plotted.
+if (window.CanvasJS && typeof CanvasJS.addColorSet === "function") {
+    CanvasJS.addColorSet("igEnergyPalette", [
+        "#0f9457", "#ffd525", "#0a5c39", "#e7b400",
+        "#3b6cff", "#0d7a49", "#f4b400", "#5c6a76"
+    ]);
+}
+var igChartTheme = {
+    theme: "light2",
+    backgroundColor: "transparent",
+    colorSet: "igEnergyPalette",
+    toolTip: { cornerRadius: 8, fontSize: 13 }
+};
+
 function chart3()
 {
-    
     var chart33 = new CanvasJS.Chart("chartContainer3", {
         animationEnabled: true,
+        ...igChartTheme,
 
         data: [{
-            type: "pie",
+            type: "doughnut",
+            innerRadius: "62%",
             startAngle: 240,
-            width:200,
-            height:200,
             yValueFormatString: "##0",
-            indexLabel: "{label} {y}",
+            indexLabel: "",
             dataPoints: [
                 {
                     y: {{$getSentimateGraphNagativeData->count()}},
@@ -580,140 +365,75 @@ function chart3()
             ]
         }]
     });
-    
+
     chart33.render();
 }
 
-function chart2()
-{
-    
-    var chart22 = new CanvasJS.Chart("chartContainer1", {
-        animationEnabled: true,
+// Statistics Overview — real line/area trend built from the same raw
+// records the app already fetches for the selected range (getSocailGraphData
+// / getTicketGraphData, both bounded by startGraphDate/endGraphDate, which
+// the single dashboard date filter now drives). No new query: this only
+// buckets the already-fetched records by day, client-side.
+var igPostDates = {!! json_encode($getSocailGraphData->pluck('istPostDate')) !!};
+var igTicketDates = {!! json_encode($getTicketGraphData->pluck('date_Created')) !!};
 
-        data: [{
-            type: "pie",
-            startAngle: 240,
-            width:200,
-            height:200,
-            yValueFormatString: "##0",
-            indexLabel: "{label} {y}",
-            dataPoints: [
-                {
-                    y: {{$getPostGraphDuplicateData->count()}},
-                    label: "Duplicate"
-                },
-                {
-                    y: {{$getPostGraphNewData->count()}},
-                    label: "New"
-                },
-                {
-                    y: {{$getPostGraphconvertLeadData->count()}},
-                    label: "Converted To Lead"
-                },
-                {
-                    y: {{$getPostGraphConvertedData->count()}},
-                    label: "Converted To Ticket"
-                },
-            ]
-        }]
+function overviewChart()
+{
+    var fromEl = document.getElementById('igDashFrom');
+    var toEl = document.getElementById('igDashTo');
+    var container = document.getElementById('chartContainerOverview');
+    if (!container || !fromEl || !fromEl.value || !toEl || !toEl.value) return;
+
+    function dayKey(raw) {
+        return String(raw).substring(0, 10);
+    }
+    function countByDay(list) {
+        var map = {};
+        list.forEach(function (raw) {
+            var k = dayKey(raw);
+            map[k] = (map[k] || 0) + 1;
+        });
+        return map;
+    }
+    var postCounts = countByDay(igPostDates);
+    var ticketCounts = countByDay(igTicketDates);
+
+    var cursor = new Date(fromEl.value + 'T00:00:00');
+    var end = new Date(toEl.value + 'T00:00:00');
+    var days = [];
+    var guard = 0;
+    while (cursor <= end && guard < 400) {
+        var y = cursor.getFullYear(), m = ('0' + (cursor.getMonth() + 1)).slice(-2), d = ('0' + cursor.getDate()).slice(-2);
+        days.push(y + '-' + m + '-' + d);
+        cursor.setDate(cursor.getDate() + 1);
+        guard++;
+    }
+    function fmtLabel(key) {
+        var d = new Date(key + 'T00:00:00');
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return ('0' + d.getDate()).slice(-2) + ' ' + months[d.getMonth()];
+    }
+
+    var postPoints = days.map(function (k) { return { label: fmtLabel(k), y: postCounts[k] || 0 }; });
+    var ticketPoints = days.map(function (k) { return { label: fmtLabel(k), y: ticketCounts[k] || 0 }; });
+
+    var chartOv = new CanvasJS.Chart("chartContainerOverview", {
+        animationEnabled: true,
+        ...igChartTheme,
+        axisX: { labelFontSize: 11, gridColor: "#eef1f5", interval: Math.ceil(days.length / 10) || 1 },
+        axisY: { gridColor: "#eef1f5", labelFontSize: 11, includeZero: true },
+        toolTip: { shared: true, cornerRadius: 8, fontSize: 13 },
+        legend: { fontSize: 12, verticalAlign: "top", horizontalAlign: "right" },
+        data: [
+            { type: "splineArea", name: "Posts", showInLegend: true, fillOpacity: .15, markerSize: 0, dataPoints: postPoints },
+            { type: "spline", name: "Tickets", showInLegend: true, markerSize: 0, dataPoints: ticketPoints }
+        ]
     });
-    
-    chart22.render();
+    chartOv.render();
 }
 
-function chart1()
-{
-    var chart = new CanvasJS.Chart("chartContainer2", {
-        animationEnabled: true,
+window.onload = function() {
 
-        data: [{
-            type: "pie",
-            width:200,
-            height:200,
-            startAngle: 240,
-            yValueFormatString: "##0",
-            indexLabel: "{label} {y}",
-            dataPoints: [{
-                    y: {{$getLeadGraphNewData->count()}},
-                    label: "New"
-                },
-                {
-                    y: {{$getLeadGraphAssignedData->count()}},
-                    label: "Assigned"
-                },
-                {
-                    y: {{$getLeadGraphInProcessData->count()}},
-                    label: "In Process"
-                },
-                {
-                    y: {{$getLeadGraphCovertedData->count()}},
-                    label: "Converted"
-                },
-                {
-                    y: {{$getLeadGraphRecycledData->count()}},
-                    label: "Recycled"
-                },
-                {
-                    y: {{$getLeadGraphDuplicateData->count()}},
-                    label: "Duplicate"
-                },
-                {
-                    y: {{$getLeadGraphDeadData->count()}},
-                    label: "Dead"
-                },
-
-            ]
-        }]
-    });
-    chart.render();
-}
-function chart ()
-{
-    var chart = new CanvasJS.Chart("chartContainer", {
-        animationEnabled: true,
-
-        data: [{
-            type: "pie",
-            startAngle: 240,
-            width:200,
-            height:200,
-            yValueFormatString: "##0",
-            indexLabel: "{label} {y}",
-            dataPoints: [{
-                    y: {{$getTicketGraphNewData->count()}},
-                    label: "New"
-                },
-                {
-                    y: {{$getTicketGraphPendingData->count()}},
-                    label: "Pending With Team"
-                },
-                {
-                    y: {{$getTicketGraphMoveData->count()}},
-                    label: "Move To Internal Team"
-                },
-                {
-                    y: {{$getTicketGraphResolvedData->count()}},
-                    label: "Resolved"
-                },
-                {
-                    y: {{$getTicketGraphRejectedData->count()}},
-                    label: "Rejected"
-                },
-                {
-                    y: {{$getTicketGraphDuplicateData->count()}},
-                    label: "Duplicate"
-                },
-                {
-                    y: {{$getTicketGraphAssignedData->count()}},
-                    label: "Assigned"
-                },
-            ]
-        }]
-    });
-    chart.render();
-}
-window.onload = function() { 
-   
     const counters = document.querySelectorAll(".counter");
 
     counters.forEach((counter) => {
@@ -730,51 +450,25 @@ window.onload = function() {
     updateCounter();
     });
 
+    setTimeout(() => { overviewChart(); chart3(); }, 200);
 }
 
-function initializeCharts(tabId) {
-    if (tabId == 'pills-profile') {
-        setTimeout(() => { chart2() }, 200);
-    } else if (tabId == 'pills-contact') {
-        setTimeout(() => { chart1() }, 200);
-    } else if (tabId == 'sentimants') {
-        setTimeout(() => { chart3() }, 200);
-    } else {
-        setTimeout(() => { chart() }, 200);
-    }
-}
-
-$(document).ready(function(){
-  $("#pills-home-tab, #pills-profile-tab, #pills-contact-tab,#tab_sentimants").click(function(){
-        var id = $(this).attr('id');
-        if(id == 'pills-profile-tab')
-        {
-            setTimeout(() => {  chart2()  }, 200);
-        }
-        else if(id == 'pills-contact-tab')
-        {
-            setTimeout(() => {  chart1()  }, 200);
-        }
-        else if(id == 'tab_sentimants')
-        {
-            setTimeout(() => {  chart3()  }, 200);
-        }
-        else{
-            setTimeout(() => {  chart()  }, 200);
-        }
-        
-  });
-
-  var classShowElement = $('.show.active');
-    if (classShowElement.length > 0) {
-        var id = classShowElement.attr('id');
-        initializeCharts(id);
-    }
-//   chart();
-//    chart2();
-//    chart1();
-//    chart3();
+// Single dashboard-wide date filter: mirror the chosen From/To into every
+// section-specific date pair the controller already understands, so one
+// submit updates every date-dependent part of the dashboard in one request.
+// No new backend query — this only reuses the existing four override blocks
+// that already exist in DashboardController::countDashboard.
+document.getElementById('igDashDateForm').addEventListener('submit', function () {
+    var from = document.getElementById('igDashFrom').value;
+    var to = document.getElementById('igDashTo').value;
+    ['igMirrorStartGraphDate', 'igMirrorStartPostGraphDate', 'igMirrorStartGraphLeadDate', 'igMirrorStartGraphSentimateDate'].forEach(function (id) {
+        document.getElementById(id).value = from;
+    });
+    ['igMirrorEndGraphDate', 'igMirrorEndPostGraphDate', 'igMirrorEndGraphLeadDate', 'igMirrorEndGraphSentimateDate'].forEach(function (id) {
+        document.getElementById(id).value = to;
+    });
 });
 
 </script>
+
     @endsection

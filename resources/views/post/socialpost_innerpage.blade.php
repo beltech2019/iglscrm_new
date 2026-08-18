@@ -227,7 +227,8 @@ $leadIdsStr = implode(', ', $leadIds);
 		
 		
 @if($reply)
-<table class="table  {{ addUIComponent('SOCIALPOST_REPLY_TABLE') }}">
+<div class="table-responsive">
+<table class="table ig-table {{ addUIComponent('SOCIALPOST_REPLY_TABLE') }}">
     <thead>
         <tr>
             <th scope="col">ID</th>
@@ -261,7 +262,8 @@ $leadIdsStr = implode(', ', $leadIds);
                 <tr id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
                     data-bs-parent="#accordionExample">
                     <td colspan="6">
-                        <table class="table accordion-body">
+                        <div class="table-responsive">
+                        <table class="table ig-table accordion-body">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -277,10 +279,11 @@ $leadIdsStr = implode(', ', $leadIds);
                                     <td>{{$dmDatas-> message}}</td>
                                     <td>{{$dmDatas-> sender_name}}</td>
                                     <td>{{$dmDatas-> message_time}}</td>
-                                </tr>         
-                            @endforeach    
+                                </tr>
+                            @endforeach
                             </tbody>
                         </table>
+                        </div>
                     </td>
                 </tr>
             </td>
@@ -295,6 +298,7 @@ $leadIdsStr = implode(', ', $leadIds);
         </tr>
     </tbody>
 </table>
+</div>
 @endif
 		
 		

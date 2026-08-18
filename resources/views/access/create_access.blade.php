@@ -35,7 +35,7 @@
                 </div>
                 <div class="busines_details">
                     <div class="moreinfo table-responsive">
-                    <table class="table">
+                    <table class="table ig-table">
                         <thead>
                             <tr>   
                             <th scope="col">Component Name</th>

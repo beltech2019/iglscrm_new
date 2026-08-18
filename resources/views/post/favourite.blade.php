@@ -30,9 +30,10 @@
                         </div>
                 <div class="busines_details">
                     <div class="moreinfo">
-                    <table class="table">
+                    <div class="table-responsive">
+                    <table class="table ig-table" data-ig-tabletools>
                         <thead>
-                            <tr>   
+                            <tr>
                             <th scope="col">Id</th>
                             <th scope="col">Message</th>
                             <th scope="col">Type</th>
@@ -58,6 +59,7 @@
                         @endif   
                         </tbody>
                         </table>
+                    </div>
                         <div class="my-2 row">
                             <div class="col-md-9">
                                 {!! $getFavourite->withQueryString()->links() !!}

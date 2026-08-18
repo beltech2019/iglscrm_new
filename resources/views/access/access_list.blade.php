@@ -17,7 +17,8 @@
                 </div>
                 <div class="busines_details">
                     <div class="moreinfo">
-                    <table class="table {{ addUIComponent('DASHBOARD_TICKETS') }}">
+                    <div class="table-responsive">
+                    <table class="table ig-table {{ addUIComponent('DASHBOARD_TICKETS') }}" data-ig-tabletools>
                         <thead>
                             <tr>   
                             <th scope="col">Role Name</th>
@@ -54,6 +55,7 @@
                         @endif   
                         </tbody>
                         </table>
+                    </div>
                     </div>
                 </div>
                

@@ -35,6 +35,14 @@ class DashboardController extends Controller
             $startGraphLeadDate = $endDate->copy()->subDays(getValueByKey('LAST_POST_DAYS')-1);
             $endGraphSentimateDate = Carbon::now();
             $startGraphSentimateDate = $endDate->copy()->subDays(getValueByKey('LAST_POST_DAYS')-1);
+            // Single dashboard-wide date filter (UI consolidation): mirrors the
+            // exact same override pattern already used below for the other four
+            // date pairs. Placed after their defaults are computed so it can't
+            // shift the "now"-based fallback those defaults derive from.
+            if($request->startDate){
+                $startDate = parseDateWithCurrentTime($request->startDate);
+                $endDate = parseDateWithCurrentTime($request->endDate);
+            }
             $ticketshowActive="show active";
             $ticketActive="active";
             $postshowActive="";

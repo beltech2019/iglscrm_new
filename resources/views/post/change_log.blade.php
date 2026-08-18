@@ -24,7 +24,8 @@
                         </div>
                     </div>-->
         <div class="formscoulam">
-        <table class="table">
+        <div class="table-responsive">
+        <table class="table ig-table" data-ig-tabletools>
 		  <thead>
 			<tr>
 			  <th scope="col">Field</th>
@@ -49,6 +50,7 @@
     
   </tbody>
 </table>
+        </div>
         </div>
         </div>
     </div>
