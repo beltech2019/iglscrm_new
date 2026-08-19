@@ -409,7 +409,19 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
 @keyframes ig-lane-move{ to{ background-position-x: -52px; } }
 
 .ig-car{ position:absolute; bottom:14%; width: clamp(56px,7vw,110px); filter: drop-shadow(0 6px 6px rgba(0,0,0,.35)); }
-.ig-car-r{ position:absolute; bottom:14%; width: clamp(56px,7vw,110px); filter: drop-shadow(0 6px 6px rgba(0,0,0,.35)); }
+.ig-car-r{
+  position:absolute; bottom:14%; width: clamp(56px,7vw,110px);
+  filter: drop-shadow(0 6px 6px rgba(0,0,0,.35));
+  /* Opposite-direction traffic gets its own lane, not just its own
+     timing — two vehicles heading straight at each other on the same line
+     are guaranteed to cross paths eventually no matter how their pauses
+     are scheduled. A %-based offset here would be relative to .ig-road's
+     own box, which is only 12% of the scene's height, so it would barely
+     read as "a different lane" at any screen size; a fixed pixel nudge is
+     what reliably keeps this lane visually clear of the left-to-right one
+     everywhere from 360px phones to 1920px desktops. */
+  transform: translateY(-26px);
+}
 .ig-car .car-body{ fill:#f4f6f5; }
 .ig-car.ig-car-2 .car-body{ fill:#ffd525; }
 .ig-car.ig-scooter .car-body{ fill:#3b6cff; }
@@ -418,42 +430,43 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
 .ig-car .car-light{ fill:#fff6cf; }
 .ig-car .car-shadow{ fill: rgba(0,0,0,.28); filter: blur(2px); }
 
-.ig-car-1{ animation: ig-car-drive-1 16s cubic-bezier(.55,0,.2,1) infinite; }
-@keyframes ig-car-drive-1{
-  0%{ left:-15%; }
-  35%{ left:52%; }
-  60%{ left:52%; }
-  100%{ left:118%; }
-}
-.ig-car-2{ width: clamp(50px,6vw,96px); bottom:15%; animation: ig-car-drive-2 20s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-6s; }
-@keyframes ig-car-drive-2{
+/* ==========================================================================
+   Pump queue — synchronized timing, no JS.
+   Every vehicle in a lane plays the *same* keyframe at the *same* duration,
+   just phase-shifted by a third of it (0s / -6s / -12s of an 18s loop).
+   Because it's literally one motion curve offset in time, the spacing
+   between any two vehicles in that lane — moving or parked at the pump —
+   never changes over the course of the loop, so it can never shrink to
+   zero. They all share one pump position (left/right:50%, lined up with
+   the existing .ig-refuel-glow-1 marker below); the dwell there (keyframe
+   25%→39%, ~2.5s of the 18s loop) is well under a third of the cycle, so
+   only one vehicle is ever sitting at the pump at a time, with ~3.5s of
+   slack on either side as a safety margin at the handover.
+   ========================================================================== */
+
+/* -- Lane A: left-to-right (ig-car-1/2/3), pump at left:50% -- */
+.ig-car-1{ animation: ig-lane-a-drive 18s cubic-bezier(.55,0,.2,1) infinite; }
+.ig-car-2{ width: clamp(50px,6vw,96px); bottom:15%; animation: ig-lane-a-drive 18s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-6s; }
+.ig-car-3{ width: clamp(38px,4.4vw,68px); bottom:13.5%; animation: ig-lane-a-drive 18s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-12s; }
+@keyframes ig-lane-a-drive{
   0%{ left:-18%; }
-  40%{ left:64%; }
-  62%{ left:64%; }
+  25%{ left:50%; }
+  39%{ left:50%; }
   100%{ left:120%; }
 }
-.ig-car-3{ width: clamp(38px,4.4vw,68px); bottom:13.5%; animation: ig-car-drive-3 13s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-2s; }
-@keyframes ig-car-drive-3{
-  0%{ left:-10%; }
-  45%{ left:46%; }
-  64%{ left:46%; }
-  100%{ left:116%; }
-}
 
-.ig-car-6{ width: 150px; bottom:14%; animation: ig-car-drive-3 10s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-3s; }
-@keyframes ig-car-drive-6{
-  0%{ right:-10%; }
-  45%{ right:46%; }
-  64%{ right:46%; }
-  100%{ right:116%; }
+/* -- Lane B: right-to-left (ig-car-6/7, ig-truck-1), pump at right:50% —
+      the same shared spot as lane A, just a separate lane (see .ig-car-r's
+      translateY above), so the two directions never collide either. -- */
+.ig-car-6{ animation: ig-lane-b-drive 18s cubic-bezier(.55,0,.2,1) infinite; }
+.ig-car-7{ animation: ig-lane-b-drive 18s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-6s; }
+.ig-truck-1{ animation: ig-lane-b-drive 18s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-12s; }
+@keyframes ig-lane-b-drive{
+  0%{ right:-18%; }
+  25%{ right:50%; }
+  39%{ right:50%; }
+  100%{ right:120%; }
 }
-
-/* ca-unscreen.gif: genuinely right-to-left now. It was silently using the
-   left-driving ig-car-drive-3 keyframe despite its ig-car-r class, so it
-   was actually travelling the wrong way. Switched to ig-car-drive-6 above,
-   which already animates the `right` property (it just wasn't wired up
-   to anything before). */
-.ig-car-7{ width: 150px; bottom:14%; animation: ig-car-drive-6 16s cubic-bezier(.54,0,.2,1) infinite; animation-delay:-4s; }
 
 .ig-refuel-glow{
   position:absolute; bottom:16%; width:70px; height:70px; border-radius:50%;
@@ -464,21 +477,12 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
 .ig-refuel-glow-2{ left:62%; animation-delay:-1.2s; }
 @keyframes ig-refuel-pulse{ 0%,100%{ opacity:.25; transform:scale(.85);} 50%{ opacity:.7; transform:scale(1.1);} }
 
-/* -- truck: reuses .ig-car-r's positioning mechanics (same wheel/light/
-      shadow classes) with its own art and a wider footprint. car2.gif now
-      drives right-to-left (was left-to-right before) — kept its own
-      keyframe/timing, just mirrored `left` to `right`. -- */
-.ig-car-r.ig-truck{ width: clamp(78px,9.5vw,150px); bottom:13%; }
+/* -- truck (car2.gif): a lane B member (see ig-lane-b-drive above), just
+      with its own art and a wider footprint. -- */
+.ig-car-r.ig-truck{ width: clamp(78px,9.5vw,150px); }
 .ig-truck .truck-cargo{ fill:#e5484d; }
 .ig-truck .truck-cab{ fill:#f4f6f5; }
 .ig-truck .truck-window{ fill:rgba(10,15,20,.85); }
-.ig-truck-1{ animation: ig-truck-drive 24s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-9s; }
-@keyframes ig-truck-drive{
-  0%{ right:-22%; }
-  38%{ right:40%; }
-  60%{ right:40%; }
-  100%{ right:124%; }
-}
 
 /* -- home + kitchen: the pipeline's destination. Sits clear of the CNG
       station to its right; on desktop this lands in the open gap between
@@ -570,7 +574,7 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
 @media (prefers-reduced-motion: reduce){
   .ig-sun,.ig-star,.ig-cloud,.ig-bird,.ig-bird .wing-l,.ig-bird .wing-r,
   .ig-station .gauge-needle,.ig-station .flame-unit,.flame-unit-2,.ig-station-glow,
-  .ig-pipeline .pipe-flow,.ig-road-lane,.ig-car,.ig-refuel-glow,.ig-particle,
+  .ig-pipeline .pipe-flow,.ig-road-lane,.ig-car,.ig-car-r,.ig-refuel-glow,.ig-particle,
   .ig-truck-1,.ig-home .home-riser-flow,.ig-home .home-stove-pipe-flow,.ig-home .home-flame,
   .animate__animated{
     animation: none !important;
