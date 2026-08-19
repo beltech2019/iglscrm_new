@@ -448,7 +448,12 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
   100%{ right:116%; }
 }
 
-.ig-car-7{ width: 150px; bottom:14%; animation: ig-car-drive-3 16s cubic-bezier(.54,0,.2,1) infinite; animation-delay:-4s; }
+/* ca-unscreen.gif: genuinely right-to-left now. It was silently using the
+   left-driving ig-car-drive-3 keyframe despite its ig-car-r class, so it
+   was actually travelling the wrong way. Switched to ig-car-drive-6 above,
+   which already animates the `right` property (it just wasn't wired up
+   to anything before). */
+.ig-car-7{ width: 150px; bottom:14%; animation: ig-car-drive-6 16s cubic-bezier(.54,0,.2,1) infinite; animation-delay:-4s; }
 
 .ig-refuel-glow{
   position:absolute; bottom:16%; width:70px; height:70px; border-radius:50%;
@@ -459,21 +464,20 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
 .ig-refuel-glow-2{ left:62%; animation-delay:-1.2s; }
 @keyframes ig-refuel-pulse{ 0%,100%{ opacity:.25; transform:scale(.85);} 50%{ opacity:.7; transform:scale(1.1);} }
 
-/* -- truck: reuses .ig-car's positioning/animation mechanics (same
-      left-driving keyframe pattern, same wheel/light/shadow classes) with
-      its own art and a wider footprint. Pauses near pump island 1 (which
-      sits at roughly 42% of the station's width) so it reads as "also
-      stopping to refuel", not just passing through. -- */
-.ig-car.ig-truck{ width: clamp(78px,9.5vw,150px); bottom:13%; }
+/* -- truck: reuses .ig-car-r's positioning mechanics (same wheel/light/
+      shadow classes) with its own art and a wider footprint. car2.gif now
+      drives right-to-left (was left-to-right before) — kept its own
+      keyframe/timing, just mirrored `left` to `right`. -- */
+.ig-car-r.ig-truck{ width: clamp(78px,9.5vw,150px); bottom:13%; }
 .ig-truck .truck-cargo{ fill:#e5484d; }
 .ig-truck .truck-cab{ fill:#f4f6f5; }
 .ig-truck .truck-window{ fill:rgba(10,15,20,.85); }
 .ig-truck-1{ animation: ig-truck-drive 24s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-9s; }
 @keyframes ig-truck-drive{
-  0%{ left:-22%; }
-  38%{ left:40%; }
-  60%{ left:40%; }
-  100%{ left:124%; }
+  0%{ right:-22%; }
+  38%{ right:40%; }
+  60%{ right:40%; }
+  100%{ right:124%; }
 }
 
 /* -- home + kitchen: the pipeline's destination. Sits clear of the CNG

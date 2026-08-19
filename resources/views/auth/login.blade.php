@@ -128,7 +128,7 @@ body{
 
             <img class="ig-car ig-car-3 ig-scooter" src="images/bike2.gif">
 
-            <img class="ig-car ig-truck ig-truck-1" src="images/car2.gif">
+            <img class="ig-car-r ig-truck ig-truck-1" src="images/car2.gif">
         </div>
 
         <!-- ============ layer 6: floating gas / energy particles ============ -->
