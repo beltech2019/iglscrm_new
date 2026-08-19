@@ -178,6 +178,19 @@
             <div class="ig-dash-card ig-panel ig-donut-card">
                 <div class="ig-panel-toolbar">
                     <h6 class="formh6 ig-panel-title"><i class="bi bi-pie-chart"></i> Category Breakdown</h6>
+                    <div class="tabscircle2">
+                        <ul class="nav nav-pills" id="ig-breakdown-tab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="ig-tab-sentiment" data-bs-toggle="pill" data-bs-target="#ig-pane-sentiment" type="button" role="tab" aria-controls="ig-pane-sentiment" aria-selected="true">Sentiment</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="ig-tab-tickets" data-bs-toggle="pill" data-bs-target="#ig-pane-tickets" type="button" role="tab" aria-controls="ig-pane-tickets" aria-selected="false">Tickets</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="ig-tab-posts" data-bs-toggle="pill" data-bs-target="#ig-pane-posts" type="button" role="tab" aria-controls="ig-pane-posts" aria-selected="false">Posts</button>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
                 <?php
@@ -190,33 +203,123 @@
                         ['label' => 'Information', 'count' => $getSentimateGraphInformationData->count(), 'color' => '#3b6cff'],
                         ['label' => 'Spam', 'count' => $getSentimateGraphSpamData->count(), 'color' => '#0d7a49'],
                     ];
+
+                    // Tickets and Posts status breakdowns — this is the data that
+                    // used to render as pie charts in the old Statistics Overview
+                    // tabs. That data is still fetched by the controller every
+                    // request (getTicketGraph*Data / getPostGraph*Data, bound to
+                    // the same startGraphDate/startPostGraphDate the single
+                    // dashboard-wide date filter already drives); it just wasn't
+                    // being rendered anywhere after Statistics Overview became the
+                    // Posts/Tickets trend chart. Bringing it back here, not there.
+                    $ticketTotal = $getTicketGraphNewData->count() + $getTicketGraphPendingData->count() + $getTicketGraphMoveData->count() + $getTicketGraphResolvedData->count() + $getTicketGraphRejectedData->count() + $getTicketGraphDuplicateData->count() + $getTicketGraphAssignedData->count();
+                    $ticketSlices = [
+                        ['label' => 'New', 'count' => $getTicketGraphNewData->count(), 'color' => '#0f9457'],
+                        ['label' => 'Pending With Team', 'count' => $getTicketGraphPendingData->count(), 'color' => '#ffd525'],
+                        ['label' => 'Move To Internal Team', 'count' => $getTicketGraphMoveData->count(), 'color' => '#3b6cff'],
+                        ['label' => 'Resolved', 'count' => $getTicketGraphResolvedData->count(), 'color' => '#0a5c39'],
+                        ['label' => 'Rejected', 'count' => $getTicketGraphRejectedData->count(), 'color' => '#e5484d'],
+                        ['label' => 'Duplicate', 'count' => $getTicketGraphDuplicateData->count(), 'color' => '#e7b400'],
+                        ['label' => 'Assigned', 'count' => $getTicketGraphAssignedData->count(), 'color' => '#5c6a76'],
+                    ];
+
+                    $postTotal = $getPostGraphNewData->count() + $getPostGraphDuplicateData->count() + $getPostGraphconvertLeadData->count() + $getPostGraphConvertedData->count();
+                    $postSlices = [
+                        ['label' => 'New', 'count' => $getPostGraphNewData->count(), 'color' => '#0f9457'],
+                        ['label' => 'Duplicate', 'count' => $getPostGraphDuplicateData->count(), 'color' => '#e7b400'],
+                        ['label' => 'Converted To Lead', 'count' => $getPostGraphconvertLeadData->count(), 'color' => '#3b6cff'],
+                        ['label' => 'Converted To Ticket', 'count' => $getPostGraphConvertedData->count(), 'color' => '#0a5c39'],
+                    ];
                 ?>
-                @if($sentiTotal > 0)
-                <div class="ig-donut-wrap">
-                    <div class="ig-donut-canvas-wrap">
-                        <div id="chartContainer3" style="height:230px;"></div>
-                        <div class="ig-donut-center">
-                            <b>{{$sentiTotal}}</b>
-                            <span>Total</span>
+
+                <div class="tab-content" id="ig-breakdown-tabContent">
+                    <div class="tab-pane fade show active" id="ig-pane-sentiment" role="tabpanel" aria-labelledby="ig-tab-sentiment">
+                        @if($sentiTotal > 0)
+                        <div class="ig-donut-wrap">
+                            <div class="ig-donut-canvas-wrap">
+                                <div id="chartContainer3" style="height:230px;"></div>
+                                <div class="ig-donut-center">
+                                    <b>{{$sentiTotal}}</b>
+                                    <span>Total</span>
+                                </div>
+                            </div>
+                            <div class="ig-donut-legend">
+                                @foreach($sentiSlices as $slice)
+                                <div class="ig-donut-legend-row">
+                                    <span class="ig-donut-dot" style="background:{{$slice['color']}}"></span>
+                                    <span>{{$slice['label']}}</span>
+                                    <b>{{ round(($slice['count']/$sentiTotal)*100) }}%</b>
+                                </div>
+                                @endforeach
+                            </div>
                         </div>
+                        @else
+                        <div class="ig-empty-state ig-empty-state-sm">
+                            <i class="bi bi-pie-chart"></i>
+                            <h6>No record found</h6>
+                            <p>Try a different date range to see category activity here.</p>
+                        </div>
+                        @endif
                     </div>
-                    <div class="ig-donut-legend">
-                        @foreach($sentiSlices as $slice)
-                        <div class="ig-donut-legend-row">
-                            <span class="ig-donut-dot" style="background:{{$slice['color']}}"></span>
-                            <span>{{$slice['label']}}</span>
-                            <b>{{ $sentiTotal > 0 ? round(($slice['count']/$sentiTotal)*100) : 0 }}%</b>
+
+                    <div class="tab-pane fade" id="ig-pane-tickets" role="tabpanel" aria-labelledby="ig-tab-tickets">
+                        @if($ticketTotal > 0)
+                        <div class="ig-donut-wrap">
+                            <div class="ig-donut-canvas-wrap">
+                                <div id="chartContainerTicketBreakdown" style="height:230px;"></div>
+                                <div class="ig-donut-center">
+                                    <b>{{$ticketTotal}}</b>
+                                    <span>Total</span>
+                                </div>
+                            </div>
+                            <div class="ig-donut-legend">
+                                @foreach($ticketSlices as $slice)
+                                <div class="ig-donut-legend-row">
+                                    <span class="ig-donut-dot" style="background:{{$slice['color']}}"></span>
+                                    <span>{{$slice['label']}}</span>
+                                    <b>{{ round(($slice['count']/$ticketTotal)*100) }}%</b>
+                                </div>
+                                @endforeach
+                            </div>
                         </div>
-                        @endforeach
+                        @else
+                        <div class="ig-empty-state ig-empty-state-sm">
+                            <i class="bi bi-pie-chart"></i>
+                            <h6>No record found</h6>
+                            <p>Try a different date range to see ticket activity here.</p>
+                        </div>
+                        @endif
+                    </div>
+
+                    <div class="tab-pane fade" id="ig-pane-posts" role="tabpanel" aria-labelledby="ig-tab-posts">
+                        @if($postTotal > 0)
+                        <div class="ig-donut-wrap">
+                            <div class="ig-donut-canvas-wrap">
+                                <div id="chartContainerPostBreakdown" style="height:230px;"></div>
+                                <div class="ig-donut-center">
+                                    <b>{{$postTotal}}</b>
+                                    <span>Total</span>
+                                </div>
+                            </div>
+                            <div class="ig-donut-legend">
+                                @foreach($postSlices as $slice)
+                                <div class="ig-donut-legend-row">
+                                    <span class="ig-donut-dot" style="background:{{$slice['color']}}"></span>
+                                    <span>{{$slice['label']}}</span>
+                                    <b>{{ round(($slice['count']/$postTotal)*100) }}%</b>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @else
+                        <div class="ig-empty-state ig-empty-state-sm">
+                            <i class="bi bi-pie-chart"></i>
+                            <h6>No record found</h6>
+                            <p>Try a different date range to see post activity here.</p>
+                        </div>
+                        @endif
                     </div>
                 </div>
-                @else
-                <div class="ig-empty-state ig-empty-state-sm">
-                    <i class="bi bi-pie-chart"></i>
-                    <h6>No record found</h6>
-                    <p>Try a different date range to see category activity here.</p>
-                </div>
-                @endif
             </div>
         </div>
 
@@ -369,6 +472,62 @@ function chart3()
     chart33.render();
 }
 
+// Category Breakdown — Tickets / Posts status tabs. Same status-count data
+// the controller has always computed for the selected range (getTicketGraph*
+// / getPostGraph*, bound to startGraphDate/startPostGraphDate, which the
+// single dashboard date filter already drives); just rendering it again as
+// a doughnut, the way the old pre-redesign tabs did.
+function ticketBreakdownChart()
+{
+    var container = document.getElementById('chartContainerTicketBreakdown');
+    if (!container) return;
+    var chartTb = new CanvasJS.Chart("chartContainerTicketBreakdown", {
+        animationEnabled: true,
+        ...igChartTheme,
+        data: [{
+            type: "doughnut",
+            innerRadius: "62%",
+            startAngle: 240,
+            yValueFormatString: "##0",
+            indexLabel: "",
+            dataPoints: [
+                { y: {{$getTicketGraphNewData->count()}}, label: "New" },
+                { y: {{$getTicketGraphPendingData->count()}}, label: "Pending With Team" },
+                { y: {{$getTicketGraphMoveData->count()}}, label: "Move To Internal Team" },
+                { y: {{$getTicketGraphResolvedData->count()}}, label: "Resolved" },
+                { y: {{$getTicketGraphRejectedData->count()}}, label: "Rejected" },
+                { y: {{$getTicketGraphDuplicateData->count()}}, label: "Duplicate" },
+                { y: {{$getTicketGraphAssignedData->count()}}, label: "Assigned" },
+            ]
+        }]
+    });
+    chartTb.render();
+}
+
+function postBreakdownChart()
+{
+    var container = document.getElementById('chartContainerPostBreakdown');
+    if (!container) return;
+    var chartPb = new CanvasJS.Chart("chartContainerPostBreakdown", {
+        animationEnabled: true,
+        ...igChartTheme,
+        data: [{
+            type: "doughnut",
+            innerRadius: "62%",
+            startAngle: 240,
+            yValueFormatString: "##0",
+            indexLabel: "",
+            dataPoints: [
+                { y: {{$getPostGraphNewData->count()}}, label: "New" },
+                { y: {{$getPostGraphDuplicateData->count()}}, label: "Duplicate" },
+                { y: {{$getPostGraphconvertLeadData->count()}}, label: "Converted To Lead" },
+                { y: {{$getPostGraphConvertedData->count()}}, label: "Converted To Ticket" },
+            ]
+        }]
+    });
+    chartPb.render();
+}
+
 // Statistics Overview — real line/area trend built from the same raw
 // records the app already fetches for the selected range (getSocailGraphData
 // / getTicketGraphData, both bounded by startGraphDate/endGraphDate, which
@@ -451,6 +610,31 @@ window.onload = function() {
     });
 
     setTimeout(() => { overviewChart(); chart3(); }, 200);
+}
+
+// Category Breakdown tab switching. CanvasJS can't reliably measure a
+// display:none container, so each Tickets/Posts doughnut is only rendered
+// the first time its tab is actually shown (same pattern the old pre-redesign
+// tab system used) rather than at page load alongside chart3().
+var igTicketBreakdownRendered = false;
+var igPostBreakdownRendered = false;
+var igTabTickets = document.getElementById('ig-tab-tickets');
+var igTabPosts = document.getElementById('ig-tab-posts');
+if (igTabTickets) {
+    igTabTickets.addEventListener('shown.bs.tab', function () {
+        if (!igTicketBreakdownRendered) {
+            igTicketBreakdownRendered = true;
+            setTimeout(ticketBreakdownChart, 50);
+        }
+    });
+}
+if (igTabPosts) {
+    igTabPosts.addEventListener('shown.bs.tab', function () {
+        if (!igPostBreakdownRendered) {
+            igPostBreakdownRendered = true;
+            setTimeout(postBreakdownChart, 50);
+        }
+    });
 }
 
 // Single dashboard-wide date filter: mirror the chosen From/To into every

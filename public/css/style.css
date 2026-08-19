@@ -248,7 +248,7 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
     font-size: 13px;
     color: var(--ig-ink-400);
     margin-top: -10px;
-    margin-bottom: 14px;
+    margin-bottom: 8px;
 }
 .ig-field{ text-align: left; }
 .ig-input-group{ position: relative; }
@@ -350,7 +350,7 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
 
 /* -- station -- */
 .ig-station{
-  position:absolute; left:0; right:0; bottom:12%; height:36%; width:100%;
+  position:absolute; left:0; right:0; bottom:12%; height:36%; width:40%;
   filter: drop-shadow(0 18px 26px rgba(20,60,45,.18));
 }
 .ig-station .canopy{ fill:#ffffff; }
@@ -409,6 +409,7 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
 @keyframes ig-lane-move{ to{ background-position-x: -52px; } }
 
 .ig-car{ position:absolute; bottom:14%; width: clamp(56px,7vw,110px); filter: drop-shadow(0 6px 6px rgba(0,0,0,.35)); }
+.ig-car-r{ position:absolute; bottom:14%; width: clamp(56px,7vw,110px); filter: drop-shadow(0 6px 6px rgba(0,0,0,.35)); }
 .ig-car .car-body{ fill:#f4f6f5; }
 .ig-car.ig-car-2 .car-body{ fill:#ffd525; }
 .ig-car.ig-scooter .car-body{ fill:#3b6cff; }
@@ -438,6 +439,16 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
   64%{ left:46%; }
   100%{ left:116%; }
 }
+
+.ig-car-6{ width: 150px; bottom:14%; animation: ig-car-drive-3 10s cubic-bezier(.55,0,.2,1) infinite; animation-delay:-3s; }
+@keyframes ig-car-drive-6{
+  0%{ right:-10%; }
+  45%{ right:46%; }
+  64%{ right:46%; }
+  100%{ right:116%; }
+}
+
+.ig-car-7{ width: 150px; bottom:14%; animation: ig-car-drive-3 16s cubic-bezier(.54,0,.2,1) infinite; animation-delay:-4s; }
 
 .ig-refuel-glow{
   position:absolute; bottom:16%; width:70px; height:70px; border-radius:50%;
@@ -479,8 +490,12 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
      left edge instead of a "gap" position keeps it clear of the card at
      every desktop width, not just the wider ones. This is a positioning
      fix, not a stacking one — .ig-home never needs to out-rank the card. */
-  position:absolute; left:3%; bottom:10.5%; width:clamp(130px,15vw,220px); height:44%;
-  filter: drop-shadow(0 14px 20px rgba(20,60,45,.16));
+  position: absolute;
+    left: -1%;
+    bottom: 9.5%;
+    width: 22vw;
+    height: 36%;
+    filter: drop-shadow(0 14px 20px rgba(20, 60, 45, .16));
 }
 .ig-home .home-riser-casing{ stroke:#3a4a44; stroke-width:9; fill:none; }
 .ig-home .home-riser-flow{
@@ -576,7 +591,7 @@ input[type="datetime-local"].form-control:hover::-webkit-calendar-picker-indicat
 .ig-card{
   width:100%;
   background: var(--ig-surface);
-  padding: 32px 36px;
+  padding: 12px 36px;
   border-radius: var(--ig-radius-lg);
   box-shadow: 0 40px 80px -20px rgba(0,0,0,.55);
   border: 1px solid rgba(255,255,255,.08);
@@ -2043,4 +2058,12 @@ select.ig-filter-input{ min-width:96px; }
 @keyframes ig-fade-up{ from{ opacity:0; transform: translateY(10px); } to{ opacity:1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce){
   .ig-animate-in{ opacity:1; transform:none; animation:none; }
+}
+.animate__fadeInDown{
+      bottom: 5vw;
+    left: 16vw;
+}
+.animate__fadeInRight{
+  margin-left: 24vw;
+  margin-top: 24.75vw;
 }

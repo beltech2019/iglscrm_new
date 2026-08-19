@@ -73,34 +73,7 @@ body{
         </svg>
 
         <!-- ============ layer 3: CNG station structure ============ -->
-        <svg class="ig-station" viewBox="0 0 1600 420" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
-            <!-- canopy -->
-            <rect class="canopy-glow" x="560" y="118" width="480" height="10" rx="5"/>
-            <rect class="canopy" x="540" y="70" width="520" height="34" rx="10"/>
-            <rect class="pillar" x="600" y="104" width="22" height="180" rx="4"/>
-            <rect class="pillar" x="980" y="104" width="22" height="180" rx="4"/>
-            <rect class="backwall" x="660" y="104" width="280" height="180" rx="6"/>
-            <text class="station-sign" x="800" y="60" text-anchor="middle">IGL &#8226; CNG STATION</text>
-
-            <!-- pump island 1 -->
-            <g class="pump-unit" transform="translate(700,190)">
-                <rect class="pump-body" x="0" y="0" width="64" height="110" rx="10"/>
-                <rect class="pump-screen" x="10" y="14" width="44" height="26" rx="4"/>
-                <circle class="gauge-ring" cx="32" cy="70" r="20"/>
-                <line class="gauge-needle" x1="32" y1="70" x2="32" y2="54"/>
-                <circle class="gauge-pin" cx="32" cy="70" r="2.6"/>
-                <rect class="pump-hose" x="58" y="30" width="6" height="60" rx="3"/>
-            </g>
-
-            <!-- pump island 2 -->
-            <g class="pump-unit pump-unit-2" transform="translate(870,190)">
-                <rect class="pump-body" x="0" y="0" width="64" height="110" rx="10"/>
-                <rect class="pump-screen" x="10" y="14" width="44" height="26" rx="4"/>
-                <circle class="gauge-ring" cx="32" cy="70" r="20"/>
-                <line class="gauge-needle" x1="32" y1="70" x2="32" y2="54"/>
-                <circle class="gauge-pin" cx="32" cy="70" r="2.6"/>
-                <rect class="pump-hose" x="-6" y="30" width="6" height="60" rx="3"/>
-            </g>
+        <img src="images/gas_pump.png" class="img5 hidemobile animate__animated animate__fadeInRight ig-station">
 
             <!-- flame / burner accents -->
             <g transform="translate(662,320)">
@@ -123,29 +96,8 @@ body{
              story arrives. The riser pipe (bottom of this SVG) taps off the
              same horizontal pipeline below and carries the same animated
              flow up into the wall meter and, from there, to the stove. ============ -->
-        <svg class="ig-home" viewBox="0 0 300 340" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
-            <path class="pipe-casing home-riser-casing" d="M56,340 L56,196"/>
-            <path class="pipe-flow home-riser-flow" d="M56,340 L56,196"/>
-            <rect class="home-meter" x="48" y="170" width="16" height="26" rx="2"/>
-            <path class="home-roof" d="M20,90 L150,20 L280,90 Z"/>
-            <rect class="home-wall" x="40" y="90" width="220" height="130" rx="6"/>
-            <rect class="home-kitchen" x="70" y="120" width="140" height="90" rx="4"/>
-            <!-- explicit meter -> stove run, inside the kitchen, so the gas
-                 is clearly traced all the way from the wall meter to the
-                 burner rather than just implied by the stove being nearby -->
-            <path class="pipe-casing home-stove-pipe-casing" d="M64,183 L80,183 L80,169 L112,169"/>
-            <path class="pipe-flow home-stove-pipe-flow" d="M64,183 L80,183 L80,169 L112,169"/>
-            <rect class="home-counter" x="80" y="178" width="120" height="24" rx="3"/>
-            <rect class="home-stovetop" x="112" y="169" width="56" height="9" rx="2"/>
-            <circle class="home-burner" cx="140" cy="169" r="11"/>
-            <ellipse class="home-pot" cx="140" cy="154" rx="18" ry="11"/>
-            <rect class="home-pot-handle" x="118" y="148" width="11" height="4" rx="2"/>
-            <rect class="home-pot-handle" x="151" y="148" width="11" height="4" rx="2"/>
-            <g class="flame-unit home-flame" transform="translate(132,143)">
-                <path class="flame-outer" d="M8 0C8 6 2 8 2 14c0 5 3.5 9 8 9s8-4 8-9c0-3-1.5-5-2.7-6.6.2 1.8-.6 3.2-1.9 3.2-1.4 0-1.9-1.2-1.6-2.7C13.4 5 8 4 8 0Z"/>
-                <path class="flame-inner" d="M8 9c0 2.7-2.2 3.4-2.2 6.2A4.2 4.2 0 0 0 10.2 19a4 4 0 0 0 2.2-7.4c-.3.9-1 1.4-1.7 1.1-.7-.3-.9-1.2-.5-2.1.4-.8-.3-1.6-2-2.1Z"/>
-            </g>
-        </svg>
+        <img src="images/home.png" class="ig-home">
+            
 
         <!-- ============ layer 4: pipeline with animated gas flow ============ -->
         <svg class="ig-pipeline" viewBox="0 0 1600 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -170,35 +122,13 @@ body{
                 <circle class="car-light" cx="112" cy="27" r="3"/>
             </svg>
 
-            <svg class="ig-car ig-car-2" viewBox="0 0 120 52" xmlns="http://www.w3.org/2000/svg">
-                <rect class="car-shadow" x="6" y="44" width="104" height="6" rx="3"/>
-                <path class="car-body" d="M8 34 C8 24 16 24 24 20 L34 10 C38 6 46 4 56 4 L82 4 C90 4 96 8 100 16 L108 20 C114 22 116 26 116 32 L116 36 C116 39 113 41 110 41 L14 41 C10 41 8 38 8 34Z"/>
-                <path class="car-cabin" d="M40 20 L48 9 C50 7 54 6 58 6 L74 6 C79 6 84 9 86 14 L90 20 Z"/>
-                <circle class="car-wheel" cx="34" cy="41" r="9"/>
-                <circle class="car-wheel" cx="94" cy="41" r="9"/>
-                <circle class="car-light" cx="112" cy="27" r="3"/>
-            </svg>
+            <img class="ig-car ig-car-2" src="images/car4.gif">
+            <img class="ig-car-r ig-car-6" src="images/car3.gif">
+            <img class="ig-car-r ig-car-7" src="images/ca-unscreen.gif">
 
-            <svg class="ig-car ig-car-3 ig-scooter" viewBox="0 0 70 46" xmlns="http://www.w3.org/2000/svg">
-                <rect class="car-shadow" x="4" y="38" width="62" height="5" rx="2.5"/>
-                <path class="car-body" d="M8 34 C6 24 14 22 22 22 L30 14 C33 11 38 10 42 12 L46 22 L58 24 C62 25 64 28 64 32 L64 34 Z"/>
-                <circle class="car-wheel" cx="18" cy="34" r="7"/>
-                <circle class="car-wheel" cx="56" cy="34" r="7"/>
-            </svg>
+            <img class="ig-car ig-car-3 ig-scooter" src="images/bike2.gif">
 
-            <svg class="ig-car ig-truck ig-truck-1" viewBox="0 0 160 60" xmlns="http://www.w3.org/2000/svg">
-                <rect class="car-shadow" x="4" y="50" width="150" height="6" rx="3"/>
-                <rect class="truck-cargo" x="6" y="14" width="90" height="34" rx="4"/>
-                <path class="truck-cab" d="M96 24 L120 24 C126 24 131 28 133 34 L138 46 L96 46 Z"/>
-                <rect class="truck-window" x="102" y="28" width="20" height="12" rx="2"/>
-                <circle class="car-wheel" cx="30" cy="48" r="10"/>
-                <circle class="car-wheel" cx="80" cy="48" r="10"/>
-                <circle class="car-wheel" cx="122" cy="48" r="10"/>
-                <circle class="car-light" cx="136" cy="38" r="3"/>
-            </svg>
-
-            <div class="ig-refuel-glow ig-refuel-glow-1"></div>
-            <div class="ig-refuel-glow ig-refuel-glow-2"></div>
+            <img class="ig-car ig-truck ig-truck-1" src="images/car2.gif">
         </div>
 
         <!-- ============ layer 6: floating gas / energy particles ============ -->
@@ -257,10 +187,10 @@ body{
 
                                     </div>
 
-                                    <div class="mb-3 ">
+                                    <div class="mb-1 ">
                                         <input type="submit" class=" btn btn-primary" value="Login">
                                     </div>
-                                    <div class="mb-3 row">
+                                    <div class="mb-1 row">
                                         <p class="text-center fontforget_passowrd">Forget Password?<a href="#" class="flipbutton" id="loginButton">
                                             Click Here</a></p>
                                     </div>
