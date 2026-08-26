@@ -13,14 +13,11 @@ html{ -webkit-text-size-adjust: 100%; }
 body{ overflow-x: hidden; }
 .container-fluid{ padding-left: 16px; padding-right: 16px; }
 
-.table-responsive{
-  -webkit-overflow-scrolling: touch;
-}
-/* NOTE: the scroll-edge affordance (fade + "scroll for more" hint) now
-   lives entirely in style.css (.ig-scroll-x background trick + the
-   .ig-has-scroll/::after hint), driven by ui-enhance.js measuring real
-   overflow instead of a static always-on gradient. Keeping both would
-   fight over the same ::after pseudo-element on the same selector. */
+/* NOTE: tables no longer scroll horizontally — see the "Table
+   responsiveness" block in style.css (.ig-table wraps/reflows, and
+   collapses into stacked cards below 768px). .table-responsive itself now
+   only sets overflow-x:visible there; nothing in this file needs to touch
+   it. */
 
 #chartContainer, #chartContainer1, #chartContainer2, #chartContainer3{
   width: 100% !important;

@@ -807,88 +807,120 @@ thead{ white-space: nowrap; }
 th{ white-space: nowrap; }
 table th, table td{ }
 .table-responsive{
-  padding-bottom: 54px;
   border-radius: var(--ig-radius-sm);
   position: relative;
-  /* a visible, on-brand scrollbar instead of the bare OS default — this is
-     the affordance that tells people the table scrolls, without resorting
-     to hiding columns or letting content spill outside the card */
-  scrollbar-width: thin;
-  scrollbar-color: var(--ig-green-100) transparent;
-}
-.table-responsive::-webkit-scrollbar{ height: 9px; }
-.table-responsive::-webkit-scrollbar-track{ background: transparent; }
-.table-responsive::-webkit-scrollbar-thumb{ background: var(--ig-green-100); border-radius: 10px; border: 2px solid #fff; }
-.table-responsive:hover::-webkit-scrollbar-thumb,
-.table-responsive:focus-within::-webkit-scrollbar-thumb{ background: var(--ig-green-500); }
-
-/* -- edge fade shadows: pure-CSS "scroll shadow" trick. Two gradients that
-      scroll WITH the content (so they sit right at the table's real edges)
-      layered under two gradients that stay fixed to the viewport of the
-      scroller (so they only render once there is more to see). No JS, and
-      they vanish automatically once you've scrolled to an edge. -- */
-.table-responsive.ig-scroll-x{
-  background:
-    linear-gradient(to right, #fff 30%, rgba(255,255,255,0)) left,
-    linear-gradient(to left, #fff 30%, rgba(255,255,255,0)) right,
-    radial-gradient(farthest-side at left, rgba(16,24,32,.12), rgba(16,24,32,0)) left,
-    radial-gradient(farthest-side at right, rgba(16,24,32,.12), rgba(16,24,32,0)) right;
-  background-repeat: no-repeat;
-  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
-  background-attachment: local, local, scroll, scroll;
+  /* Reflow, not scroll (see the "Table responsiveness" block below) — this
+     wrapper no longer manages horizontal overflow, so there's nothing here
+     to add a scrollbar/edge-fade/"scroll for more" hint for. It's kept as
+     the layout anchor (rounded corners, positioning context) other markup
+     already expects. */
+  overflow-x: visible;
 }
 
-/* -- mobile "swipe for more" hint: appears only while the table actually
-      overflows (JS adds .ig-has-scroll after measuring it) and only until
-      the person scrolls it once (JS then adds .ig-scrolled). Decorative
-      only — the table works identically with or without JS. -- */
-.table-responsive.ig-has-scroll:not(.ig-scrolled)::after{
-  /* sits in the wrapper's own reserved bottom padding (see padding-bottom
-     above) so it can never be clipped by the wrapper's own overflow:auto —
-     an element positioned outside the box (e.g. a negative top) would be */
-  content: "Scroll for more \2192";
-  position: absolute;
-  bottom: 14px;
-  right: 10px;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: .2px;
-  color: var(--ig-green-700);
-  background: var(--ig-green-100);
-  padding: 4px 10px;
-  border-radius: var(--ig-radius-pill);
-  pointer-events: none;
-  animation: ig-hint-nudge 1.6s ease-in-out infinite;
-  display: none;
+/* ==========================================================================
+   Table responsiveness — reflow, not scroll.
+   Every data table in the app carries .ig-table inside a .table-responsive
+   wrapper. Instead of letting a wide table scroll sideways, columns wrap
+   and shrink to fit on tablet/desktop; below 768px the table itself
+   transforms into a stack of labelled cards (data-label is injected per
+   cell by ig-table-tools.js, from that column's own header, for every
+   .ig-table — not just the ones with sort/filter/search). There is
+   deliberately no overflow-x anywhere in this block.
+
+   table-layout:fixed is the load-bearing rule here, not a cosmetic one.
+   With the browser default (table-layout:auto), a <table> is allowed to
+   render WIDER than its parent whenever its content's min-content width
+   demands it — max-width/word-break on the cells don't stop this, because
+   auto layout only wraps text once it has already decided how wide each
+   column "wants" to be, and a wide-enough table simply bursts its
+   container instead of shrinking. That is the actual cause of the Post/
+   Ticket table overflow: with 7-12 columns, the header words plus the
+   auto-generated filter row's inputs (each with their own min-width) add
+   up to more than the viewport at normal desktop zoom, but happened to
+   fit once zooming out enlarged the effective CSS-pixel viewport — hence
+   "looks fine at 80%/50% zoom, breaks at 100%+". table-layout:fixed makes
+   the table honour width:100% of its container as a hard constraint:
+   column widths are taken from the header row (evenly split, since no
+   column declares an explicit width) and never grow past that no matter
+   how wide the content wants to be — content wraps inside its column
+   instead. This is why the filter-row inputs' own min-width had to go
+   too (see .ig-filter-input below): a fixed-width column can still be
+   visually overflowed by a *child* that refuses to shrink below its own
+   min-width, even though the table itself no longer can. */
+.ig-table{ table-layout: fixed; }
+.ig-table thead th,
+.ig-table td{
+  white-space: normal;               /* override the global nowrap above */
 }
+.ig-table td,
+.ig-table td *:not(.dropdown-menu):not(.dropdown-menu *){
+  overflow-wrap: anywhere;           /* long unbroken text/IDs/URLs never force the column wider than its share */
+  word-break: break-word;
+  min-width: 0;                      /* buttons/links/spans inside a cell must be able to shrink with their fixed-width column */
+}
+/* .dropdown-menu is excluded above on purpose: it's position:absolute (out
+   of flow, so it can never cause the table itself to overflow) and needs
+   to keep Bootstrap's own min-width so the Edit/Delete row menus don't
+   collapse to a sliver. */
+
 @media (max-width: 767px){
-  .table-responsive.ig-has-scroll:not(.ig-scrolled)::after{ display: inline-block; }
-}
-@keyframes ig-hint-nudge{
-  0%, 100%{ transform: translateX(0); opacity:1; }
-  50%{ transform: translateX(3px); opacity:.75; }
-}
-@media (prefers-reduced-motion: reduce){
-  .table-responsive.ig-has-scroll:not(.ig-scrolled)::after{ animation: none; }
-}
+  /* Visually hidden, not display:none — screen readers can still announce
+     "Status" etc. via the data-label text even though sighted users no
+     longer see a header row at this width (the standard sr-only pattern). */
+  .ig-table thead{
+    position: absolute; width: 1px; height: 1px; margin: -1px;
+    padding: 0; border: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap;
+  }
+  .ig-table, .ig-table tbody, .ig-table tbody tr{ display: block; width: 100%; }
+  .ig-table{ border: none; }
+  .ig-table tbody tr{
+    background: #fff;
+    border: 1px solid var(--ig-border);
+    border-radius: var(--ig-radius-md);
+    padding: 4px 14px;
+    margin-bottom: 12px;
+    box-shadow: var(--ig-shadow-xs);
+  }
+  .ig-table tbody tr:last-child{ margin-bottom: 0; }
+  .ig-table tbody td{
+    display: block;
+    max-width: none;
+    padding: 9px 0;
+  }
+  .ig-table tbody td:not(:last-child){ border-bottom: 1px dashed var(--ig-border); }
+  .ig-table tbody td[data-label]::before{
+    content: attr(data-label);
+    display: block;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--ig-ink-400);
+    margin-bottom: 3px;
+  }
+  /* Placeholder rows (empty state / "no matching rows") span every column
+     via colspan — they're not real per-column data, so render them as a
+     plain block instead of a bordered "card". */
+  .ig-table tbody tr.ig-empty-row,
+  .ig-table tbody tr.ig-no-match-row{
+    border: none; box-shadow: none; padding: 0; background: transparent;
+  }
+  .ig-table tbody tr.ig-empty-row td,
+  .ig-table tbody tr.ig-no-match-row td{ padding: 0; border: none; }
 
-/* -- sticky first column: the row's identity/actions column stays put while
-      the rest of a wide table scrolls underneath it, so you never lose
-      track of which row you're looking at. Applies to the redesigned
-      .ig-table component only. -- */
-.ig-table thead th:first-child,
-.ig-table tbody td:first-child{
-  position: sticky;
-  left: 0;
-  z-index: 2;
+  /* "Show N more" — for wide tables (see ig-table-tools.js), the middle
+     columns beyond the 6th are marked .ig-card-extra and start collapsed,
+     so a 12-column ticket row doesn't turn into a wall of text on a phone.
+     The first column and the last (almost always the identity/action
+     column) are never collapsed. */
+  .ig-table tbody tr:not(.ig-card-expanded) td.ig-card-extra{ display: none; }
+  .ig-card-more-cell{ display: block !important; border-bottom: none !important; padding: 4px 0 0 !important; }
+  .ig-card-more-btn{
+    display: inline-flex; align-items: center; gap: 5px;
+    background: none; border: none; padding: 2px 0;
+    font-size: 12px; font-weight: 700; color: var(--ig-green-700);
+  }
+  .ig-card-more-btn:focus-visible{ outline: 2px solid var(--ig-green-500); outline-offset: 2px; border-radius: 3px; }
 }
-.ig-table thead th:first-child{ z-index: 3; background: var(--ig-bg); }
-.ig-table tbody td:first-child{ background: #fff; }
-.ig-table tbody tr:hover td:first-child{ background: var(--ig-green-50); }
-.ig-table tbody td:first-child,
-.ig-table thead th:first-child{
-  box-shadow: 2px 0 6px -2px rgba(16,24,32,.10);
-}
+/* the "show more" toggle cell only exists for card mode */
+.ig-card-more-cell{ display: none; }
 
 /* ==========================================================================
    Icon menus / action rows
@@ -1806,6 +1838,7 @@ img.newimg{ width: 27px; height: 27px; background: var(--ig-ink-100); padding: 1
    ========================================================================== */
 .ig-toolbar-actions{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .ig-icon-btn{
+  position: relative;
   display:inline-flex; align-items:center; justify-content:center;
   width:38px; height:38px; border-radius: var(--ig-radius-sm);
   background: var(--ig-surface); border:1px solid var(--ig-border); color: var(--ig-ink-600);
@@ -1813,6 +1846,21 @@ img.newimg{ width: 27px; height: 27px; background: var(--ig-ink-100); padding: 1
 }
 .ig-icon-btn:hover{ background: var(--ig-green-50); border-color: var(--ig-green-500); color: var(--ig-green-700); }
 .ig-icon-btn-danger:hover{ background: var(--ig-danger-100); border-color: var(--ig-danger); color: var(--ig-danger); }
+
+/* -- bulk-selection count badge: purely additive feedback for the existing
+      "check rows, click delete" pattern (see ig-table-tools.js). Only ever
+      reflects checkbox state that was already there; never changes which
+      button does what or where it posts. -- */
+.ig-icon-btn.ig-has-selection{ background: var(--ig-danger-100); border-color: var(--ig-danger); color: var(--ig-danger); }
+.ig-selected-count{
+  position:absolute; top:-6px; right:-6px;
+  min-width:18px; height:18px; padding:0 4px; box-sizing:border-box;
+  display:none; align-items:center; justify-content:center;
+  border-radius:999px; background:var(--ig-danger); color:#fff;
+  font-size:10.5px; font-weight:800; line-height:1;
+  box-shadow:0 0 0 2px #fff;
+}
+.ig-icon-btn.ig-has-selection .ig-selected-count{ display:flex; }
 .ig-btn-add{ display:inline-flex; align-items:center; gap:7px; }
 .ig-row-menu-btn{
   display:inline-flex; align-items:center; justify-content:center;
@@ -1883,11 +1931,16 @@ img.newimg{ width: 27px; height: 27px; background: var(--ig-ink-100); padding: 1
   font-weight:400;
   white-space:normal;
 }
-.ig-filter-cell{ font-weight:400; }
-.ig-filter-input{ font-size:12.5px; width:100%; min-width:84px; box-sizing:border-box; }
-select.ig-filter-input{ min-width:96px; }
-.ig-filter-range{ display:flex; gap:4px; flex-wrap:nowrap; }
-.ig-filter-range input{ width:50%; min-width:56px; }
+.ig-filter-cell{ font-weight:400; min-width:0; }
+/* min-width:0 (not the browser's auto/content-based floor) is required here:
+   .ig-table is table-layout:fixed now (see below), so every column already
+   has a real, bounded width — these inputs just need to fill whatever that
+   is, down to a genuinely narrow column, instead of carrying their own
+   84-96px floor that would make THEM overflow their own cell. */
+.ig-filter-input{ font-size:12.5px; width:100%; min-width:0; box-sizing:border-box; }
+select.ig-filter-input{ min-width:0; }
+.ig-filter-range{ display:flex; gap:4px; flex-wrap:nowrap; min-width:0; }
+.ig-filter-range input{ width:50%; min-width:0; }
 
 .ig-no-match-row td{ border:none !important; }
 
@@ -1902,6 +1955,12 @@ select.ig-filter-input{ min-width:96px; }
   white-space:nowrap;
 }
 .ig-badge::before{ content:""; width:6px; height:6px; border-radius:50%; background: currentColor; }
+/* Inside a fixed-layout table cell (see "Table responsiveness" above), a
+   long nowrap status like "Pending With Team" could otherwise be wider
+   than its now-bounded column and visually spill into the next cell —
+   letting it wrap keeps it self-contained (the pill just grows a touch
+   taller) instead of overlapping real data in the neighbouring column. */
+.ig-table td .ig-badge{ white-space: normal; max-width: 100%; }
 .ig-badge-new{ background: var(--ig-info-100); color:#1c3fa8; }
 .ig-badge-assigned, .ig-badge-in-process, .ig-badge-pending-with-team{ background: var(--ig-amber-100); color:#8a6b00; }
 .ig-badge-converted, .ig-badge-resolved, .ig-badge-active{ background: var(--ig-green-100); color: var(--ig-green-800); }
