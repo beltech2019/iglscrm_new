@@ -843,10 +843,12 @@ table th, table td{ }
    column widths are taken from the header row (evenly split, since no
    column declares an explicit width) and never grow past that no matter
    how wide the content wants to be — content wraps inside its column
-   instead. This is why the filter-row inputs' own min-width had to go
-   too (see .ig-filter-input below): a fixed-width column can still be
-   visually overflowed by a *child* that refuses to shrink below its own
-   min-width, even though the table itself no longer can. */
+   instead. (The per-column filter row that used to sit under the header
+   — with its own min-width inputs fighting this same constraint — has
+   since been removed; see ig-table-tools.js.) A fixed-width column can
+   still be visually overflowed by a *child* that refuses to shrink below
+   its own min-width, even though the table itself no longer can — hence
+   min-width:0 on cell content below. */
 .ig-table{ table-layout: fixed; }
 .ig-table thead th,
 .ig-table td{
@@ -1191,6 +1193,26 @@ body.sidenav-toggled .ig-nav-toggle-btn .menuicons{ transform: rotate(90deg); }
 .navbar-brand:hover .menuicons{ transform: scale(1.08); }
 .postioninner{ position:relative; }
 .postioninner i{ position: absolute; right: 47px; top: 8px; color: var(--ig-ink-400); }
+/* The search button's own icon is repositioned (above) to sit inside the
+   search input as its search affordance, so the <button> itself is left
+   with no visible content — yet its own border/background/padding were
+   still rendered, showing up as an empty bordered box next to the search
+   field. Collapse the button's own box to nothing; its icon child is
+   absolutely positioned relative to .postioninner (not the button), so it
+   keeps rendering in place and stays clickable/submits the form exactly
+   as before. */
+.postioninner .btnhoverser{
+  width: 0;
+  height: 0;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible;
+}
 
 /* ==========================================================================
    Modals
@@ -1787,9 +1809,16 @@ select.readonly{ opacity: 0.8; pointer-events: none; }
 .btnchange{ padding: 6px 9px; border-radius: var(--ig-radius-xs); border: 1px solid var(--ig-border); }
 .dangeriline{ width:100px; }
 .width50{ width:50%; }
-.table_width_align th:nth-child(1){ width: 26%; }
-.table_width_align th:nth-child(2){ width: 27%; }
-.table_width_align th:nth-child(5){ width: 47%; }
+/* .table_width_align used to hardcode widths on just 3 header cells
+   (1st/2nd/5th), left over from a fixed 5-column table. The post/search
+   tables now render a variable number of columns (driven by the user's
+   column picker), so those three percentages alone already summed to
+   100% and starved every other column down to ~0 width under
+   table-layout:fixed — the exact cause of the character-by-character
+   column collapse seen on the Social User / Post Date columns. Removed
+   in favour of the even, content-agnostic split table-layout:fixed
+   already applies to every other .ig-table (see "Table responsiveness"
+   above) — the class is still present in markup but no longer styled. */
 .filter_popup{ max-width: 724px !important; }
 .heightscroll2{ height: 502px; overflow: auto; }
 .starred{ color: var(--ig-flame-500); }
@@ -1818,7 +1847,12 @@ img.newimg{ width: 27px; height: 27px; background: var(--ig-ink-100); padding: 1
 .documentType ul li i.bi.bi-x-lg{ background: var(--ig-ink-100); color: var(--ig-ink-700); padding: 3px 4px; border-radius: 40px; font-size: 9px; margin-left: 8px; cursor: pointer; margin-bottom: 8px; }
 .socialusertd{ width: 50.33% !important; }
 .socialusertd i{ margin-right: 0.25rem!important; }
-.socialusertd a{ word-break: break-all; color: var(--ig-info); }
+/* break-word (not break-all) so long social usernames wrap by whole
+   chunks instead of one letter per line inside their fixed-width
+   column — break-all was fighting the table's own overflow-wrap:anywhere
+   fallback (see "Table responsiveness" above), which already handles the
+   rare unbroken string that's still too long for the column. */
+.socialusertd a{ word-break: break-word; color: var(--ig-info); }
 .tickettable{ word-break: break-word; }
 
 /* ==========================================================================
@@ -1883,6 +1917,8 @@ img.newimg{ width: 27px; height: 27px; background: var(--ig-ink-100); padding: 1
   background: var(--ig-bg);
   border-bottom: 2px solid var(--ig-border);
   position: sticky; top:0; z-index:1;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .ig-table tbody tr{ border-bottom: 1px solid var(--ig-border); }
 .ig-table tbody tr:last-child{ border-bottom:none; }
@@ -1902,7 +1938,20 @@ img.newimg{ width: 27px; height: 27px; background: var(--ig-ink-100); padding: 1
   position:absolute; left:10px; top:50%; transform:translateY(-50%);
   font-size:12.5px; color: var(--ig-ink-400); pointer-events:none;
 }
-.ig-table-search input{ padding-left:30px; }
+.ig-table-search input{ padding-left:30px; height:100%; }
+/* When the table's panel already has an upper icon/action toolbar
+   (.ig-toolbar-actions — filter/refresh/delete/+New, etc.), ig-table-tools.js
+   moves the search box in there instead of floating it above the table on
+   its own row. Same icon+input look as .ig-table-search, just sized to sit
+   level with the 38px icon buttons rather than spanning the full row. */
+.ig-table-search-inline{
+  width:220px; max-width:100%; flex:1 1 200px; height:38px;
+}
+.ig-table-search-inline input{ height:38px; }
+
+@media (max-width:575px){
+  .ig-table-search-inline{ flex-basis:100%; }
+}
 
 /* IMPORTANT: the <th> itself must stay `display: table-cell` (its browser
    default) so the header row, the filter row, and the body rows all size
@@ -1915,32 +1964,28 @@ img.newimg{ width: 27px; height: 27px; background: var(--ig-ink-100); padding: 1
 .ig-table thead th.ig-th-sorted{ color: var(--ig-green-700); }
 .ig-th-content{
   display:flex; align-items:center; justify-content:space-between; gap:6px;
-  white-space:nowrap;
+  /* Guard, not just decoration: a sortable header's label+icon must never
+     be allowed to render past its own (fixed-width) column — without this,
+     a column narrower than "Label ↕" needs spills its sort icon out past
+     the table's own right edge instead of staying contained. Letting the
+     label wrap (rather than nowrap+truncate) is what keeps it contained
+     without losing/cutting off the header word itself on a narrow column;
+     overflow-wrap/word-break match the data cells below (see .ig-table td
+     above) so a single long word (SENTIMENT, DEPARTMENT) can still break
+     instead of overflowing when its column is genuinely narrower than the
+     whole word. */
+  overflow:hidden;
+  min-width:0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .ig-sort-icon{ display:inline-flex; flex:none; font-size:12px; opacity:.55; }
 .ig-th-sorted .ig-sort-icon{ opacity:1; }
 
-/* Filter row: real <tr>/<th> cells that line up 1:1 with the header and body
-   columns via the table's own layout — no independent widths, no offsets. */
-.ig-table thead tr.ig-filter-row th{
-  position: static;              /* don't inherit the header row's sticky top:0 */
-  background: #fff;
-  border-bottom: 1px solid var(--ig-border);
-  padding: 6px 8px;
-  vertical-align: middle;
-  font-weight:400;
-  white-space:normal;
-}
-.ig-filter-cell{ font-weight:400; min-width:0; }
-/* min-width:0 (not the browser's auto/content-based floor) is required here:
-   .ig-table is table-layout:fixed now (see below), so every column already
-   has a real, bounded width — these inputs just need to fill whatever that
-   is, down to a genuinely narrow column, instead of carrying their own
-   84-96px floor that would make THEM overflow their own cell. */
-.ig-filter-input{ font-size:12.5px; width:100%; min-width:0; box-sizing:border-box; }
-select.ig-filter-input{ min-width:0; }
-.ig-filter-range{ display:flex; gap:4px; flex-wrap:nowrap; min-width:0; }
-.ig-filter-range input{ width:50%; min-width:0; }
+/* The per-column Min/Max/Search filter row (.ig-filter-row/.ig-filter-cell/
+   .ig-filter-input/.ig-filter-range) that used to render here has been
+   removed from ig-table-tools.js — the table relies on the single
+   "search this table" box instead. Styles removed along with it. */
 
 .ig-no-match-row td{ border:none !important; }
 
@@ -2106,6 +2151,12 @@ select.ig-filter-input{ min-width:0; }
 .downloadbtn{
   display:inline-flex; align-items:center; justify-content:center;
   width:34px; height:34px; padding:0 !important; border-radius:50% !important;
+  /* The app-wide mobile touch-target rule (.btn{min-height:42px} below
+     767px, see responsive.css) would otherwise stretch just this button's
+     height past its width, turning the circle into an oval and — since
+     its flex parent stretches its "See All" sibling to match — inflating
+     that pill button too. Keep it a true circle at every breakpoint. */
+  min-height:34px !important;
 }
 
 /* ==========================================================================

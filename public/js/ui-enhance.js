@@ -67,64 +67,13 @@
 })();
 
 /*
- * Table horizontal-scroll affordance — applies to every .table-responsive
- * app-wide (Social Tickets and all other data tables). Purely additive:
- * it only toggles CSS classes that make an *already-scrollable* table easier
- * to notice and track (edge fade, "scroll for more" hint, sticky-column
- * shadow). It never changes which columns are shown, never adds scrolling
- * where the table already fit, and the table works identically if this
- * script fails to run. Runs even when prefers-reduced-motion is set, since
- * measuring scroll state isn't itself an animation (the hint's own nudge
- * animation is separately disabled via CSS @media in that case).
+ * Tables no longer scroll horizontally (see the "Table responsiveness"
+ * block in style.css) — wide tables reflow/wrap instead, and collapse into
+ * stacked cards below 768px. There is nothing left for this file to measure
+ * or add a scroll affordance for; the per-cell responsive labelling and the
+ * "show more" collapsed-column toggle live in ig-table-tools.js instead,
+ * since they need to run at the same time the table's own markup is read.
  */
-(function () {
-  "use strict";
-
-  function refresh(el) {
-    var canScroll = el.scrollWidth > el.clientWidth + 1;
-    el.classList.toggle("ig-scroll-x", canScroll);
-    if (!canScroll) {
-      el.classList.remove("ig-has-scroll", "ig-scrolled");
-      return;
-    }
-    el.classList.add("ig-has-scroll");
-    el.classList.toggle("ig-scrolled", el.scrollLeft > 8);
-  }
-
-  function init() {
-    var wrappers = document.querySelectorAll(".table-responsive");
-    if (!wrappers.length) return;
-
-    wrappers.forEach(function (el) {
-      refresh(el);
-      el.addEventListener(
-        "scroll",
-        function () {
-          el.classList.toggle("ig-scrolled", el.scrollLeft > 8);
-        },
-        { passive: true }
-      );
-    });
-
-    var resizeTimer;
-    window.addEventListener(
-      "resize",
-      function () {
-        window.clearTimeout(resizeTimer);
-        resizeTimer = window.setTimeout(function () {
-          wrappers.forEach(refresh);
-        }, 150);
-      },
-      { passive: true }
-    );
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-})();
 
 /*
  * Right-side panels (Assigned to Me / Favourite, and any future offcanvas

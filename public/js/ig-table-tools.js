@@ -3,14 +3,14 @@
  *
  * Purely client-side, opt-in table enhancement:
  *   - click-to-sort column headers (asc / desc / default) with a visual indicator
- *   - an auto-generated per-column filter row (text / select / date / numeric range,
- *     auto-detected from the column's own rendered content)
- *   - a per-table "search this table" box (separate from any column filters)
+ *   - a single per-table "search this table" box — moved into the panel's own
+ *     upper action-icon toolbar when there is one (filter/refresh/delete/+New),
+ *     otherwise placed on its own row right above the table
  *
  * Usage: add `data-ig-tabletools` to any <table> that already has real <thead><tr><th>
- * headers and data rows in <tbody>. Everything else (search box, filter row, sort
- * indicators, wiring) is generated automatically at runtime. No markup restructuring
- * needed, and nothing here touches routes/AJAX/pagination — it only sorts/filters the
+ * headers and data rows in <tbody>. Everything else (search box, sort indicators,
+ * wiring) is generated automatically at runtime. No markup restructuring needed,
+ * and nothing here touches routes/AJAX/pagination — it only sorts/filters the
  * rows that are already present in the DOM (i.e. the current page of results).
  *
  * Rows excluded from sorting/filtering (left untouched, always visible):
@@ -106,6 +106,56 @@
         return { type: 'text', sortable: true };
     }
 
+    // ------------------------------------------------------------------
+    // Column widths — proportional to content, not an even split.
+    // table-layout:fixed (see the "Table responsiveness" block in
+    // style.css) takes column widths from this header row and never lets
+    // a column grow past that share again — that's what stops the table
+    // from overflowing sideways. Left with no explicit widths, a fixed
+    // table just splits evenly across however many columns are visible:
+    // technically overflow-free, but it makes a short column (Status,
+    // Action) exactly as wide as a long one (Post Message, Subject),
+    // which looks unbalanced and forces the long column's text to wrap
+    // constantly. This estimates each column's fair share from its own
+    // header label and a sample of its actual cell text, so a table whose
+    // visible columns change (see the "Choose Columns" modal) still gets
+    // sensible, non-overflowing proportions without per-page/per-column
+    // CSS that would go stale the moment columns are hidden or reordered.
+    // ------------------------------------------------------------------
+    var MIN_COL_WEIGHT = 14;   // floor, in "characters" — keeps a short column
+                                // (Num., Status, Action, Department) wide
+                                // enough to fit its own header label on one
+                                // (or close to one) line, plus its sort icon
+    var MAX_COL_WEIGHT = 40;   // ceiling — a long free-text column (Post
+                                // Message) already wraps onto multiple lines,
+                                // so it shouldn't claim width proportional to
+                                // its full paragraph length, only to a
+                                // "line" of it — capped low enough that it
+                                // can't crowd every short column down to
+                                // its bare floor at typical column counts
+    var WIDTH_SAMPLE_ROWS = 30;
+
+    function applyContentBasedWidths(ths, rows) {
+        var weights = ths.map(function (th, idx) {
+            var headerLen = textOf(th).length;
+            var maxCellLen = 0;
+            var sampleCount = Math.min(rows.length, WIDTH_SAMPLE_ROWS);
+            for (var r = 0; r < sampleCount; r++) {
+                var cell = cellsOf(rows[r])[idx];
+                if (!cell) continue;
+                var len = textOf(cell).length;
+                if (len > maxCellLen) maxCellLen = len;
+            }
+            var effective = Math.max(headerLen, maxCellLen);
+            return Math.min(Math.max(effective, MIN_COL_WEIGHT), MAX_COL_WEIGHT);
+        });
+        var total = weights.reduce(function (a, b) { return a + b; }, 0);
+        if (!total) return;
+        ths.forEach(function (th, idx) {
+            th.style.width = ((weights[idx] / total) * 100).toFixed(2) + '%';
+        });
+    }
+
     function buildSortIcon() {
         var span = document.createElement('span');
         span.className = 'ig-sort-icon';
@@ -144,6 +194,8 @@
         var colMeta = ths.map(function (th, idx) {
             return classify(idx, textOf(th), rows);
         });
+
+        applyContentBasedWidths(ths, rows);
 
         // --- sort wiring -------------------------------------------------
         var currentSort = { index: -1, dir: 'none' };
@@ -228,109 +280,13 @@
 
         table.__igOriginalOrder = dataRows(tbody).slice();
 
-        // --- filter row ----------------------------------------------------
-        var filterRow = document.createElement('tr');
-        filterRow.className = 'ig-filter-row';
-        var filterInputs = [];
-
-        ths.forEach(function (th, index) {
-            var td = document.createElement('th');
-            td.className = 'ig-filter-cell';
-            var meta = colMeta[index];
-            if (meta) {
-                if (meta.type === 'select') {
-                    var select = document.createElement('select');
-                    select.className = 'form-select form-select-sm ig-filter-input';
-                    select.setAttribute('aria-label', 'Filter ' + textOf(th));
-                    var optAll = document.createElement('option');
-                    optAll.value = '';
-                    optAll.textContent = 'All';
-                    select.appendChild(optAll);
-                    meta.options.forEach(function (val) {
-                        var opt = document.createElement('option');
-                        opt.value = val;
-                        opt.textContent = val;
-                        select.appendChild(opt);
-                    });
-                    select.addEventListener('change', reapplyFilters);
-                    td.appendChild(select);
-                    filterInputs.push({
-                        index: index,
-                        get: function () { return select.value; },
-                        matches: function (cellText, val) { return val === '' || cellText === val; }
-                    });
-                } else if (meta.type === 'date') {
-                    var dateInput = document.createElement('input');
-                    dateInput.type = 'date';
-                    dateInput.className = 'form-control form-control-sm ig-filter-input';
-                    dateInput.setAttribute('aria-label', 'Filter ' + textOf(th));
-                    dateInput.addEventListener('change', reapplyFilters);
-                    td.appendChild(dateInput);
-                    filterInputs.push({
-                        index: index,
-                        get: function () { return dateInput.value; },
-                        matches: function (cellText, val) {
-                            if (!val) return true;
-                            var t = parseDateLoose(cellText);
-                            if (isNaN(t)) return false;
-                            var cellDay = new Date(t);
-                            var iso = cellDay.getFullYear() + '-' +
-                                String(cellDay.getMonth() + 1).padStart(2, '0') + '-' +
-                                String(cellDay.getDate()).padStart(2, '0');
-                            return iso === val;
-                        }
-                    });
-                } else if (meta.type === 'numeric') {
-                    var wrap = document.createElement('div');
-                    wrap.className = 'ig-filter-range';
-                    var min = document.createElement('input');
-                    min.type = 'number';
-                    min.placeholder = 'Min';
-                    min.className = 'form-control form-control-sm ig-filter-input';
-                    var max = document.createElement('input');
-                    max.type = 'number';
-                    max.placeholder = 'Max';
-                    max.className = 'form-control form-control-sm ig-filter-input';
-                    min.addEventListener('input', reapplyFilters);
-                    max.addEventListener('input', reapplyFilters);
-                    wrap.appendChild(min);
-                    wrap.appendChild(max);
-                    td.appendChild(wrap);
-                    filterInputs.push({
-                        index: index,
-                        get: function () { return { min: min.value, max: max.value }; },
-                        matches: function (cellText, val) {
-                            var n = parseFloat(cellText);
-                            if (isNaN(n)) return false;
-                            if (val.min !== '' && n < parseFloat(val.min)) return false;
-                            if (val.max !== '' && n > parseFloat(val.max)) return false;
-                            return true;
-                        }
-                    });
-                } else {
-                    var input = document.createElement('input');
-                    input.type = 'text';
-                    input.placeholder = 'Search…';
-                    input.className = 'form-control form-control-sm ig-filter-input';
-                    input.setAttribute('aria-label', 'Filter ' + textOf(th));
-                    input.addEventListener('input', reapplyFilters);
-                    td.appendChild(input);
-                    filterInputs.push({
-                        index: index,
-                        get: function () { return input.value.trim().toLowerCase(); },
-                        matches: function (cellText, val) {
-                            return val === '' || cellText.toLowerCase().indexOf(val) !== -1;
-                        }
-                    });
-                }
-            }
-            filterRow.appendChild(td);
-        });
-        thead.appendChild(filterRow);
-
-        // --- global per-table search ---------------------------------------
-        var toolbar = document.createElement('div');
-        toolbar.className = 'ig-table-search-wrap mb-2';
+        // --- global per-table search -----------------------------------
+        // (Per-column Min/Max/Search filter boxes used to be auto-generated
+        // here as an extra <thead> row — removed per design feedback: they
+        // duplicated the single search box below, cluttered the header, and
+        // their own min-widths were part of what made wide tables crowd
+        // their columns. The table now relies solely on this one search box
+        // plus the sortable headers above.)
         var searchWrap = document.createElement('div');
         searchWrap.className = 'ig-table-search';
         var searchIcon = document.createElement('i');
@@ -343,10 +299,25 @@
         searchInput.addEventListener('input', reapplyFilters);
         searchWrap.appendChild(searchIcon);
         searchWrap.appendChild(searchInput);
-        toolbar.appendChild(searchWrap);
 
-        var anchor = table.closest('.table-responsive') || table;
-        anchor.parentNode.insertBefore(toolbar, anchor);
+        // Prefer dropping the search box into the panel's own upper
+        // action-icon bar (filter/refresh/delete/+New, etc.) so it reads as
+        // one of the table's main controls instead of a second, separate
+        // search row floating above the table. Pages that don't have that
+        // toolbar (yet) keep the previous placement — search box on its own
+        // row, right above the table — so nothing regresses there.
+        var panel = table.closest('.ig-panel, .bgwhite2, .busines_details') || table.parentElement;
+        var actionsBar = panel ? panel.querySelector('.ig-toolbar-actions') : null;
+        if (actionsBar) {
+            searchWrap.classList.add('ig-table-search-inline');
+            actionsBar.insertBefore(searchWrap, actionsBar.firstChild);
+        } else {
+            var toolbar = document.createElement('div');
+            toolbar.className = 'ig-table-search-wrap mb-2';
+            toolbar.appendChild(searchWrap);
+            var anchor = table.closest('.table-responsive') || table;
+            anchor.parentNode.insertBefore(toolbar, anchor);
+        }
 
         var noMatchRow = null;
         function ensureNoMatchRow(colCount) {
@@ -367,15 +338,8 @@
             var rows = dataRows(tbody);
             var visibleCount = 0;
             rows.forEach(function (tr) {
-                var cells = cellsOf(tr);
                 var rowText = textOf(tr).toLowerCase();
-                var matchesGlobal = globalTerm === '' || rowText.indexOf(globalTerm) !== -1;
-                var matchesAllCols = filterInputs.every(function (f) {
-                    var cell = cells[f.index];
-                    var cellText = cell ? textOf(cell) : '';
-                    return f.matches(cellText, f.get());
-                });
-                var visible = matchesGlobal && matchesAllCols;
+                var visible = globalTerm === '' || rowText.indexOf(globalTerm) !== -1;
                 tr.classList.toggle('ig-row-hidden', !visible);
                 tr.style.display = visible ? '' : 'none';
                 if (visible) visibleCount++;
@@ -395,12 +359,136 @@
         for (var i = 0; i < tables.length; i++) initTable(tables[i]);
     }
 
+    // ------------------------------------------------------------------
+    // Responsive card mode — runs on every .ig-table (not just the ones
+    // opted into sort/filter/search above), since every table needs to be
+    // usable below 768px, where style.css turns each row into a labelled
+    // card instead of letting it scroll sideways.
+    //
+    //   1. Copies each column's own header text onto that column's <td> as
+    //      data-label, which the card-mode CSS reads via ::before —
+    //      generated once here rather than hand-written per template, so
+    //      it can never drift out of sync with a header that gets renamed.
+    //   2. For rows with more than 7 columns, marks the extra middle ones
+    //      .ig-card-extra (collapsed by default in card mode only) and adds
+    //      a "Show N more" toggle, so a 12-column ticket row doesn't turn
+    //      into a wall of text on a phone. The first column (identity/
+    //      selection) and the last (almost always Actions) are never
+    //      collapsed. Desktop/tablet table view is completely unaffected —
+    //      .ig-card-extra has no styling outside the <768px breakpoint.
+    // ------------------------------------------------------------------
+    var CARD_VISIBLE_COUNT = 6;
+
+    function applyResponsiveCards(table) {
+        if (table.__igCardInit) return;
+        table.__igCardInit = true;
+
+        var thead = table.querySelector('thead');
+        var tbody = table.querySelector('tbody');
+        if (!thead || !tbody) return;
+        var headerRow = thead.querySelector('tr');
+        if (!headerRow) return;
+
+        var headerCells = [];
+        for (var i = 0; i < headerRow.children.length; i++) {
+            var c = headerRow.children[i];
+            if (c.tagName === 'TH' || c.tagName === 'TD') headerCells.push(c);
+        }
+        var labels = headerCells.map(function (th) { return textOf(th); });
+
+        dataRows(tbody).forEach(function (tr) {
+            var cells = cellsOf(tr);
+            // A single colspan'd cell is a placeholder (empty state / "no
+            // matching rows"), not real column data — leave it alone.
+            if (cells.length === 1 && cells[0].hasAttribute('colspan')) return;
+
+            var extraCells = [];
+            cells.forEach(function (cell, idx) {
+                if (cell.hasAttribute('colspan')) return;
+                if (labels[idx]) cell.setAttribute('data-label', labels[idx]);
+                var isLast = (idx === cells.length - 1);
+                if (idx >= CARD_VISIBLE_COUNT && !isLast) {
+                    cell.classList.add('ig-card-extra');
+                    extraCells.push(cell);
+                }
+            });
+
+            if (extraCells.length > 0 && !tr.querySelector('.ig-card-more-cell')) {
+                var moreCell = document.createElement('td');
+                moreCell.className = 'ig-card-more-cell';
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'ig-card-more-btn';
+                btn.setAttribute('aria-expanded', 'false');
+                var moreLabel = 'Show ' + extraCells.length + ' more';
+                btn.innerHTML = '<i class="bi bi-chevron-down" aria-hidden="true"></i> ' + moreLabel;
+                btn.addEventListener('click', function () {
+                    var expanded = tr.classList.toggle('ig-card-expanded');
+                    btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+                    btn.innerHTML = expanded
+                        ? '<i class="bi bi-chevron-up" aria-hidden="true"></i> Show less'
+                        : '<i class="bi bi-chevron-down" aria-hidden="true"></i> ' + moreLabel;
+                });
+                moreCell.appendChild(btn);
+                tr.insertBefore(moreCell, extraCells[0]);
+            }
+        });
+    }
+
+    function initAllCards() {
+        var tables = document.querySelectorAll('table.ig-table');
+        for (var i = 0; i < tables.length; i++) applyResponsiveCards(tables[i]);
+    }
+
+    // ------------------------------------------------------------------
+    // Bulk-selection indicator — purely additive visual feedback for the
+    // existing "check rows, then click delete" pattern already used by
+    // several tables (leadsList, socialticket, socialpost, global search).
+    // This never touches the existing delete logic/endpoints — it only
+    // reads checkbox state and shows a count on the delete button that's
+    // already there, scoped to that specific table+button pair by DOM
+    // proximity so two tables on the same page can never cross-count.
+    // ------------------------------------------------------------------
+    function initBulkSelectionIndicators() {
+        var tables = document.querySelectorAll('table.ig-table');
+        tables.forEach(function (table) {
+            var boxes = table.querySelectorAll('.deleteCheck');
+            if (!boxes.length) return;
+            var panel = table.closest('.ig-panel, .bgwhite2, .busines_details') || table.parentElement;
+            if (!panel) return;
+            var deleteBtn = panel.querySelector('.ig-icon-btn-danger, #deleteBtn');
+            if (!deleteBtn || deleteBtn.querySelector('.ig-selected-count')) return;
+
+            var badge = document.createElement('span');
+            badge.className = 'ig-selected-count';
+            deleteBtn.appendChild(badge);
+
+            function refresh() {
+                var count = 0;
+                boxes.forEach(function (b) { if (b.checked) count++; });
+                badge.textContent = count > 0 ? String(count) : '';
+                deleteBtn.classList.toggle('ig-has-selection', count > 0);
+            }
+            boxes.forEach(function (b) { b.addEventListener('change', refresh); });
+            refresh();
+        });
+    }
+
+    function initAllResponsive() {
+        initAllCards();
+        initBulkSelectionIndicators();
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initAll);
+        document.addEventListener('DOMContentLoaded', function () {
+            initAll();
+            initAllResponsive();
+        });
     } else {
         initAll();
+        initAllResponsive();
     }
 
     // expose for manual re-init if a page swaps table content via its own JS
-    window.igTableTools = { init: initAll, initTable: initTable };
+    window.igTableTools = { init: initAll, initTable: initTable, initResponsive: initAllResponsive };
 })();

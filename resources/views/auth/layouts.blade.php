@@ -55,7 +55,7 @@ $roleInfo = \App\Models\Role::find($loggedUser->role);
                 <form class="me-auto postioninner d-flex {{ addUIComponent('GLOBALSEARCH') }}" action="/globalSearch" method="GET">
                     <input class="form-control formsearch  me-2" type="search" minlength="4" name="search"
                         value="{{request()->get('search')}}" placeholder="Search" aria-label="Search" required>
-                    <button class="btn btn-secondary btnhoverser"><i class="bi bi-search"></i></button>
+                    <button class="btn btn-secondary btnhoverser" tabindex="-1" aria-hidden="true"><i class="bi bi-search"></i></button>
                     <select name="type" id="type" class="form-select innerinput" style="width: 92px;">
                         <option value="ALL" {{request()->get('type') && request()->get('type')=='ALL'?'selected':''}}>
                             All</option>
