@@ -258,4 +258,6 @@ Route::controller(TicketResponseController::class)->group(function() {
 
     Route::post('/createSapTicket/{id}', 'createSapTicket')->name('createSapTicket');
     Route::get('/{id}/getSapTicketStatus', 'getSapTicketStatus')->name('getSapTicketStatus');
+    Route::post('/createSalesforceCase/{id}', 'createSalesforceCase')->name('createSalesforceCase');
+    Route::get('/{id}/getSalesforceCaseStatus', 'getSalesforceCaseStatus')->name('getSalesforceCaseStatus');
 });

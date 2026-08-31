@@ -13,6 +13,8 @@ use App\Models\Favourite;
 use App\Models\Defaults;
 use App\Models\TweetReply;
 use App\Models\TicketSapGroups;
+use App\Models\SalesforceCase;
+use App\Services\SalesforceService;
 use Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
@@ -293,29 +295,33 @@ class SocialTicketController extends Controller
 
     public function editTicket(Request $request,$id)
     {
-    try {
-        $getSocialUser = GetTweet::orderby('id','desc');
-			$modal=false;
-			if($request->user){
-			    $getSocialUser = $getSocialUser->where('socialUser_name','like','%'.$request->user.'%');  
-				$modal=true;
-			}
-			if($request->assignedto){
-			    $getSocialUser = $getSocialUser->where('assignedto','like','%'.$request->assignedto.'%');  
-				$modal=true;
-			}
-			if($request->page){
-				$modal=true;
-			}
-			$getSocialUser = $getSocialUser->paginate(getValueByKey('PAGENATION_COUNT'));
-            $getUser = User::where('role', '!=', '2')->get();
-        $getSocialTicket = SocialTicket::where('id', $id)->first();
-        $attacheddata=ProjectAttachment::where('attachment_id',$getSocialTicket->getTweet_id)->get();
-        return \View::make('post.edit_social_ticket', compact(['getSocialTicket','getUser','getSocialUser','id','modal','attacheddata']));
-       } catch(Exception $e) {
-        Log::debug($e->getMessage());
-        return redirect()->back()->with('message', $e->getMessage());
-      }
+        try {
+            $getSocialUser = GetTweet::orderby('id','desc');
+                $modal=false;
+                if($request->user){
+                    $getSocialUser = $getSocialUser->where('socialUser_name','like','%'.$request->user.'%');  
+                    $modal=true;
+                }
+                if($request->assignedto){
+                    $getSocialUser = $getSocialUser->where('assignedto','like','%'.$request->assignedto.'%');  
+                    $modal=true;
+                }
+                if($request->page){
+                    $modal=true;
+                }
+                $getSocialUser = $getSocialUser->paginate(getValueByKey('PAGENATION_COUNT'));
+                $getUser = User::where('role', '!=', '2')->get();
+                $getSocialTicket = SocialTicket::where('id', $id)->first();
+                $salesforceCase = \App\Models\SalesforceCase::where(
+                    'ticket_id',
+                    $id
+                )->latest()->first();
+            $attacheddata=ProjectAttachment::where('attachment_id',$getSocialTicket->getTweet_id)->get();
+            return \View::make('post.edit_social_ticket', compact(['getSocialTicket','getUser','getSocialUser','id','modal','attacheddata','salesforceCase']));
+        } catch(Exception $e) {
+            Log::debug($e->getMessage());
+            return redirect()->back()->with('message', $e->getMessage());
+        }
     }   
 
     public function updateTicket(Request $request,$id)
@@ -325,7 +331,6 @@ class SocialTicketController extends Controller
             $old=SocialTicket::find($id);
             $response=SocialTicket::find($id);
             if($request->hasFile('media')){
-                log:info("hello media");
 				$files = $request->file('media');
 				$res = uploadFileDocuments($files,'projectAttachments');
 				$uploadDateTime = Carbon::now();
@@ -381,8 +386,8 @@ class SocialTicketController extends Controller
                      'postMessage' => $replyMessage,
                    ];
                    $request = new Request($requestData);
-                   $id=$old->getTweet_id;
-                   $result = app('App\Http\Controllers\TweetController')->replyTweetId($request,$id);
+                   $tweetId = $old->getTweet_id;
+                   $result = app('App\Http\Controllers\TweetController')->replyTweetId($request,$tweetId);
                 }
               }else{
                 
@@ -390,16 +395,34 @@ class SocialTicketController extends Controller
               }
 			
 			$response->update($requestInfo);
-			$changes = $response->getChanges();
-			createLog($old,$changes,'ticket');
-            adminChange($old,$changes,'tb_socialticket','update');
-            DB::commit();
-             return redirect()->route('getSocialTicket')->with('success','Ticket Updated');
-       } catch(Exception $e) {
-           DB::rollback();
-           return redirect()->back()->with('message',$e->getMessage());
-       }
-        
+
+            /*
+            |--------------------------------------------------------------------------
+            | Existing CRM Logs
+            |--------------------------------------------------------------------------
+            */
+
+            $changes = $response->getChanges();
+
+            createLog($old,$changes,'ticket');
+
+            adminChange(
+                $old,
+                $changes,
+                'tb_socialticket',
+                'update'
+            );
+
+        DB::commit();
+
+        return redirect()
+            ->route('getSocialTicket')
+            ->with('success','Ticket Updated');
+        } catch(Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('message',$e->getMessage());
+        }
+                
     } 
 
 	public function getSocialTicketById(Request $request,$id)
@@ -424,10 +447,11 @@ class SocialTicketController extends Controller
             ->orderBy('message_time', 'desc')
             ->get();
             $saptickets = TicketSapGroups::where('ticket_id',$id)->get();
+            $salesforceCases = SalesforceCase::where('ticket_id', $id)->get();
 		} catch(Exception $e) {
 			return redirect()->back()->with('message',$e->getMessage());
         }
-        return \View::make('post.socialpost_inner', compact(['reply','getsocial','getActivity','getSocialLog','getFavourite','attacheddata','dmData','saptickets']));
+        return \View::make('post.socialpost_inner', compact(['reply','getsocial','getActivity','getSocialLog','getFavourite','attacheddata','dmData','saptickets', 'salesforceCases']));
     }
 
     public function deleteTicket($id)
@@ -499,22 +523,30 @@ class SocialTicketController extends Controller
         }
        return redirect()->back()->with('message','Deleted');
     }
-	public function updateTicketBtText(Request $request,$postId)
+
+
+    public function updateTicketBtText(Request $request,$postId)
     {
-		try{
-			$post = SocialTicket::find($postId);
+        try{
+            $post = SocialTicket::find($postId);
             $old=SocialTicket::find($postId);
-			$post->update(array_merge($request->all(), ['internalUpdate' => $request->internalUpdate?$request->internalUpdate:0]));		
+
+            $post->update(array_merge(
+                $request->all(),
+                ['internalUpdate' => $request->internalUpdate?$request->internalUpdate:0]
+            ));
+
             $changes = $post->getChanges();
             adminChange($old,$changes,'tb_socialticket','update');
-			
-		} catch(Exception $e) {
-			return redirect()->back()->with('message',$e->getMessage());
+
+        } catch(Exception $e) {
+            return redirect()->back()->with('message',$e->getMessage());
         }
-       return redirect()->back()->with('success','Ticket updated');
+
+        return redirect()->back()->with('success','Ticket updated');
     }
-	
-	public function markDuplicate(Request $request,$id)
+
+    public function markDuplicate(Request $request,$id)
     {
         DB::beginTransaction();
         try{

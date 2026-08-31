@@ -75,7 +75,19 @@
                                                     <i class="bi bi-view-stacked"></i> Sap Ticket Create
                                                 </a>
                                             </li>
-                                            @endif        
+                                            @endif      
+                                            
+                                            @if($getsocial->assigned_to != null && count($salesforceCases) == 0)
+                                            <li>
+                                                <a class="dropdown-item"
+                                                href="#"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#salesforceTicketModal">
+                                                    <i class="bi bi-cloud"></i> Salesforce Case Create
+                                                </a>
+                                            </li>
+                                            @endif
+                                            
                                         </ul>
                                     </div>
 
@@ -196,7 +208,7 @@
                                                         <div class="col-md-12 {{ addUIComponent('SOCIALTICKET_SAP_TICKET_STATUS') }}">
                                                             <div class="row">
                                                                 <label class="form-label">CRM Status</label>
-                                                                <div class="d-flex">
+                                                                <div class="d-flex" style="display: none !important;">
                                                                     @if(count($saptickets) > 0)
                                                                         @foreach($saptickets as $sapticket)
                                                                             <a href="#" 
@@ -210,6 +222,31 @@
                                                                     @else
                                                                         <span>NA</span>
                                                                     @endif
+                                                                </div>
+
+                                                               <div class="d-flex">
+                                                                    @if(count($salesforceCases) > 0)
+
+                                                                        @foreach($salesforceCases as $salesforceCase)
+
+                                                                            <a href="#"
+                                                                            class="me-2"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#salesforceCaseStatusModal"
+                                                                            data-salesforce-case-id="{{ $salesforceCase->salesforce_case_id }}">
+
+                                                                                {{ $salesforceCase->case_number ?? $salesforceCase->salesforce_case_id }}
+
+                                                                            </a>
+
+                                                                        @endforeach
+
+                                                                    @else
+
+                                                                        <span>NA</span>
+
+                                                                    @endif
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -713,7 +750,301 @@
             </div>
     </div>
 </div>
-            
+
+    
+<!-- Salesforce Create Case Modal -->
+<div class="modal fade" id="salesforceTicketModal" tabindex="-1"
+     aria-labelledby="salesforceTicketModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <form id="salesforceTicketForm"
+              action="/createSalesforceCase/{{$getsocial->id}}"
+              method="POST">
+
+            @csrf
+
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: #ffd525;">
+                    <h5 class="modal-title" id="salesforceTicketModalLabel">
+                        Create Salesforce Case
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <!-- Case Type -->
+                    <div class="mb-3">
+                        <label class="form-label">Case Type</label>
+
+                        <select class="form-select"
+                                name="case_type"
+                                id="salesforceCaseType"
+                                required>
+
+                            <option value="">Select Case Type</option>
+
+                            <option value="domestic">
+                                Domestic Ticket
+                            </option>
+
+                            <option value="ic">
+                                I&C Ticket
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <!-- Ticket Group -->
+                    <div class="mb-3">
+                        <label class="form-label">Ticket Group</label>
+
+                        <select class="form-select" name="ticket_group" id="ticket_group" required>
+                            <option value="">Select Ticket Group</option>
+
+                            <option value="Enquiry Query">Enquiry Query</option>
+                            <option value="Enquiry Non-Query">Enquiry Service Ticket</option>
+
+                            <option value="Customer Query">Customer Query</option>
+                            <option value="Customer Non-Query">Customer Service Ticket</option>
+
+                            <option value="Non-Registered Customer Query">
+                                Non-Registered Customer Query
+                            </option>
+
+                            <option value="Non-Registered Customer Non-Query">
+                                Non-Registered Customer Service Ticket
+                            </option>
+                        </select>
+                    </div>
+
+
+                    <!-- Ticket Type -->
+                    <div class="mb-3">
+                        <label class="form-label">Ticket Type</label>
+
+                        <select class="form-select" name="ticket_type" id="ticket_type" required disabled>
+                            <option value="">Select Ticket Type</option>
+                        </select>
+                    </div>
+
+
+                    <!-- Ticket Category -->
+                    <div class="mb-3">
+                        <label class="form-label">Ticket Category</label>
+
+                        <select class="form-select"
+                                name="ticket_category"
+                                id="ticket_category"
+                                required
+                                disabled>
+
+                            <option value="">Select Category</option>
+                        </select>
+                    </div>
+
+                    <!-- Subject -->
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+
+                        <input type="text"
+                               class="form-control"
+                               name="subject"
+                               value="{{ $getsocial->postMessage }}"
+                               required>
+                    </div>
+
+                    <!-- Comments -->
+                    <div class="mb-3">
+                        <label class="form-label">Comments</label>
+
+                        <textarea class="form-control"
+                                  name="comments"
+                                  rows="3">{{ $getsocial->description }}</textarea>
+                    </div>
+
+                    <!-- Origin -->
+                    <div class="mb-3">
+                        <label class="form-label">Origin</label>
+
+                        <select class="form-select"
+                                name="origin"
+                                required>
+
+                            <option value="Call Center">Call Center</option>
+                            <option value="Web">Web</option>
+                            <option value="Mobile App">Mobile App</option>
+                            <option value="Email">Email</option>
+
+                        </select>
+                    </div>
+
+                    <hr>
+
+                    <!-- Customer Type -->
+                    <div class="mb-3">
+                        <label class="form-label">Customer Type</label>
+
+                        <select class="form-select"
+                                name="customer_type"
+                                id="salesforceCustomerType"
+                                required>
+
+                            <option value="">Select Customer Type</option>
+
+                            <option value="registered">
+                                Registered Customer
+                            </option>
+
+                            <option value="unregistered">
+                                Unregistered Customer
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <!-- Registered Customer -->
+                    <div class="mb-3"
+                         id="salesforceAccountContainer"
+                         style="display:none;">
+
+                        <label class="form-label">Account ID</label>
+
+                        <input type="text"
+                               class="form-control"
+                               name="account_id"
+                               placeholder="Salesforce Account ID">
+                    </div>
+
+                    <!-- Unregistered Customer -->
+                    <div id="salesforceUnregisteredContainer"
+                         style="display:none;">
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Customer Name
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   name="customer_name"
+                                   value="{{ $getsocial->socialUser }}">
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Mobile Number
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   name="mobile">
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Address Master
+                            </label>
+
+                            <select class="form-select"
+                                    name="address_master_id">
+
+                                <option value="">
+                                    Select Address
+                                </option>
+
+                                @foreach(\App\Models\SalesforceAddressMaster::orderBy('name')->get() as $address)
+
+                                    <option value="{{ $address->salesforce_id }}">
+
+                                        {{ $address->name }}
+                                        -
+                                        {{ $address->area }}
+                                        -
+                                        {{ $address->city }}
+                                        -
+                                        {{ $address->pincode }}
+
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Create Salesforce Case
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- Salesforce Case Status Modal -->
+<div class="modal fade" id="salesforceCaseStatusModal" tabindex="-1"
+     aria-labelledby="salesforceCaseStatusModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="salesforceCaseStatusModalLabel">
+                    Salesforce Case Status
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div id="salesforceCaseStatusContent">
+                    Loading...
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
             <script>
 			$("#ticket").addClass("active");
             function openNav() {
@@ -846,5 +1177,366 @@
                 });
         });
     });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const ticketGroup = document.getElementById('ticket_group');
+    const ticketType = document.getElementById('ticket_type');
+    const ticketCategory = document.getElementById('ticket_category');
+
+
+    /*
+     * Salesforce dependent picklist mapping
+     *
+     * Group:
+     * 0 = Enquiry Query
+     * 1 = Enquiry Non-Query
+     * 2 = Customer Query
+     * 3 = Customer Non-Query
+     * 4 = Non-Registered Customer Query
+     * 5 = Non-Registered Customer Non-Query
+     */
+
+    const groupIndex = {
+        "Enquiry Query": 0,
+        "Enquiry Non-Query": 1,
+        "Customer Query": 2,
+        "Customer Non-Query": 3,
+        "Non-Registered Customer Query": 4,
+        "Non-Registered Customer Non-Query": 5
+    };
+
+
+    /*
+     * Ticket Type -> Salesforce validFor Group indexes
+     */
+
+    const ticketTypes = [
+        {
+            value: "Modification/Shifting",
+            validFor: [3]
+        },
+        {
+            value: "EMI",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "General Info",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "App / Web Login Related",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "Billing & Consumption",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "E-Bill Required",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "Estimated Bills",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "Final Bill & NOC",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "KYC / Ownership / NAC",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "Meter Reading",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "Payment",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "Security Deposit",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "Service Request Procedure & Charges",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "New Connection Request Procedure",
+            validFor: [0, 2, 4]
+        },
+        {
+            value: "Leakage",
+            validFor: [3, 5]
+        },
+        {
+            value: "No Gas",
+            validFor: [3]
+        },
+        {
+            value: "Meter Not Working",
+            validFor: [3]
+        },
+        {
+            value: "Refund",
+            validFor: [3, 5]
+        },
+        {
+            value: "Arrears in Billing",
+            validFor: [3]
+        },
+        {
+            value: "Meter Not Available on Site",
+            validFor: [3]
+        },
+        {
+            value: "Temporary Disconnection",
+            validFor: [3]
+        },
+        {
+            value: "Permanent Disconnection",
+            validFor: [3]
+        },
+        {
+            value: "Low Line Pressure",
+            validFor: [3]
+        },
+        {
+            value: "BP Master Data Correction",
+            validFor: [3]
+        },
+        {
+            value: "EVC Not Working",
+            validFor: [3]
+        },
+        {
+            value: "Meter Not Found",
+            validFor: [3]
+        },
+        {
+            value: "Restoration",
+            validFor: [3]
+        },
+        {
+            value: "Defaulter Restoration",
+            validFor: [1, 3, 5]
+        },
+        {
+            value: "IT",
+            validFor: [1, 3, 5]
+        },
+        {
+            value: "Billing Errors",
+            validFor: [1, 3, 5]
+        },
+        {
+            value: "Service Quality",
+            validFor: [1, 3, 5]
+        }
+    ];
+
+
+    /*
+     * Ticket Type -> Ticket Category
+     */
+
+    const categoryMap = {
+
+        "Modification/Shifting": ["Service Request"],
+
+        "EMI": ["Query"],
+        "General Info": ["Query"],
+        "App / Web Login Related": ["Query"],
+        "Billing & Consumption": ["Query"],
+        "E-Bill Required": ["Query"],
+        "Estimated Bills": ["Query"],
+        "Final Bill & NOC": ["Query"],
+        "KYC / Ownership / NAC": ["Query"],
+        "Meter Reading": ["Query"],
+        "Payment": ["Query"],
+        "Security Deposit": ["Query"],
+        "Service Request Procedure & Charges": ["Query"],
+        "New Connection Request Procedure": ["Query"],
+
+        "Leakage": ["Emergency"],
+        "No Gas": ["Emergency"],
+
+        "Meter Not Working": ["Complaint"],
+        "Arrears in Billing": ["Complaint"],
+        "Low Line Pressure": ["Complaint"],
+        "EVC Not Working": ["Complaint"],
+        "Meter Not Found": ["Complaint"],
+
+        "Refund": ["Service Request"],
+        "Temporary Disconnection": ["Service Request"],
+        "Permanent Disconnection": ["Service Request"],
+        "BP Master Data Correction": ["Service Request"],
+        "Restoration": ["Service Request"],
+        "Defaulter Restoration": ["Service Request"],
+
+        "Meter Not Available on Site": ["Internal"],
+        "IT": ["Internal"],
+        "Billing Errors": ["Internal"],
+        "Service Quality": ["Internal"]
+    };
+
+
+    /*
+     * When Ticket Group changes
+     */
+
+    ticketGroup.addEventListener('change', function () {
+
+        const selectedGroup = this.value;
+
+        ticketType.innerHTML =
+            '<option value="">Select Ticket Type</option>';
+
+        ticketCategory.innerHTML =
+            '<option value="">Select Category</option>';
+
+        ticketCategory.disabled = true;
+
+        if (!selectedGroup) {
+            ticketType.disabled = true;
+            return;
+        }
+
+        const selectedIndex = groupIndex[selectedGroup];
+
+        ticketTypes.forEach(function (type) {
+
+            if (type.validFor.includes(selectedIndex)) {
+
+                const option = document.createElement('option');
+
+                option.value = type.value;
+                option.textContent = type.value;
+
+                ticketType.appendChild(option);
+            }
+        });
+
+        ticketType.disabled = false;
+    });
+
+
+    /*
+     * When Ticket Type changes
+     */
+
+    ticketType.addEventListener('change', function () {
+
+        const selectedType = this.value;
+
+        ticketCategory.innerHTML =
+            '<option value="">Select Category</option>';
+
+        if (!selectedType) {
+            ticketCategory.disabled = true;
+            return;
+        }
+
+        const categories = categoryMap[selectedType] || [];
+
+        categories.forEach(function (category) {
+
+            const option = document.createElement('option');
+
+            option.value = category;
+            option.textContent = category;
+
+            ticketCategory.appendChild(option);
+        });
+
+        ticketCategory.disabled = categories.length === 0;
+    });
+
+});
+</script>
+
+<script>
+$(document).ready(function () {
+
+    $('#salesforceCustomerType').change(function () {
+
+        var customerType = $(this).val();
+
+        if (customerType === 'registered') {
+
+            $('#salesforceAccountContainer').show();
+            $('#salesforceUnregisteredContainer').hide();
+
+        } else if (customerType === 'unregistered') {
+
+            $('#salesforceAccountContainer').hide();
+            $('#salesforceUnregisteredContainer').show();
+
+        } else {
+
+            $('#salesforceAccountContainer').hide();
+            $('#salesforceUnregisteredContainer').hide();
+
+        }
+
+    });
+
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    var salesforceModal =
+        document.getElementById('salesforceCaseStatusModal');
+
+    if (!salesforceModal) {
+        return;
+    }
+
+    salesforceModal.addEventListener('show.bs.modal', function (event) {
+
+        var button = event.relatedTarget;
+
+        var salesforceCaseId =
+            button.getAttribute('data-salesforce-case-id');
+
+        var contentDiv =
+            salesforceModal.querySelector('#salesforceCaseStatusContent');
+
+        contentDiv.innerHTML = 'Loading...';
+
+        fetch('/' + salesforceCaseId + '/getSalesforceCaseStatus')
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error('Failed to load Salesforce Case status');
+                }
+
+                return response.text();
+            })
+            .then(data => {
+
+                contentDiv.innerHTML = data;
+
+            })
+            .catch(error => {
+
+                contentDiv.innerHTML =
+                    '<div class="alert alert-danger">' +
+                    'Error loading Salesforce Case status' +
+                    '</div>';
+
+                console.error('Salesforce Error:', error);
+            });
+
+    });
+
+});
 </script>
   @endsection
