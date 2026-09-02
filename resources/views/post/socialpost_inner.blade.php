@@ -869,21 +869,6 @@
                                   rows="3">{{ $getsocial->description }}</textarea>
                     </div>
 
-                    <!-- Origin -->
-                    <div class="mb-3">
-                        <label class="form-label">Origin</label>
-
-                        <select class="form-select"
-                                name="origin"
-                                required>
-
-                            <option value="Call Center">Call Center</option>
-                            <option value="Web">Web</option>
-                            <option value="Mobile App">Mobile App</option>
-                            <option value="Email">Email</option>
-
-                        </select>
-                    </div>
 
                     <hr>
 

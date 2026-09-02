@@ -94,11 +94,13 @@ class TicketResponseController extends Controller
                 'IGL_Legacy_Case_Id__c' => (string) $ticket->id,
                 'Subject' => Str::limit($request->subject, 255, ''),
                 'Comments' => $request->comments,
-
-                'Origin' => $request->origin ?? 'Call Center',
+                'Origin' => 'SocialCRM',
                 'status' => $response['status'] ?? 'New',
             ];
-
+Log::info('Salesforce Case Origin Check', [
+    'ticket_id' => $ticket->id,
+    'origin' => $caseData['Origin'] ?? null,
+]);
             if ($request->customer_type === 'registered') {
 
                 $caseData['AccountId'] = $request->account_id;
