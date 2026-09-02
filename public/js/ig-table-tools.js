@@ -107,54 +107,28 @@
     }
 
     // ------------------------------------------------------------------
-    // Column widths — proportional to content, not an even split.
-    // table-layout:fixed (see the "Table responsiveness" block in
-    // style.css) takes column widths from this header row and never lets
-    // a column grow past that share again — that's what stops the table
-    // from overflowing sideways. Left with no explicit widths, a fixed
-    // table just splits evenly across however many columns are visible:
-    // technically overflow-free, but it makes a short column (Status,
-    // Action) exactly as wide as a long one (Post Message, Subject),
-    // which looks unbalanced and forces the long column's text to wrap
-    // constantly. This estimates each column's fair share from its own
-    // header label and a sample of its actual cell text, so a table whose
-    // visible columns change (see the "Choose Columns" modal) still gets
-    // sensible, non-overflowing proportions without per-page/per-column
-    // CSS that would go stale the moment columns are hidden or reordered.
+    // Column widths are NO LONGER set from JavaScript.
+    //
+    // This used to estimate each column's share from its header label and a
+    // sample of its cell text, then write an inline percentage width onto
+    // every <th>, because table-layout:fixed splits a table evenly and that
+    // looked unbalanced. The estimate was in "characters" clamped between
+    // MIN_COL_WEIGHT (14) and MAX_COL_WEIGHT (40). On the 12-column ticket
+    // table almost every column hit the 14 floor, so the split came out
+    // near-even anyway — and the identity column ("Num.", 4 characters of
+    // heading) was handed ~6% of the table, about 75px, to fit a checkbox,
+    // a gear button, a ticket number and a copy icon. That is the overlap
+    // that was reported, and the shredded "D E P A R T M E N T" headings
+    // came from the same source.
+    //
+    // The table is now table-layout:auto with nowrap headings (see the
+    // "Table responsiveness" block in style.css), so the browser derives
+    // real min/max-content widths from the actual rendered content — which
+    // it measures far more accurately than a character count ever could,
+    // and which automatically stays correct when the "Choose Columns" modal
+    // shows or hides columns. Writing inline widths here would override
+    // that and reintroduce the problem, so we deliberately do not.
     // ------------------------------------------------------------------
-    var MIN_COL_WEIGHT = 14;   // floor, in "characters" — keeps a short column
-                                // (Num., Status, Action, Department) wide
-                                // enough to fit its own header label on one
-                                // (or close to one) line, plus its sort icon
-    var MAX_COL_WEIGHT = 40;   // ceiling — a long free-text column (Post
-                                // Message) already wraps onto multiple lines,
-                                // so it shouldn't claim width proportional to
-                                // its full paragraph length, only to a
-                                // "line" of it — capped low enough that it
-                                // can't crowd every short column down to
-                                // its bare floor at typical column counts
-    var WIDTH_SAMPLE_ROWS = 30;
-
-    function applyContentBasedWidths(ths, rows) {
-        var weights = ths.map(function (th, idx) {
-            var headerLen = textOf(th).length;
-            var maxCellLen = 0;
-            var sampleCount = Math.min(rows.length, WIDTH_SAMPLE_ROWS);
-            for (var r = 0; r < sampleCount; r++) {
-                var cell = cellsOf(rows[r])[idx];
-                if (!cell) continue;
-                var len = textOf(cell).length;
-                if (len > maxCellLen) maxCellLen = len;
-            }
-            var effective = Math.max(headerLen, maxCellLen);
-            return Math.min(Math.max(effective, MIN_COL_WEIGHT), MAX_COL_WEIGHT);
-        });
-        var total = weights.reduce(function (a, b) { return a + b; }, 0);
-        if (!total) return;
-        ths.forEach(function (th, idx) {
-            th.style.width = ((weights[idx] / total) * 100).toFixed(2) + '%';
-        });
-    }
 
     function buildSortIcon() {
         var span = document.createElement('span');
@@ -194,8 +168,6 @@
         var colMeta = ths.map(function (th, idx) {
             return classify(idx, textOf(th), rows);
         });
-
-        applyContentBasedWidths(ths, rows);
 
         // --- sort wiring -------------------------------------------------
         var currentSort = { index: -1, dir: 'none' };
@@ -474,9 +446,247 @@
         });
     }
 
+    // ==================================================================
+    // Relative column widths  (data-ig-colweights)
+    //
+    // A table can ask for certain columns to be a MULTIPLE of the width
+    // they would naturally get, e.g.
+    //
+    //     <table data-ig-colweights="Subject:3, Status:2">
+    //
+    // meaning "make Subject three times, and Status twice, as wide as they
+    // currently come out". Every column not named keeps a factor of 1.
+    //
+    // Why measure instead of hard-coding percentages: the natural widths
+    // are negotiated by the browser from the real content (see the
+    // table-layout:auto note in style.css), and they legitimately differ
+    // per page, per data set and per viewport. Hard-coded percentages
+    // would be a snapshot of one machine on one day, and would go stale
+    // the moment the "Choose Columns" modal hides a column. So we let the
+    // browser lay the table out first, read the widths it chose, scale
+    // those, and normalise the result back into percentages.
+    //
+    // Percentages (not pixels) are what gets written, so the table still
+    // reflows with its container. table-layout stays `auto`, which matters
+    // for safety: under auto layout a specified width is a PREFERRED width
+    // that the browser will not honour below the column's min-content
+    // width. The identity column's nowrap contents therefore still set a
+    // hard floor, so no amount of widening a neighbour can squeeze the
+    // ticket number back underneath its gear icon.
+    // ------------------------------------------------------------------
+    function parseColWeights(raw) {
+        var map = {};
+        if (!raw) return map;
+        raw.split(',').forEach(function (pair) {
+            var idx = pair.lastIndexOf(':');
+            if (idx === -1) return;
+            var name = pair.slice(0, idx).trim().toLowerCase();
+            var val = parseFloat(pair.slice(idx + 1));
+            if (name && isFinite(val) && val > 0) map[name] = val;
+        });
+        return map;
+    }
+
+    function applyRelativeWidths(table) {
+        var weights = parseColWeights(table.getAttribute('data-ig-colweights'));
+        var names = Object.keys(weights);
+        if (!names.length) return;
+
+        // Below 768px style.css turns the table into stacked cards: the
+        // header row is clipped to 1px for screen readers and the cells are
+        // display:block, so column widths are meaningless and measuring them
+        // would poison the cached baseline. Clear and bail out.
+        if (window.innerWidth < 768) {
+            var hr = table.tHead && table.tHead.rows[0];
+            if (hr) Array.prototype.forEach.call(hr.cells, function (th) { th.style.width = ''; });
+            table.style.tableLayout = '';
+            table.style.width = '';
+            table.__igNaturalWidths = null;
+            return;
+        }
+
+        var headRow = table.tHead && table.tHead.rows[0];
+        if (!headRow) return;
+        var ths = Array.prototype.slice.call(headRow.cells);
+        if (ths.length < 2) return;
+
+        var wrap = table.closest ? table.closest('.table-responsive') : null;
+
+        // --- 1. Baseline -------------------------------------------------
+        // The widths the browser negotiates on its own, with table-layout
+        // auto and no widths of ours applied. Cached, because re-measuring
+        // after we have written widths back would compound the factors on
+        // every recalculation (3x, then 9x, then 27x...).
+        if (!table.__igNaturalWidths || table.__igNaturalWidths.length !== ths.length) {
+            table.style.tableLayout = 'auto';
+            table.style.width = '';
+            ths.forEach(function (th) { th.style.width = ''; });
+            // see .ig-measuring in style.css — makes the identity cell report
+            // its true one-line width instead of its collapsed shrunken one
+            table.classList.add('ig-measuring');
+            void table.offsetWidth;                 // force synchronous layout
+            table.__igNaturalWidths = ths.map(function (th) {
+                // Ceiling + 1px of headroom. The measured width is fractional,
+                // and the percentages written back are rounded, so a column
+                // scaled by exactly 1.0 could still land a sub-pixel short of
+                // what it measured — enough to bump the copy icon onto a
+                // second line in the identity cell. The headroom absorbs that.
+                return Math.ceil(th.getBoundingClientRect().width) + 1;
+            });
+            table.classList.remove('ig-measuring');
+        }
+        var natural = table.__igNaturalWidths;
+
+        // --- 2. Scale ----------------------------------------------------
+        var scaled = ths.map(function (th, i) {
+            var label = textOf(th).toLowerCase();
+            var factor = 1;
+            for (var k = 0; k < names.length; k++) {
+                if (label === names[k]) { factor = weights[names[k]]; break; }
+            }
+            return Math.max(natural[i] * factor, 1);
+        });
+        var total = scaled.reduce(function (a, b) { return a + b; }, 0);
+        if (!total) return;
+
+        // --- 3. Apply ----------------------------------------------------
+        // table-layout:FIXED here, deliberately, and only for tables that
+        // asked for weights. Under auto layout a specified width is merely a
+        // hint: the browser still sizes columns from their content, and when
+        // the table is already as narrow as its content allows there is no
+        // slack to redistribute — asking for "3x" produced about 1.03x.
+        // Fixed layout honours the widths we compute exactly.
+        //
+        // Widening columns beyond what the viewport holds necessarily makes
+        // the table wider than its container, so it scrolls sideways. That
+        // is the intended trade (and why the top scrollbar below exists),
+        // not a regression.
+        //
+        // Losing auto layout also loses its min-content floor, so overlap
+        // can no longer be prevented by the layout algorithm. It is instead
+        // prevented structurally: .ig-idcell is a WRAPPING flex row with
+        // flex:none children, and flex items cannot overlap each other —
+        // if a column is ever too narrow the ID drops to its own line
+        // intact rather than sliding under the gear icon.
+        var avail = wrap ? wrap.clientWidth : table.parentNode.clientWidth;
+        var finalWidth = Math.max(total, avail || 0);
+
+        table.style.tableLayout = 'fixed';
+        table.style.width = Math.round(finalWidth) + 'px';
+        ths.forEach(function (th, i) {
+            th.style.width = ((scaled[i] / total) * 100).toFixed(3) + '%';
+        });
+    }
+
+    function applyAllRelativeWidths() {
+        var tables = document.querySelectorAll('table[data-ig-colweights]');
+        for (var i = 0; i < tables.length; i++) applyRelativeWidths(tables[i]);
+    }
+
+    // ==================================================================
+    // Top horizontal scrollbar, synchronised with the table's own.
+    //
+    // A wide table scrolls sideways inside .table-responsive, but that
+    // scrollbar sits under the LAST row — on a 25-row page you have to
+    // scroll to the bottom of the page before you can scroll the table
+    // sideways. This adds a second, always-reachable scrollbar directly
+    // above the table.
+    //
+    // It is a real scroll container, not a fake one: an empty spacer div
+    // as wide as the table inside a strip as wide as the viewport gives
+    // the browser's own native scrollbar, so it inherits normal wheel,
+    // touch, keyboard and accessibility behaviour for free. The two
+    // containers then mirror each other's scrollLeft.
+    //
+    // Only scrollLeft is ever touched, so vertical page scrolling is
+    // untouched.
+    // ------------------------------------------------------------------
+    function initTopScrollbar(wrap) {
+        if (wrap.__igTopBar) return wrap.__igTopBar;
+
+        var bar = document.createElement('div');
+        bar.className = 'ig-scroll-top';
+        bar.setAttribute('aria-hidden', 'true');   // duplicate control; the table itself is the accessible one
+        var spacer = document.createElement('div');
+        spacer.className = 'ig-scroll-top-spacer';
+        bar.appendChild(spacer);
+        wrap.parentNode.insertBefore(bar, wrap);
+
+        // Guard against the feedback loop: assigning scrollLeft fires a
+        // scroll event on the other element, which would assign back.
+        var syncing = false;
+        function mirror(from, to) {
+            return function () {
+                if (syncing) return;
+                syncing = true;
+                to.scrollLeft = from.scrollLeft;
+                // released on the next frame, after the echoed scroll event
+                requestAnimationFrame(function () { syncing = false; });
+            };
+        }
+        bar.addEventListener('scroll', mirror(bar, wrap), { passive: true });
+        wrap.addEventListener('scroll', mirror(wrap, bar), { passive: true });
+
+        wrap.__igTopBar = { bar: bar, spacer: spacer };
+        return wrap.__igTopBar;
+    }
+
+    function refreshTopScrollbar(wrap) {
+        var table = wrap.querySelector('table');
+        if (!table) return;
+
+        var overflows = wrap.scrollWidth - wrap.clientWidth > 1;
+        if (!overflows) {
+            // nothing to scroll — don't show a dead scrollbar
+            if (wrap.__igTopBar) wrap.__igTopBar.bar.classList.remove('is-active');
+            return;
+        }
+        var parts = initTopScrollbar(wrap);
+        parts.spacer.style.width = wrap.scrollWidth + 'px';
+        parts.bar.classList.add('is-active');
+        parts.bar.scrollLeft = wrap.scrollLeft;
+    }
+
+    function refreshAllTopScrollbars() {
+        var wraps = document.querySelectorAll('.table-responsive');
+        for (var i = 0; i < wraps.length; i++) refreshTopScrollbar(wraps[i]);
+    }
+
+    // Widths first, then the scrollbar — the scrollbar's spacer has to be
+    // sized from the table's FINAL width, not its pre-scaling one.
+    function layoutTables() {
+        applyAllRelativeWidths();
+        refreshAllTopScrollbars();
+    }
+
+    var resizeTimer = null;
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+            // drop the cached baselines: a different viewport negotiates
+            // different natural widths, so they must be re-measured
+            document.querySelectorAll('table[data-ig-colweights]').forEach(function (t) {
+                t.__igNaturalWidths = null;
+            });
+            layoutTables();
+        }, 150);
+    });
+
+    // Web fonts land after DOMContentLoaded and change text metrics, which
+    // changes the natural widths we measured. Re-run once they are ready.
+    if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function') {
+        document.fonts.ready.then(function () {
+            document.querySelectorAll('table[data-ig-colweights]').forEach(function (t) {
+                t.__igNaturalWidths = null;
+            });
+            layoutTables();
+        });
+    }
+
     function initAllResponsive() {
         initAllCards();
         initBulkSelectionIndicators();
+        layoutTables();
     }
 
     if (document.readyState === 'loading') {
@@ -490,5 +700,5 @@
     }
 
     // expose for manual re-init if a page swaps table content via its own JS
-    window.igTableTools = { init: initAll, initTable: initTable, initResponsive: initAllResponsive };
+    window.igTableTools = { init: initAll, initTable: initTable, initResponsive: initAllResponsive, layout: layoutTables };
 })();

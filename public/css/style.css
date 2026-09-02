@@ -777,16 +777,19 @@ a.navbarmenu:hover{ color: var(--ig-green-700); }
    Tables
    ========================================================================== */
 th{
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--ig-ink-500);
-  text-transform: uppercase;
-  letter-spacing: .04em;
+  /* Reference (iglscrm.smartmanager.in) renders headings in their authored
+     mixed case at ~13px. UPPERCASE made every heading measurably wider —
+     with the fixed table layout below that was a direct cause of headings
+     breaking one-letter-per-line ("D E P A R T M E N T"). */
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ig-ink-700);
+  text-transform: none;
   border-color: var(--ig-border) !important;
   background: #fafbfd;
 }
 td{
-  font-size: 13.5px;
+  font-size: 12.5px;
   color: var(--ig-ink-900);
   vertical-align: middle;
 }
@@ -799,7 +802,7 @@ td{
   --bs-table-hover-bg: var(--ig-green-50);
 }
 .table > :not(caption) > * > *{
-  padding: .85rem .9rem;
+  padding: .6rem .65rem;
 }
 .table tbody tr{ transition: background var(--ig-fast) var(--ig-ease); }
 table{ width: 100%; }
@@ -814,7 +817,13 @@ table th, table td{ }
      to add a scrollbar/edge-fade/"scroll for more" hint for. It's kept as
      the layout anchor (rounded corners, positioning context) other markup
      already expects. */
-  overflow-x: visible;
+  /* Horizontal scroll is the SAFETY VALVE, not the primary strategy. Columns
+     size themselves to their content (see .ig-table below) and normally fit;
+     when a very wide table genuinely cannot, it scrolls sideways. Previously
+     this was `visible` with a promise that the table would always reflow to
+     fit — but "always fits" was bought by letting headings shred themselves
+     into vertical letter columns, which is far worse than a scrollbar. */
+  overflow-x: auto;
 }
 
 /* ==========================================================================
@@ -849,21 +858,208 @@ table th, table td{ }
    still be visually overflowed by a *child* that refuses to shrink below
    its own min-width, even though the table itself no longer can — hence
    min-width:0 on cell content below. */
-.ig-table{ table-layout: fixed; }
-.ig-table thead th,
+.ig-table{
+  /* AUTO, not fixed. This is the load-bearing rule for the whole layout.
+
+     With table-layout:fixed and no explicit column widths, every column got
+     an equal share of the table. At 12 columns that is ~8% each — roughly
+     75px — which is narrower than the word "Department". A fixed column is
+     a hard cap, so the heading had nowhere to go but downwards, one letter
+     per line. Widening the table doesn't help: fixed still splits it evenly,
+     so every column stays equally wrong.
+
+     With auto layout the browser negotiates each column between its
+     min-content and max-content width. Combined with the nowrap headers
+     below, that gives every column a guaranteed floor of "as wide as my own
+     heading", and lets genuinely long free text (Subject, Post message)
+     take the slack. This is what the reference site does. */
+  table-layout: auto;
+  width: 100%;
+}
+
+/* A heading is never allowed to wrap. Beyond being the readability fix the
+   brief asks for, this is the MECHANISM that sizes the table: under auto
+   layout a nowrap cell reports its full text width as its min-content
+   width, so no column can ever be squeezed narrower than its own heading. */
+.ig-table thead th{
+  white-space: nowrap;
+}
+
 .ig-table td{
-  white-space: normal;               /* override the global nowrap above */
+  white-space: normal;               /* override the global th/thead nowrap */
 }
 .ig-table td,
-.ig-table td *:not(.dropdown-menu):not(.dropdown-menu *){
-  overflow-wrap: anywhere;           /* long unbroken text/IDs/URLs never force the column wider than its share */
+.ig-table td *:not(.dropdown-menu):not(.dropdown-menu *):not(.ig-idcell):not(.ig-idcell *){
+  overflow-wrap: anywhere;           /* long unbroken text/IDs/URLs wrap inside their column instead of widening it */
   word-break: break-word;
-  min-width: 0;                      /* buttons/links/spans inside a cell must be able to shrink with their fixed-width column */
+  min-width: 0;
 }
 /* .dropdown-menu is excluded above on purpose: it's position:absolute (out
    of flow, so it can never cause the table itself to overflow) and needs
    to keep Bootstrap's own min-width so the Edit/Delete row menus don't
-   collapse to a sliver. */
+   collapse to a sliver. .ig-idcell is excluded because it must measure as
+   one unbreakable unit — see below. */
+
+/* --------------------------------------------------------------------
+   Identity cell — the "Num." / "Post ID" column.
+
+   This single cell carries four things on one line: the select checkbox,
+   the gear action button, the record's ID link, and the copy-to-clipboard
+   icon. It was a bare .d-flex, so under the old fixed ~75px column the
+   flex children were compressed past each other and the ticket number
+   rendered underneath the gear icon.
+
+   nowrap is what actually fixes it: it makes the cell's min-content width
+   equal to the full width of all four items plus their gaps, so auto
+   layout is obliged to allocate that much and the items can never be
+   squeezed into overlapping. flex:none on the controls guarantees the
+   icons keep their own size rather than donating it to the text.
+   -------------------------------------------------------------------- */
+.ig-idcell{
+  display: flex;
+  align-items: center;
+  /* WRAP, not nowrap. Flex items never overlap each other — when the column
+     is too narrow the ID drops onto its own line, still intact, instead of
+     sliding underneath the gear icon. That makes "no overlap" a structural
+     property rather than something that depends on the column happening to
+     be wide enough, which matters now that weighted tables use
+     table-layout:fixed and have no min-content floor to fall back on. */
+  flex-wrap: wrap;
+  gap: 7px;
+  row-gap: 3px;
+}
+/* The CONTROLS never shrink — that is what stops them being compressed
+   into each other. The ID text is deliberately not in this list: it is the
+   one item allowed to give up space (and, at the very end, to wrap), so a
+   narrow column shrinks the text rather than the icons. */
+.ig-idcell > .form-check-input,
+.ig-idcell > .copy-button,
+.ig-idcell > .dropdown,
+.ig-idcell > .settingicons{ flex: none; }
+.ig-idcell .form-check-input,
+.ig-idcell .copy-button,
+.ig-idcell .settingicons,
+.ig-idcell .dropdown{ margin: 0; }
+.ig-idcell .settingicons .bi-gear{ margin: 0; }
+.ig-idcell a{ text-decoration: underline; }
+/* The ID prefers to sit on one unbroken line, but must never render past
+   the edge of its own cell (the Post ID column is deliberately narrowed).
+   `break-word` rather than `anywhere` on purpose: both allow a long
+   unbroken ID to break when it genuinely cannot fit, but `anywhere` also
+   drops the cell's min-content width to a single character, which would
+   corrupt the natural-width measurement the column scaling is built on. */
+.ig-idcell .ig-idcell-value{
+  flex: 0 1 auto;      /* may shrink, so the icons keep their size instead */
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+/* Measurement mode (toggled for a single reflow by ig-table-tools.js).
+
+   The column-scaling code needs each column's HONEST natural width — for
+   the identity column that means "the width at which the checkbox, gear,
+   ID and copy icon sit comfortably on one line". But at render time the ID
+   must be allowed to shrink and wrap, otherwise a deliberately narrowed
+   column (Post ID is scaled to 0.75) would overflow. Those two needs are
+   contradictory, so the cell is measured in one mode and painted in the
+   other: nowrap and unshrinkable while measuring, flexible afterwards. */
+.ig-measuring .ig-idcell{ flex-wrap: nowrap; }
+.ig-measuring .ig-idcell .ig-idcell-value{
+  flex: none;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+/* .mainstyle adds horizontal padding to the gear glyph elsewhere in the app;
+   inside the identity cell the flex `gap` already provides that spacing, and
+   the extra padding only ate width the ID needed. */
+.ig-idcell .mainstyle{ padding: 0; }
+
+/* --------------------------------------------------------------------
+   Top horizontal scrollbar (built by ig-table-tools.js)
+
+   The table's own sideways scrollbar sits below the last row, so on a
+   25-row page you had to scroll to the bottom of the page before you
+   could scroll the table sideways. This strip sits directly above the
+   table and mirrors it.
+
+   It is a genuine scroll container — an empty spacer as wide as the
+   table inside a strip as wide as the viewport — so the browser draws
+   its own native scrollbar and normal wheel/touch/keyboard behaviour
+   comes for free. Only added when the table actually overflows.
+   -------------------------------------------------------------------- */
+.ig-scroll-top{
+  display: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Explicit min-height, because the strip's own content is only 1px tall.
+     Platforms with classic scrollbars (Windows, most Linux) reserve layout
+     height for the scrollbar and the strip would be visible anyway — but
+     platforms with OVERLAY scrollbars (macOS, and Chromium's default in
+     some environments) reserve nothing, leaving a 1px-tall control that is
+     invisible and impossible to grab. The min-height guarantees a real
+     target everywhere. */
+  min-height: 12px;
+  margin-bottom: 6px;
+  /* A faint groove so the control is discoverable even when the platform's
+     overlay thumb is faded out. */
+  background: var(--ig-ink-100, #eef0f4);
+  border-radius: var(--ig-radius-pill, 999px);
+}
+.ig-scroll-top.is-active{ display: block; }
+.ig-scroll-top-spacer{ height: 1px; }
+
+/* Scrollbars auto-hide on macOS and on some touch devices, which would
+   make this strip invisible and therefore pointless — it exists precisely
+   to be a visible, reachable control. So paint it explicitly rather than
+   relying on the platform default. */
+.ig-scroll-top{
+  scrollbar-width: thin;                                  /* Firefox */
+  scrollbar-color: var(--ig-ink-300, #c3c8d0) transparent;
+}
+.ig-scroll-top::-webkit-scrollbar{ height: 10px; -webkit-appearance: none; }
+.ig-scroll-top::-webkit-scrollbar-track{
+  background: transparent;   /* the strip itself paints the groove */
+}
+.ig-scroll-top::-webkit-scrollbar-thumb{
+  background: var(--ig-ink-300, #c3c8d0);
+  border-radius: var(--ig-radius-pill, 999px);
+}
+.ig-scroll-top::-webkit-scrollbar-thumb:hover{ background: var(--ig-ink-400, #9aa1ad); }
+
+/* Match it on the table's own scroller so the two read as one control. */
+.table-responsive{
+  scrollbar-width: thin;
+  scrollbar-color: var(--ig-ink-300, #c3c8d0) transparent;
+}
+.table-responsive::-webkit-scrollbar{ height: 10px; }
+.table-responsive::-webkit-scrollbar-track{
+  background: var(--ig-ink-100, #eef0f4);
+  border-radius: var(--ig-radius-pill, 999px);
+}
+.table-responsive::-webkit-scrollbar-thumb{
+  background: var(--ig-ink-300, #c3c8d0);
+  border-radius: var(--ig-radius-pill, 999px);
+}
+
+@media (max-width: 767px){
+  /* card mode: nothing scrolls sideways, so the strip has no purpose */
+  .ig-scroll-top{ display: none !important; }
+}
+
+/* Free-text columns (Post message / Subject). Under auto layout these have
+   the largest max-content width in the table and would otherwise claim most
+   of the slack. A soft cap keeps them in the same proportion as the
+   reference site while still letting them take more room than a short
+   column. Not a hard width: if the table has room to spare the column may
+   render narrower, and the text always wraps inside it. */
+.ig-col-message{ max-width: 340px; }
+
+/* Legacy width hint on the ticket identity column. 8% of the table was far
+   less than the cell's contents need; the nowrap rule above now derives the
+   real width from the content, so this must not cap it. */
+.widthtd{ width: auto; }
 
 @media (max-width: 767px){
   /* Visually hidden, not display:none — screen readers can still announce
@@ -890,6 +1086,7 @@ table th, table td{ }
     padding: 9px 0;
   }
   .ig-table tbody td:not(:last-child){ border-bottom: 1px dashed var(--ig-border); }
+  /* (.ig-idcell already wraps by default — nothing extra needed in card mode) */
   .ig-table tbody td[data-label]::before{
     content: attr(data-label);
     display: block;
@@ -1530,7 +1727,7 @@ input[type=number]{ -moz-appearance: textfield; }
 .pastactivity{ margin-top: 40px; }
 .linebreak{}
 .mainstyle{ padding: 0 9px; }
-.widthtd{ width: 8%; }
+.widthtd{ width: auto; }  /* superseded — see .ig-idcell in the table block */
 .coulams_form2{
   padding: 6px 14px;
   background: #fbfbfc;
@@ -1917,8 +2114,12 @@ img.newimg{ width: 27px; height: 27px; background: var(--ig-ink-100); padding: 1
   background: var(--ig-bg);
   border-bottom: 2px solid var(--ig-border);
   position: sticky; top:0; z-index:1;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  /* NOTE: no overflow-wrap/word-break here. They used to be, and they
+     silently cancelled the `white-space: nowrap` set in the table block
+     above — a heading in a too-narrow column broke apart anyway. That also
+     corrupted the width measurement, because a header that wraps reports a
+     much smaller natural width, so the column was then sized to fit the
+     broken heading rather than the whole one. */
 }
 .ig-table tbody tr{ border-bottom: 1px solid var(--ig-border); }
 .ig-table tbody tr:last-child{ border-bottom:none; }
@@ -1963,21 +2164,15 @@ img.newimg{ width: 27px; height: 27px; background: var(--ig-ink-100); padding: 1
 .ig-table thead th.ig-th-sort:hover{ color: var(--ig-green-700); }
 .ig-table thead th.ig-th-sorted{ color: var(--ig-green-700); }
 .ig-th-content{
-  display:flex; align-items:center; justify-content:space-between; gap:6px;
-  /* Guard, not just decoration: a sortable header's label+icon must never
-     be allowed to render past its own (fixed-width) column — without this,
-     a column narrower than "Label ↕" needs spills its sort icon out past
-     the table's own right edge instead of staying contained. Letting the
-     label wrap (rather than nowrap+truncate) is what keeps it contained
-     without losing/cutting off the header word itself on a narrow column;
-     overflow-wrap/word-break match the data cells below (see .ig-table td
-     above) so a single long word (SENTIMENT, DEPARTMENT) can still break
-     instead of overflowing when its column is genuinely narrower than the
-     whole word. */
-  overflow:hidden;
-  min-width:0;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  display:flex; align-items:center; justify-content:flex-start; gap:6px;
+  /* Must NOT wrap or break. The <th> is nowrap (see the table block above)
+     precisely so the column can never be sized below its heading; letting
+     this inner wrapper break words would hand back the letter-per-line
+     behaviour the nowrap rule exists to prevent. justify-content is
+     flex-start (not space-between) so the sort icon sits next to its label
+     instead of being pushed to the far edge of a wide column. */
+  white-space: nowrap;
+  overflow: visible;
 }
 .ig-sort-icon{ display:inline-flex; flex:none; font-size:12px; opacity:.55; }
 .ig-th-sorted .ig-sort-icon{ opacity:1; }

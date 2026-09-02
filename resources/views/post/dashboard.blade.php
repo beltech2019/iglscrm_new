@@ -56,7 +56,11 @@
                  </p>
             </div>
             <div class="table-responsive">
-            <table class="table ig-table  {{ addUIComponent('SOCIALPOST_TABLE') }}" data-ig-tabletools>
+            {{-- data-ig-colweights: multiples of each column's naturally negotiated width.
+     Names are matched against the header text, so this survives the "Choose
+     Columns" modal hiding or reordering columns. --}}
+            <table class="table ig-table  {{ addUIComponent('SOCIALPOST_TABLE') }}" data-ig-tabletools
+                   data-ig-colweights="Post ID:0.75, Post message:3, Social User:2, Post Url:2">
                 <thead>
                     <tr class="table_width_align">
 					@if(!empty($postColumn) && $postColumn->count())
@@ -89,16 +93,23 @@
 						@if(!empty($postColumn) && $postColumn->count())
 						
 						@if(in_array('getTweet_id',$fields))
-                        <td class="linebreak" scope="row"> <input class="form-check-input deleteCheck" type="checkbox" 
-                                value="{{$posts->id}}" id="{{$posts->id}}">
-                            <a  href="{{ addUIComponent('SOCIALPOST_INNER') == 'HIDDEN' ? '#':'/getSocialPostById/'.$posts->getTweet_id}}">{{$posts->getTweet_id}}</a> <i class="bi bi-clipboard copy-button"></i>
+                        {{-- Identity cell — see .ig-idcell in style.css. Keeps the checkbox,
+                             the post ID and the copy icon on one line at a width the auto
+                             table layout is obliged to honour. --}}
+                        <td class="linebreak" scope="row">
+                            <span class="ig-idcell">
+                                <input class="form-check-input deleteCheck" type="checkbox"
+                                    value="{{$posts->id}}" id="{{$posts->id}}">
+                                <a class="ig-idcell-value" href="{{ addUIComponent('SOCIALPOST_INNER') == 'HIDDEN' ? '#':'/getSocialPostById/'.$posts->getTweet_id}}">{{$posts->getTweet_id}}</a>
+                                <i class="bi bi-clipboard copy-button" title="Copy post ID"></i>
+                            </span>
                         </td>
 						@endif
 						
 						
 						@if(in_array('postMessage',$fields))
 
-                        <td style="table-layout: fixed;"><i class="bi bi-clipboard copy-button"></i> 
+                        <td class="ig-col-message"><i class="bi bi-clipboard copy-button"></i> 
 						<a style="word-break: break-word;" href="{{ addUIComponent('SOCIALPOST_INNER') == 'HIDDEN' ? '#':'/getSocialPostById/'.$posts->getTweet_id}}">
 						{!! getUrlinString($posts->postMessage)!!}</a></td>
 						@endif
@@ -170,8 +181,8 @@
                                 ? ($departments->where('department_id', $posts->department)->first()->department_name ?? '-') 
                                 : '-' 
                             }}
-                        </td
-						
+                        </td>
+
 						@endif
                     </tr>
 

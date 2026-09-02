@@ -47,7 +47,11 @@
                     </p>
                 </div>
             <div class="table-responsive">
-            <table class="table ig-table {{ addUIComponent('SOCIALTICKET_TABLE') }}" data-ig-tabletools>
+            {{-- data-ig-colweights: multiples of each column's naturally negotiated width.
+     Read by ig-table-tools.js, which measures the real widths and rescales them,
+     so these stay relative and responsive rather than fixed pixel sizes. --}}
+            <table class="table ig-table {{ addUIComponent('SOCIALTICKET_TABLE') }}" data-ig-tabletools
+                   data-ig-colweights="Subject:3, Status:2">
                 <thead>
                     <tr>
                         <th scope="col">Num.</th>
@@ -68,22 +72,29 @@
                 @if(!empty($getInfo) && $getInfo->count())
                     @foreach($getInfo as $key => $getInfos)
                     <tr>
-                        <td scope="row" class="widthtd ">
-                            <span class="d-flex">
-                            <input class="form-check-input deleteCheck" type="checkbox" value="{{$getInfos->id}}"
-                                id="flexCheckDefault">  
-                                <div class="dropdown">   
-                                <button class="settingicons" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">   
-                                <a href=""><i class="bi bi-gear mainstyle"></i></a>                                </button>
-                                <ul class="dropdown-menu dropdownmenu_innner " aria-labelledby="dropdownMenuButton1">
-                                    <li><a class="dropdown-item  {{ addUIComponent('SOCIALTICKET_EDIT_SOCIAL_TICKET') }}" href='/editTicket/{{$getInfos->id}}'><i class="bi bi-pencil"></i> Edit</a></li>
-                                    <li><a class="dropdown-item deleteLink  {{ addUIComponent('SOCIALTICKET_DELETE') }}" href="#" id="{{$getInfos->id}}"><i class="bi bi-trash3"></i> Delete</a></li>
-                                                                  </ul>
-                                </div>
-                                <a   href="{{ addUIComponent('SOCIALTICKET_INNER') == 'HIDDEN' ? '#':'/getSocialTicketById/'.$getInfos->id}}"  href="/getSocialTicketById/{{$getInfos->id}}">{{$getInfos->ticket_id}}</a> <i class="bi bi-clipboard copy-button"></i>
+                        {{-- Identity cell: checkbox + gear menu + ticket no. + copy icon.
+                             .ig-idcell (style.css) lays these out as a nowrap flex row with a
+                             fixed gap and flex:none on each control, so the ticket number can
+                             never be compressed underneath the gear or copy icons. The nowrap
+                             also tells the auto table layout how much width this column
+                             genuinely needs. --}}
+                        <td scope="row" class="widthtd">
+                            <span class="ig-idcell">
+                                <input class="form-check-input deleteCheck" type="checkbox" value="{{$getInfos->id}}"
+                                    id="flexCheckDefault">
+                                <span class="dropdown">
+                                    <button class="settingicons" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" title="Ticket actions">
+                                        <i class="bi bi-gear mainstyle"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdownmenu_innner " aria-labelledby="dropdownMenuButton1">
+                                        <li><a class="dropdown-item  {{ addUIComponent('SOCIALTICKET_EDIT_SOCIAL_TICKET') }}" href='/editTicket/{{$getInfos->id}}'><i class="bi bi-pencil"></i> Edit</a></li>
+                                        <li><a class="dropdown-item deleteLink  {{ addUIComponent('SOCIALTICKET_DELETE') }}" href="#" id="{{$getInfos->id}}"><i class="bi bi-trash3"></i> Delete</a></li>
+                                    </ul>
+                                </span>
+                                <a class="ig-idcell-value" href="{{ addUIComponent('SOCIALTICKET_INNER') == 'HIDDEN' ? '#':'/getSocialTicketById/'.$getInfos->id}}">{{$getInfos->ticket_id}}</a>
+                                <i class="bi bi-clipboard copy-button" title="Copy ticket no."></i>
                             </span>
-                            
-                            </td>
+                        </td>
                         <td><i class="bi bi-clipboard copy-button"></i> <a    href="{{ addUIComponent('SOCIALTICKET_INNER') == 'HIDDEN' ? '#':'/getSocialTicketById/'.$getInfos->id}}" >{!! getUrlinString($getInfos->postMessage)!!}</a></td>
                         <td><i class="bi bi-clipboard copy-button"></i> <a class="line_break" href="{{ addUIComponent('SOCIALUSER') == 'HIDDEN' ? '#':'/userProfile/'.$getInfos->socialUser_id}}">{{$getInfos->socialUser}}</a></td>
                         

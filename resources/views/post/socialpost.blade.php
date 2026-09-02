@@ -43,9 +43,16 @@
 					@foreach($post as $key => $posts)
                     <tr>
       
-                        <td scope="row"> <input class="form-check-input checkDele" type="checkbox" value="{{$posts->id}}" id="{{$posts->id}}">
-						{{$posts->id}}</td>
-                        <td>{{$posts->id}}</td>
+                        {{-- One cell per header. The post ID was previously emitted TWICE
+                             (once here with the checkbox, once in a cell of its own), giving
+                             8 <td>s against 7 <th>s — every value from Post message onward
+                             rendered one column left of its heading. --}}
+                        <td scope="row">
+                            <span class="ig-idcell">
+                                <input class="form-check-input checkDele" type="checkbox" value="{{$posts->id}}" id="{{$posts->id}}">
+                                <span class="ig-idcell-value">{{$posts->id}}</span>
+                            </span>
+                        </td>
                         <td>{!! getUrlinString($posts->postMessage)!!}</td>
                         <td>{{$posts->socialUser}}</td>
                         <td>{{$posts->source}}</td>
